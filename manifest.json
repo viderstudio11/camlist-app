@@ -1,7 +1,7 @@
 {
   "name": "CamList — Production Gear Lists",
   "short_name": "CamList",
-  "description": "Build production gear lists from the Utopia rental catalog",
+  "description": "Build production gear lists from a rental catalog",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

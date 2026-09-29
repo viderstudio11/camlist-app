@@ -14,7 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const SITE = '/camlist';          // the Pages path this project is served from
+const SITE = '/camlist-app';      // the Pages path this project is served from
 const ARCHIVE = path.join(ROOT, 'v');
 
 const version = (() => {
