@@ -39,3 +39,8 @@ test('slots count what is in the list and scale with the parent quantity', () =>
   assert.deepEqual([by.sdi.have, by.sdi.need, by.sdi.done], [6, 4, true]);
   assert.equal(by.hood.have, 0);
 });
+
+test('a field monitor asks for a D-Tap power cable as well', () => {
+  const kit = gearKitFor(catalog, find(/LMD-A180/));
+  assert.ok(kit.slots.some(s => s.key === 'dtap'));
+});
