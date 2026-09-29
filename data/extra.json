@@ -340,6 +340,41 @@
       "brand": null,
       "dept": "media",
       "subcat": "Drives & SSD"
+    },
+    {
+      "id": "x_gen_dtap_xlr4",
+      "name": "D-Tap to 4-Pin XLR Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dtap_xlr3",
+      "name": "D-Tap to 3-Pin XLR Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dtap_lemo2",
+      "name": "D-Tap to 2-Pin LEMO Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dtap_dc21",
+      "name": "D-Tap to DC 2.1mm Barrel Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dtap_hirose4",
+      "name": "D-Tap to 4-Pin Hirose Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
     }
   ],
   "departments": [
