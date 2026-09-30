@@ -29,7 +29,8 @@
       "brand": "sony",
       "dept": "media",
       "subcat": "Card Readers",
-      "url": "https://pro.sony/ue_US/products/memory-card-readers/mrw-g2"
+      "url": "https://www.sony.co.uk/electronics/card-readers/mrw-g2",
+      "image": "https://www.sony.co.uk/image/0b1c280e774c792a4f6e1670b57c15f6?fmt=pjpeg&bgcolor=FFFFFF&bgc=FFFFFF&wid=600&hei=600"
     },
     {
       "id": "x_sony_mrw_g1",
@@ -37,7 +38,8 @@
       "brand": "sony",
       "dept": "media",
       "subcat": "Card Readers",
-      "url": "https://pro.sony/ue_US/products/memory-card-readers/mrw-g1"
+      "url": "https://www.sony.co.uk/electronics/card-readers/mrw-g1",
+      "image": "https://www.sony.co.uk/image/968bf42b49f81ed078fc968a864823c3?fmt=pjpeg&bgcolor=FFFFFF&bgc=FFFFFF&wid=600&hei=600"
     },
     {
       "id": "x_sony_mrw_e90",
@@ -45,7 +47,8 @@
       "brand": "sony",
       "dept": "media",
       "subcat": "Card Readers",
-      "url": "https://pro.sony/ue_US/products/memory-card-readers/mrw-e90"
+      "url": "https://www.sony.co.uk/electronics/card-readers/mrw-e90",
+      "image": "https://www.sony.co.uk/image/46e92d6a4295ed3a1f3ee7b763111a5c?fmt=pjpeg&bgcolor=FFFFFF&bgc=FFFFFF&wid=600&hei=600"
     },
     {
       "id": "x_prograde_cfa_sd",
@@ -53,7 +56,8 @@
       "brand": "prograde",
       "dept": "media",
       "subcat": "Card Readers",
-      "url": "https://progradedigital.com/collections/card-readers"
+      "url": "https://shop.progradedigital.com/products/cfexpress-type-a-sdxc-sdhc-dual-slot-card-reader-usb-3-2-pg09",
+      "image": "https://cdn.shopify.com/s/files/1/2526/3692/files/PG09_898x898px.png?v=1777334644"
     },
     {
       "id": "x_prograde_cfb_sd",
@@ -61,7 +65,8 @@
       "brand": "prograde",
       "dept": "media",
       "subcat": "Card Readers",
-      "url": "https://progradedigital.com/collections/card-readers"
+      "url": "https://shop.progradedigital.com/products/cfexpress-type-b-sdxc-uhs-ii-dual-slot-card-reader-usb-3-2-pg05-5",
+      "image": "https://cdn.shopify.com/s/files/1/2526/3692/files/PG05.5_898x898px.png?v=1777334408"
     },
     {
       "id": "x_prograde_cfb_usb4",
@@ -69,7 +74,8 @@
       "brand": "prograde",
       "dept": "media",
       "subcat": "Card Readers",
-      "url": "https://progradedigital.com/collections/card-readers"
+      "url": "https://shop.progradedigital.com/products/cfexpress-type-b-single-slot-card-reader-pg05-6",
+      "image": "https://cdn.shopify.com/s/files/1/2526/3692/files/PG05.6_898x898px.png?v=1777334286"
     },
     {
       "id": "x_prograde_cfast_sd",
@@ -77,7 +83,8 @@
       "brand": "prograde",
       "dept": "media",
       "subcat": "Card Readers",
-      "url": "https://progradedigital.com/collections/card-readers"
+      "url": "https://shop.progradedigital.com/products/cfast-sd-uhs-ii-dual-slot-memory-card-reader-usb-3-2-pg02",
+      "image": "https://cdn.shopify.com/s/files/1/2526/3692/files/PG02_898x898px.png?v=1777334560"
     },
     {
       "id": "x_prograde_sd_dual",
@@ -85,7 +92,8 @@
       "brand": "prograde",
       "dept": "media",
       "subcat": "Card Readers",
-      "url": "https://progradedigital.com/collections/card-readers"
+      "url": "https://shop.progradedigital.com/products/sd-uhs-ii-dual-slot-card-reader-usb-3-2-pg08",
+      "image": "https://cdn.shopify.com/s/files/1/2526/3692/files/PG08_898x898px.png?v=1777334480"
     },
     {
       "id": "x_prograde_cfast",
@@ -141,7 +149,8 @@
       "brand": "sony",
       "dept": "cameras",
       "subcat": "Digital Cinema",
-      "url": "https://www.bhphotovideo.com/c/product/1989701-REG/sony_ilmefx5bb_fx5_cinema_camera.html"
+      "url": "https://www.sony.co.uk/electronics/interchangeable-lens-cameras/ilme-fx5",
+      "image": "https://www.sony.co.uk/image/a779c5111ad98d17c9678d3ec1592751?fmt=pjpeg&bgcolor=FFFFFF&bgc=FFFFFF&wid=600&hei=600"
     },
     {
       "id": "x_gen_laptop_mac",
@@ -212,7 +221,8 @@
       "brand": "fxlion",
       "dept": "power",
       "subcat": "Chargers & PSU",
-      "url": "https://fxlion.net/product/nano-4-ch-v-mount-charger/"
+      "url": "https://fxlion.net/product/nano-4-ch-v-mount-charger/",
+      "image": "https://fxlion.net/wp-content/uploads/2021/02/FX-NANO4S_A.jpg"
     },
     {
       "id": "x_fxlion_4ch_fast",
@@ -220,7 +230,8 @@
       "brand": "fxlion",
       "dept": "power",
       "subcat": "Chargers & PSU",
-      "url": "https://fxlion.net/product/4-ch-fast-charger-16-8v-4a-v-mount/"
+      "url": "https://fxlion.net/product/4-ch-fast-charger-16-8v-4a-v-mount/",
+      "image": "https://fxlion.net/wp-content/uploads/2021/02/PL-Q480B_A.jpg"
     },
     {
       "id": "x_schneider_hbm_4565_1_8",
@@ -599,7 +610,9 @@
       "brand": "arri",
       "dept": "power",
       "subcat": "Batteries",
-      "src": "ARRI Online Shop, Hand Units: Hi-5 uses Li-Ion Battery Pack LBP-3500 (K2.0036022)"
+      "src": "ARRI Online Shop, Hand Units: Hi-5 uses Li-Ion Battery Pack LBP-3500 (K2.0036022)",
+      "image": "https://sw6-arri-prod.s3.eu-central-1.amazonaws.com/thumbnail/09/96/0a/1760011924/ECS_K2.0036022_400x400.jpg?ts=1760011936",
+      "url": "https://shop.arri.com/Li-Ion-Battery-Pack-LBP-3500/K2.0036022"
     },
     {
       "id": "x_arri_lbp_charger",
@@ -607,7 +620,9 @@
       "brand": "arri",
       "dept": "power",
       "subcat": "Chargers & PSU",
-      "src": "ARRI Online Shop: LBP Battery Charger (K2.0039874)"
+      "src": "ARRI Online Shop: LBP Battery Charger (K2.0039874)",
+      "image": "https://sw6-arri-prod.s3.eu-central-1.amazonaws.com/thumbnail/04/74/2b/1760011933/ECS_K2.0039874_400x400.jpg?ts=1760011948",
+      "url": "https://shop.arri.com/LBP-Battery-Charger/K2.0039874"
     },
     {
       "id": "x_dji_bg30",
@@ -615,7 +630,8 @@
       "brand": "dji",
       "dept": "power",
       "subcat": "Batteries",
-      "src": "DJI Store, RS 4 Pro in the box: BG30 Battery Grip"
+      "src": "DJI Store, RS 4 Pro in the box: BG30 Battery Grip",
+      "image": "https://se-cdn.djiits.com/tpc/uploads/in_the_box/cover/7dafa9c120deb1f25409a1f0629ef45c@retina_small.png"
     },
     {
       "id": "x_dji_bg33",
@@ -623,7 +639,9 @@
       "brand": "dji",
       "dept": "power",
       "subcat": "Batteries",
-      "src": "DJI Store, RS 5 in the box: BG33 Battery Grip"
+      "src": "DJI Store, RS 5 in the box: BG33 Battery Grip",
+      "image": "https://se-cdn.djiits.com/tpc/uploads/spu/cover/5dab6f0b83f3c796789102e21b8c7607@ultra.png?format=webp",
+      "url": "https://store.dji.com/product/dji-rs-bg33-battery-grip"
     },
     {
       "id": "x_dji_focus_pro_motor",
@@ -631,7 +649,9 @@
       "brand": "dji",
       "dept": "lenscontrol",
       "subcat": "Wireless Follow Focus",
-      "src": "DJI Ronin Series Accessories Compatibility List"
+      "src": "DJI Ronin Series Accessories Compatibility List",
+      "image": "https://se-cdn.djiits.com/tpc/uploads/spu/cover/27513067860b8e09abf48af14fc6b6f8@ultra.png",
+      "url": "https://store.dji.com/product/dji-focus-pro-motor"
     },
     {
       "id": "x_dji_motor_rod_kit",
