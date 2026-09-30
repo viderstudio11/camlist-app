@@ -195,8 +195,8 @@ export function render(ctx, { id }, root) {
   // ---- content ----
   let content = '';
   let crumbs = '';
-  if (st.q.length >= 1) {
-    const res = shown(catalog.search(st.q, { limit: 160 }));
+  if (st.q.trim().length >= 1) {
+    const res = shown(catalog.search(st.q.trim(), { limit: 160 }));
     content = (res.length ? groupedByBrand(res) : `<div class="empty"><p>${t('no_results', { q: esc(st.q) })}</p></div>`) + manualCTA;
   } else if (st.view === 'brands' && !st.brand) {
     content = brandGrid(catalog.brands);
@@ -271,7 +271,7 @@ export function render(ctx, { id }, root) {
   input.oninput = () => {
     clearTimeout(timer);
     timer = setTimeout(() => {
-      st.q = input.value.trim();
+      st.q = input.value; // spaces stay while typing — trimming here ate the space before the next word
       const pos = input.selectionStart;
       rerender();
       const i2 = root.querySelector('[data-q]'); i2.focus(); try { i2.setSelectionRange(pos, pos); } catch { /* ignore */ }
