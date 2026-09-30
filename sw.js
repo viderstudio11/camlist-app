@@ -6,7 +6,7 @@ const ASSETS = [
   './js/app.js', './js/store.js', './js/catalog.js', './js/list.js', './js/i18n.js', './js/brands.js',
   './js/export-text.js', './js/export-xlsx.js', './js/export-docx.js', './js/export-print.js',
   './js/ui/dom.js', './js/ui/projects.js', './js/ui/list.js', './js/ui/catalog.js', './js/ui/export.js', './logos/index.json', './js/compat.js', './js/lens.js', './js/recency.js', './data/releases.json', './js/ui/icons-dept.js', './js/ui/icons.js', './data/compat.json', './data/extra.json', './js/power.js', './data/power.json', './js/format.js', './data/codecs.json', './data/luts.json', './data/places.json',
-  './js/ui/tools.js', './js/home.js', './js/layout.js', './js/tools/media.js', './js/tools/shutter.js', './js/tools/fov.js', './js/tools/solar.js', './js/tools/convert.js', './js/accessory.js', './js/companions.js', './js/gearkits.js', './js/kitalloc.js',
+  './js/ui/tools.js', './js/home.js', './js/layout.js', './js/tools/media.js', './js/tools/shutter.js', './js/tools/fov.js', './js/tools/solar.js', './js/tools/convert.js', './js/accessory.js', './js/companions.js', './js/gearkits.js', './js/kitalloc.js', './js/accassign.js',
   './vendor/xlsx.full.min.js', './vendor/docx.umd.js',
   './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './icons/icon-180.png',
 ];

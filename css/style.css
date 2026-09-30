@@ -997,3 +997,12 @@ body.split .view { max-width: none; padding: 12px 16px 0; }
 .pline.acc { padding-inline-start: 7mm; }
 .pline.acc .q::before { content: '◦ '; }
 .preview.tx .tx-acc { padding-inline-start: 16px; }
+
+/* older accessories: the offer to place them under their item */
+.assign-card { display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap; }
+.assign-card p { margin: 4px 0 0; font-size: 13px; color: var(--muted); }
+.assign-acts { display: flex; gap: 8px; }
+.assign-row { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.assign-name { font-weight: 600; }
+.assign-arrow { color: var(--muted); }
+.assign-row select { max-width: 100%; }

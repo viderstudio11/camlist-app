@@ -9,6 +9,7 @@ import { toolIcon } from './icons.js';
 import { editProjectSheet } from './projects.js';
 import { presetCatalog } from './catalog.js';
 import { allocFor, ensureAlloc, bump } from '../kitalloc.js';
+import { proposeParents, setParent } from '../accassign.js';
 
 const collapsed = new Set();
 let showKit = false;
@@ -135,7 +136,11 @@ export function render(ctx, { id }, root) {
   // The kit sits right under the cameras it is built around, not three screens down the list.
   const camAt = groups.findIndex(g => g.key === 'cameras');
   if (kitHTML) sections.splice(camAt + 1, 0, kitHTML);
-  root.innerHTML = headHTML + (groups.length ? sections.join('') : listHTML);
+  // Accessories added before the list remembered their item: offer to place them under it.
+  const proposals = proposeParents(p, ctx.catalog, ctx.resolve, { dismissed: p.accDismissed || [] });
+  const assignHTML = proposals.length ? `<section class="card assign-card"><div><b>${esc(t('assign_title', { n: proposals.length }))}</b><p>${esc(t('assign_hint'))}</p></div>
+    <div class="assign-acts"><button class="btn sm primary" data-assign>${t('assign_review')}</button><button class="btn sm ghost" data-assign-later>${t('assign_later')}</button></div></section>` : '';
+  root.innerHTML = headHTML + assignHTML + (groups.length ? sections.join('') : listHTML);
   if (showKit) { showKit = false; root.querySelector('.kit')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
   root.insertAdjacentHTML('beforeend', `<div class="bottombar"><button class="btn primary" data-add>${icons.plus}${t('add_gear')}</button><button class="btn" data-export ${p.items.length ? '' : 'disabled'}>${icons.share}${t('export')}</button></div>`);
 
@@ -175,6 +180,36 @@ export function render(ctx, { id }, root) {
     ctx.navigate(`#/p/${id}/add`);
   }; });
   // a monitor on NP-F: its own batteries, or V-Lock through a D-Tap cable — kept per monitor
+  root.querySelector('[data-assign-later]')?.addEventListener('click', () => {
+    store.updateProject(id, { accDismissed: [...(p.accDismissed || []), ...proposals.map(x => x.productId)] });
+    ctx.render();
+  });
+  root.querySelector('[data-assign]')?.addEventListener('click', () => {
+    const name = (pid) => displayName(ctx.resolve(pid) || { name: String(pid) });
+    const rowHTML = (x) => `<label class="assign-row"><input type="checkbox" data-pid="${esc(x.productId)}" checked>
+      <span class="assign-name" dir="auto">${esc(name(x.productId))}</span><span class="assign-arrow">→</span>
+      ${x.candidates.length === 1 ? `<span class="assign-parent" dir="auto" data-parent="${esc(x.candidates[0])}">${esc(name(x.candidates[0]))}</span>`
+        : `<select data-parent-of="${esc(x.productId)}">${x.candidates.map(c => `<option value="${esc(c)}">${esc(name(c))}</option>`).join('')}</select>`}</label>`;
+    openSheet({
+      title: t('assign_sheet_title'),
+      bodyHTML: `<p class="tnote">${esc(t('assign_sheet_hint'))}</p><div class="assign-list">${proposals.map(rowHTML).join('')}</div>`,
+      actions: [{ label: t('cancel'), kind: 'ghost' }, { label: t('assign_apply'), kind: 'primary', onClick: (body) => {
+        let items = store.getProject(id).items;
+        const skipped = [];
+        for (const x of proposals) {
+          const on = body.querySelector(`input[data-pid="${CSS.escape(String(x.productId))}"]`)?.checked;
+          if (!on) { skipped.push(x.productId); continue; }
+          const sel = body.querySelector(`[data-parent-of="${CSS.escape(String(x.productId))}"]`);
+          const parent = sel ? parseId(sel.value) : x.candidates[0];
+          items = setParent(items, x.productId, parent);
+        }
+        store.setItems(id, items);
+        // the ones left unticked are not proposed again
+        if (skipped.length) store.updateProject(id, { accDismissed: [...(store.getProject(id).accDismissed || []), ...skipped] });
+        ctx.render();
+      } }],
+    });
+  });
   root.querySelectorAll('[data-mpower]').forEach(b => { b.onclick = () => {
     store.updateProject(id, { powerRoute: { ...(p.powerRoute || {}), [parseId(b.dataset.mpower)]: b.dataset.route } });
     ctx.render();
