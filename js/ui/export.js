@@ -11,10 +11,11 @@ let format = 'text';  // text · pdf · xlsx · docx
 const FORMATS = [['text', null], ['pdf', 'PDF'], ['xlsx', 'Excel'], ['docx', 'Word']];
 
 // The share text as WhatsApp shows it: *bold* headings, one line per item, notes indented under it.
-const textPreview = (txt) => txt.split('\n').map(l => {
+const textPreview = (txt, previewDir) => txt.split('\n').map(l0 => {
+  const l = l0.replace(/^[‎‏]/, '');   // the direction mark is for the chat app; the preview sets dir itself
   const bold = /^\*(.+)\*$/.exec(l);
-  const cls = bold ? 'tx-h' : l.trim().startsWith('◦') ? 'tx-acc' : l.startsWith('   ') ? 'tx-note' : '';
-  return `<div dir="auto" class="${cls}">${bold ? `<b>${esc(bold[1])}</b>` : esc(l) || '&nbsp;'}</div>`;
+  const cls = bold ? 'tx-h' : l.trim().startsWith('◦') ? 'tx-acc' : l.startsWith('      ') ? 'tx-note deep' : l.startsWith('   ') ? 'tx-note' : '';
+  return `<div dir="${previewDir}" class="${cls}">${bold ? `<b>${esc(bold[1])}</b>` : esc(l.trim()) || '&nbsp;'}</div>`;
 }).join('');
 
 // PDF, Word and Excel share one picture of the document: departments with their counts, quantity first.
@@ -24,12 +25,12 @@ function docPreview(p, groups, t, sheet) {
   const meta = [p.productionCo && `<bdi>${esc(p.productionCo)}</bdi>`, p.techManager && `${esc(t('tech_manager'))}: <bdi>${esc(p.techManager)}</bdi>`, range && `<bdi dir="ltr">${esc(range)}</bdi>`].filter(Boolean);
   const rows = groups.map(g => {
     const items = g.entries.map(({ item, product, accessory }) => `
-      <div class="dp-row ${accessory ? 'acc' : ''}"><b>${item.qty}×</b><span dir="auto">${esc(displayName(product))}${opts.includeNotes && item.note ? `<small dir="auto">${esc(item.note)}</small>` : ''}</span></div>`).join('');
+      <div class="dp-row ${accessory ? 'acc' : ''}"><b>${item.qty}×</b><span><bdi>${esc(displayName(product))}</bdi>${opts.includeNotes && item.note ? `<small><bdi>${esc(item.note)}</bdi></small>` : ''}</span></div>`).join('');
     return `<div class="dp-dept"><span>${esc(t(`dept_${g.key}`))}</span></div>${items}`;
   }).join('');
   return `<div class="docprev ${sheet ? 'sheet' : ''}">
     ${sheet ? '' : '<div class="dp-stripe"></div>'}
-    <div class="dp-title" dir="auto">${esc(p.name || t('untitled'))}</div>
+    <div class="dp-title"><bdi>${esc(p.name || t('untitled'))}</bdi></div>
     ${meta.length ? `<div class="dp-meta">${meta.join('  ·  ')}</div>` : ''}
     ${rows}
     <div class="dp-foot">CamList</div>
@@ -56,7 +57,7 @@ export function render(ctx, { id, print }, root) {
       <div class="chips">${FORMATS.map(([k, l]) => `<button class="chip pick ${format === k ? 'on' : ''}" data-fmt="${k}">${esc(l || T('fmt_text'))}</button>`).join('')}</div>
       <p class="tnote">${esc(HINT[format])}</p>
     </div>
-    <div class="ex-preview" dir="${lang() === 'he' ? 'rtl' : 'ltr'}">${format === 'text' ? `<div class="preview tx">${textPreview(text())}</div>` : docPreview(p, groups, t, format === 'xlsx')}</div>
+    <div class="ex-preview" dir="${lang() === 'he' ? 'rtl' : 'ltr'}">${format === 'text' ? `<div class="preview tx">${textPreview(text(), lang() === 'he' ? 'rtl' : 'ltr')}</div>` : docPreview(p, groups, t, format === 'xlsx')}</div>
     <button class="btn primary block ex-go" data-go>${format === 'text' ? icons.share : icons.check}${esc(ACTION[format])}</button>
     <details class="card ex-opts">
       <summary>${esc(T('ex_options'))} <span>${esc(optLine)}</span></summary>

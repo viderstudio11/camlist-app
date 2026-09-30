@@ -48,7 +48,10 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
   const rtl = lang === 'he';
   const font = { ...FONT, hint: rtl ? 'cs' : undefined };
   const language = rtl ? { value: 'en-US', bidirectional: 'he-IL' } : { value: 'en-US' };
-  const run = (text, o = {}) => new D.TextRun({ text: String(text ?? ''), rightToLeft: rtl, font, language,
+  // A run is right-to-left only when it holds Hebrew: an English name ("Canon EOS C70 (Body)") marked RTL can
+  // have its brackets and dashes reordered. The paragraph keeps the document's direction either way.
+  const hasHebrew = (t) => /[֐-׿]/.test(t);
+  const run = (text, o = {}) => new D.TextRun({ text: String(text ?? ''), rightToLeft: hasHebrew(String(text ?? '')), font, language,
     size: o.size || 22, bold: !!o.bold, color: o.color });
   const P = (text, o = {}) => new D.Paragraph({
     bidirectional: rtl,

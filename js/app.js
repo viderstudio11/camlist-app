@@ -229,6 +229,12 @@ store.subscribe(() => {
   if (!store.storageOk && !warned) { warned = true; toast(t('storage_warning'), { kind: 'err', ms: 4000 }); }
 });
 window.addEventListener('hashchange', render);
+// An app, not a web page: a long press opens no browser menu ("copy", "search with Google", Google Lens
+// on a product photo). Android Chrome ignores -webkit-touch-callout, so the menu is stopped here —
+// except in fields and the export preview, where copying is the point.
+document.addEventListener('contextmenu', (e) => {
+  if (!e.target.closest?.('input, textarea, [contenteditable], .preview, .print')) e.preventDefault();
+});
 applyDir();
 document.documentElement.dataset.theme = store.state.settings.theme || 'light';
 document.documentElement.dataset.skin = isSkin(store.state.settings.skin) ? store.state.settings.skin : DEFAULT_SKIN;

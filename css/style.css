@@ -542,12 +542,14 @@ body {
   user-select: none;
 }
 input, textarea, select, [contenteditable],
-.preview, .tout, .tnote, .vmain, .row .name, .print {
+.preview, .tout, .tnote, .vmain, .print {
   -webkit-touch-callout: default;
   -webkit-user-select: text;
   user-select: text;
 }
 img { -webkit-user-drag: none; user-drag: none; -webkit-touch-callout: none; }
+/* product photos are pictures, not targets: a long press on one never reaches the browser's image menu */
+.thumb img, .brand-hero img, .logo img, .cbar .thumb img { pointer-events: none; }
 .kv.linkrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; text-decoration: none; }
 .kv.linkrow b { color: var(--muted); font-size: 18px; }
 [dir="rtl"] .kv.linkrow b { display: inline-block; transform: scaleX(-1); }
@@ -1006,3 +1008,5 @@ body.split .view { max-width: none; padding: 12px 16px 0; }
 .assign-name { font-weight: 600; }
 .assign-arrow { color: var(--muted); }
 .assign-row select { max-width: 100%; }
+.preview.tx .tx-note { padding-inline-start: 16px; }
+.preview.tx .tx-note.deep { padding-inline-start: 32px; }

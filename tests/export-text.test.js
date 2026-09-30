@@ -27,7 +27,7 @@ test('formatDateRange', () => {
 });
 
 test('hebrew share text snapshot', () => {
-  const txt = buildShareText(project, groups, { lang: 'he', now: new Date('2026-09-17T10:00:00Z') });
+  const txt = buildShareText(project, groups, { lang: 'he', now: new Date('2026-09-17T10:00:00Z') }).replace(/[‎‏]/g, '').replace(/⁨([^⁩]*)⁩/g, '$1');
   assert.equal(txt, [
     '*המירוץ למיליון 12*',
     'קשת 12',
@@ -48,7 +48,7 @@ test('hebrew share text snapshot', () => {
 });
 
 test('english, no notes, with links', () => {
-  const txt = buildShareText(project, groups, { lang: 'en', includeNotes: false, includeLinks: true, now: new Date('2026-09-17T10:00:00Z') });
+  const txt = buildShareText(project, groups, { lang: 'en', includeNotes: false, includeLinks: true, now: new Date('2026-09-17T10:00:00Z') }).replace(/[‎‏]/g, '').replace(/⁨([^⁩]*)⁩/g, '$1');
   assert.ok(txt.includes('*Cameras*'));
   assert.ok(txt.includes('• 2 × Sony FX6\n   https://u/fx6'));
   assert.ok(!txt.includes('Cam A+B'));
@@ -62,6 +62,23 @@ test('an accessory picked for an item is set in under it', () => {
     { item: { productId: 'm', qty: 1, note: '' }, product: { name: 'Ninja', brandName: 'Atomos' } },
     { item: { productId: 'd', qty: 1, note: 'short' }, product: { name: 'D-Tap to DC Cable', brandName: null }, accessory: true },
   ] }];
-  const txt = buildShareText({ name: 'X' }, g, { lang: 'en', now: new Date('2026-09-30T10:00:00Z') });
+  const txt = buildShareText({ name: 'X' }, g, { lang: 'en', now: new Date('2026-09-30T10:00:00Z') }).replace(/[‎‏]/g, '').replace(/⁨([^⁩]*)⁩/g, '$1');
   assert.ok(txt.includes('• 1 × Atomos Ninja\n   ◦ 1 × D-Tap to DC Cable\n      ↳ short'));
+});
+
+test('every line that is not a heading carries the document’s direction, so an English name never pulls it the other way', () => {
+  const RLM = '\u200F', LRM = '\u200E';
+  const he = buildShareText(project, groups, { lang: 'he', now: new Date('2026-09-17T10:00:00Z') }).split('\n');
+  for (const l of he) if (l && !/^\*.*\*$/.test(l)) assert.ok(l.startsWith(RLM), JSON.stringify(l));
+  assert.ok(he.includes('*מצלמות*'), 'headings stay bare so WhatsApp still makes them bold');
+  const en = buildShareText(project, groups, { lang: 'en', now: new Date('2026-09-17T10:00:00Z') }).split('\n');
+  for (const l of en) if (l && !/^\*.*\*$/.test(l)) assert.ok(l.startsWith(LRM), JSON.stringify(l));
+});
+
+test('free text keeps its own direction inside the line: a Hebrew note in an English list, an English note in a Hebrew one', () => {
+  const FSI = '\u2068', PDI = '\u2069';
+  const p = { name: 'X', notes: 'צילומי חוץ, Day 1 בנמל', productionCo: 'Keshet Studios', techManager: 'עמיר' };
+  const g = [{ dept: 1, key: 'cameras', entries: [{ item: { productId: 1, qty: 2, note: 'מצלמה A + B' }, product: { name: 'EOS C70', brandName: 'Canon' } }] }];
+  const en = buildShareText(p, g, { lang: 'en', now: new Date('2026-09-30T10:00:00Z') });
+  for (const s of ['צילומי חוץ, Day 1 בנמל', 'מצלמה A + B', 'Keshet Studios', 'עמיר', 'Canon EOS C70']) assert.ok(en.includes(FSI + s + PDI), s);
 });

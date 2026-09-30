@@ -19,7 +19,7 @@ export function renderPrint(ctx, project, groups, root, { includeNotes = true, i
       ${g.entries.map(({ item, product, accessory }) => `<div class="pline ${accessory ? 'acc' : ''}">
         <span class="q">${item.qty}×</span>
         ${includeImages ? `<span class="im">${product.image ? `<img src="${esc(product.image)}" alt="" onerror="this.remove()">` : ''}</span>` : ''}
-        <span class="nm" dir="auto">${esc(displayName(product))}${includeNotes && item.note ? `<small dir="auto">${esc(item.note)}</small>` : ''}</span>
+        <span class="nm"><bdi>${esc(displayName(product))}</bdi>${includeNotes && item.note ? `<small><bdi>${esc(item.note)}</bdi></small>` : ''}</span>
       </div>`).join('')}
     </section>`;
   }).join('');
@@ -32,10 +32,10 @@ export function renderPrint(ctx, project, groups, root, { includeNotes = true, i
     <div class="screen-only card"><b>${ctx.t('pdf_hint')}</b><button class="btn sm primary" data-print>${ctx.t('pdf')}</button></div>
     <div class="pstripe"><span class="mark">CAM<b>LIST</b></span></div>
     <header class="phead-print">
-      <h1 dir="auto">${esc(project.name || t('untitled'))}</h1>
+      <h1><bdi>${esc(project.name || t('untitled'))}</bdi></h1>
       ${meta.length ? `<p>${meta.join('  ·  ')}</p>` : ''}
       ${contact ? `<p class="dim"><bdi dir="ltr">${esc(contact)}</bdi></p>` : ''}
-      ${project.notes ? `<p class="dim" dir="auto">${esc(project.notes)}</p>` : ''}
+      ${project.notes ? `<p class="dim"><bdi>${esc(project.notes)}</bdi></p>` : ''}
     </header>
     ${sections}
     <footer class="pfoot">CamList · <bdi dir="ltr">${esc(fmtDate(todayStr()))}</bdi></footer>
