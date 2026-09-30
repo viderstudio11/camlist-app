@@ -54,3 +54,18 @@ test('a shelf with nothing left on it is not listed', () => {
   const video = catalog.departments.find(d => d.slug === 'video');
   assert.ok(!catalog.subcatsOf(video.id).some(s => ['Monitors', 'On Camera', 'Video Cables'].includes(s.en)));
 });
+
+test('second pass: arms, cages and handles in grip; stabilisers and support split; lens accessories shelf', async () => {
+  const { accessoryKind } = await import('../js/accessory.js');
+  const where = (rx) => [catalog.deptKey(find(rx).dept), shelf(find(rx))];
+  assert.deepEqual(where(/^UT Arm$/), ['grip', 'Arms & Shoe Mounts']);
+  assert.deepEqual(where(/^Magic Arm$/), ['grip', 'Arms & Shoe Mounts']);
+  assert.deepEqual(where(/^Blue Modular Handle$/), ['grip', 'Cages & Handles']);
+  assert.deepEqual(where(/RONIN RS 5/), ['tripods', 'Gimbals']);
+  assert.deepEqual(where(/^Vario 5$/), ['tripods', 'Body Support']);
+  assert.deepEqual(where(/^Hydra Alien Car Mounting System$/), ['tripods', 'Car Mounts']);
+  assert.deepEqual(where(/^FX3 Underwater camera housing$/), ['tripods', 'Underwater Housings']);
+  assert.equal(gearKitFor(catalog, find(/RONIN RS 5/)).id, 'gimbal', 'the gimbal kit follows the gimbals to their new shelf');
+  assert.equal(tripodKind(catalog, find(/^Vario 5$/)), 'body');
+  assert.equal(accessoryKind({ name: 'Lens Caps (front / rear)' }, ['General Accessories']), 'lensacc');
+});

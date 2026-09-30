@@ -363,8 +363,8 @@
       "id": "x_gen_monitor_arm",
       "name": "Monitor Arm",
       "brand": null,
-      "dept": "monitors",
-      "subcat": "Monitor Accessories",
+      "dept": "grip",
+      "subcat": "Arms & Shoe Mounts",
       "image": "https://cdn.cvp.com/images/products/thumb150/30-05-20231685444186main-small.jpg",
       "imageSrc": "CVP: ARRI Monitor Arm for Camera MAC-1 — https://cvp.com/product/arri-mac-1-monitor-arm-k2.0048394"
     },
@@ -707,8 +707,8 @@
       "id": "x_gen_noga_arm",
       "name": "Noga Arm",
       "brand": null,
-      "dept": "monitors",
-      "subcat": "Monitor Accessories",
+      "dept": "grip",
+      "subcat": "Arms & Shoe Mounts",
       "image": "https://cdn.cvp.com/images/products/thumb150/17-08-20211629190321vaxis-noga-arm-11in-14-14-var18-05-small.jpg",
       "imageSrc": "CVP: Vaxis Noga Arm — https://cvp.com/product/vaxis-var18-05-noga-arm-11in-1-4-1-4"
     },
@@ -1068,6 +1068,48 @@
       "brand": null,
       "dept": "expendables",
       "subcat": "Safety & Work Gear"
+    },
+    {
+      "id": "x_gen_cage",
+      "name": "Camera Cage (for the camera in the list)",
+      "brand": null,
+      "dept": "grip",
+      "subcat": "Cages & Handles"
+    },
+    {
+      "id": "x_gen_top_handle",
+      "name": "Top Handle",
+      "brand": null,
+      "dept": "grip",
+      "subcat": "Cages & Handles"
+    },
+    {
+      "id": "x_gen_shoe_mount",
+      "name": "Cold Shoe Mount (1/4\")",
+      "brand": null,
+      "dept": "grip",
+      "subcat": "Arms & Shoe Mounts"
+    },
+    {
+      "id": "x_gen_lens_caps",
+      "name": "Lens Caps (front / rear)",
+      "brand": null,
+      "dept": "accessories",
+      "subcat": "General Accessories"
+    },
+    {
+      "id": "x_gen_french_flag",
+      "name": "French Flag / Eyebrow",
+      "brand": null,
+      "dept": "accessories",
+      "subcat": "General Accessories"
+    },
+    {
+      "id": "x_gen_lens_case",
+      "name": "Lens Case",
+      "brand": null,
+      "dept": "accessories",
+      "subcat": "General Accessories"
     }
   ],
   "departments": [
@@ -1253,6 +1295,26 @@
         {
           "he": "אביזרי חצובה",
           "en": "Tripod Accessories"
+        },
+        {
+          "he": "גימבלים",
+          "en": "Gimbals"
+        },
+        {
+          "he": "מייצבי יד וסטדיקם",
+          "en": "Steadicam & Handheld"
+        },
+        {
+          "he": "תמיכת גוף (Easyrig)",
+          "en": "Body Support"
+        },
+        {
+          "he": "מתקני רכב",
+          "en": "Car Mounts"
+        },
+        {
+          "he": "מארזי מים",
+          "en": "Underwater Housings"
         }
       ]
     },
@@ -1266,11 +1328,97 @@
         {
           "he": "ברידג׳ פלייט ומתאמים",
           "en": "Bridge Plates & Adapters"
+        },
+        {
+          "he": "כלובים וידיות",
+          "en": "Cages & Handles"
+        },
+        {
+          "he": "זרועות ומתאמי נעל",
+          "en": "Arms & Shoe Mounts"
         }
       ]
     }
   ],
   "moves": [
+    {
+      "from": "Camera Support & Rigs",
+      "match": "ronin",
+      "to": "tripods",
+      "subcat": "Gimbals"
+    },
+    {
+      "from": "Camera Support & Rigs",
+      "match": "mokit|car mount",
+      "to": "tripods",
+      "subcat": "Car Mounts"
+    },
+    {
+      "from": "Monitor Accessories",
+      "match": "^ut arm$",
+      "to": "grip",
+      "subcat": "Arms & Shoe Mounts"
+    },
+    {
+      "from": "Grip Accessories",
+      "match": "^magic arm$",
+      "to": "grip",
+      "subcat": "Arms & Shoe Mounts"
+    },
+    {
+      "from": "Camera Support & Rigs",
+      "match": "spring handle",
+      "to": "grip",
+      "subcat": "Cages & Handles"
+    },
+    {
+      "from": "Camera Support",
+      "match": "modular handle",
+      "to": "grip",
+      "subcat": "Cages & Handles"
+    },
+    {
+      "from": "Gimbals & Stabilizers",
+      "match": "ronin|\\brs ?\\d|movi|mimic|maxima|control wheels|puppeteer",
+      "to": "tripods",
+      "subcat": "Gimbals"
+    },
+    {
+      "from": "Gimbals & Stabilizers",
+      "match": "4000 pro|glidecam|hand grip",
+      "to": "tripods",
+      "subcat": "Steadicam & Handheld"
+    },
+    {
+      "from": "Camera Support",
+      "match": "easy ?rig|mantis|vario 5|minimax|camera support$|flowcine serene|black arm|gravity one|armor man|flota|hermit",
+      "to": "tripods",
+      "subcat": "Body Support"
+    },
+    {
+      "from": "Camera Support",
+      "match": "ronin|\\brs ?\\d|movi|mimic|gimbal|ring grip|dual-handle|control handle|remote control kit|easytilt",
+      "to": "tripods",
+      "subcat": "Gimbals"
+    },
+    {
+      "from": "Camera Support",
+      "match": "car mount|suction|tank mount|hydra alien|speed pan|vibration isolator",
+      "to": "tripods",
+      "subcat": "Car Mounts"
+    },
+    {
+      "from": "Camera Support",
+      "match": "underwater|housing|salted line",
+      "to": "tripods",
+      "subcat": "Underwater Housings"
+    },
+    {
+      "from": "Camera Support",
+      "match": "fig rig|eng rig",
+      "to": "tripods",
+      "subcat": "Steadicam & Handheld"
+    },
     {
       "fromDept": "accessories",
       "match": "^bnc cable$",
@@ -1304,8 +1452,8 @@
     {
       "from": "General Accessories",
       "match": "^ut arm$",
-      "to": "monitors",
-      "subcat": "Monitor Accessories"
+      "to": "grip",
+      "subcat": "Arms & Shoe Mounts"
     },
     {
       "from": "General Accessories",
@@ -1329,7 +1477,7 @@
       "fromDept": "accessories",
       "match": "puppeteer",
       "to": "tripods",
-      "subcat": "Gimbals & Stabilizers"
+      "subcat": "Gimbals"
     },
     {
       "fromDept": "accessories",

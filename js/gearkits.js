@@ -136,7 +136,11 @@ export const bowlOf = (name) => BOWLS.find(b => b.rx.test(name))?.bowl
 export function tripodKind(catalog, p) {
   const subs = SUB(catalog, p);
   if (subs.includes('Tripod Accessories')) return 'accessory';
-  if (subs.includes('Gimbals & Stabilizers')) return 'gimbal';
+  if (subs.includes('Gimbals') || subs.includes('Gimbals & Stabilizers')) return 'gimbal';
+  if (subs.includes('Steadicam & Handheld')) return 'stabilizer';
+  if (subs.includes('Body Support')) return 'body';
+  if (subs.includes('Car Mounts')) return 'car';
+  if (subs.includes('Underwater Housings')) return 'underwater';
   if (subs.includes('Tripod Legs')) return 'legs';
   if (isHead(catalog, p)) return 'head';
   if (/tripod|with .*legs|pedestal|monopod/i.test(p.name)) return 'system';
@@ -215,7 +219,7 @@ export const GEAR_KITS = [
   },
   {
     id: 'gimbal', he: 'גימבל', en: 'Gimbal',
-    when: (catalog, p) => SUB(catalog, p).includes('Gimbals & Stabilizers') && /ronin|\brs ?\d/i.test(p.name) && !/wheel|grip$|pad|mimic/i.test(p.name),
+    when: (catalog, p) => SUB(catalog, p).some(s => s === 'Gimbals' || s === 'Gimbals & Stabilizers') && /ronin|\brs ?\d/i.test(p.name) && !/wheel|grip$|pad|mimic/i.test(p.name),
     box: (p) => GIMBAL_BOX.find(b => b.rx.test(p.name)) || null,
     slots: (p) => {
       const m = GIMBAL.find(g => g.rx.test(p.name)) || {};

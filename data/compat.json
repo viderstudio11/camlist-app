@@ -1836,8 +1836,12 @@
         "he": "כלוב / ריג",
         "en": "Cage / rig",
         "dept": "grip",
-        "subcat": "Camera Support & Rigs",
-        "qty": 1
+        "subcat": "Cages & Handles",
+        "qty": 1,
+        "fallback": {
+          "dept": "grip",
+          "subcat": "Camera Support & Rigs"
+        }
       },
       {
         "slot": "head",

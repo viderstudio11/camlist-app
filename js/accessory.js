@@ -1,7 +1,7 @@
 // Accessories, sorted the way a camera assistant looks for them. The source files filters by size only
 // (4X5.6, 4X4, 6X6, Round) and puts everything else under "General Accessories"; names fill the rest.
 
-export const ACC_KINDS = ['filters', 'mattebox', 'follow', 'lenssupport', 'control', 'timecode', 'viewfinder', 'action', 'underwater', 'camera', 'other'];
+export const ACC_KINDS = ['filters', 'mattebox', 'follow', 'lenssupport', 'control', 'timecode', 'viewfinder', 'action', 'underwater', 'camera', 'lensacc', 'other'];
 export const FILTER_TYPES = ['nd', 'irnd', 'vnd', 'grad', 'diffusion', 'pola', 'color', 'effects', 'closeup', 'protect'];
 export const FILTER_SIZES = ['4x5.65', '4x4', '6x6', 'round', 'osmo'];
 
@@ -18,6 +18,7 @@ export function accessoryKind(p, subs = []) {
   if (/time-?code|syncbox|\bgr-?1\b|clapper|slate|tally/i.test(n)) return 'timecode';
   if (/finder|\bevf\b|viewfinder|loupe/i.test(n)) return 'viewfinder';
   if (/gopro|\bhero\d|media mod|max lens|suction/i.test(n) || /gopro/i.test(p.brandName || '')) return 'action';
+  if (/lens caps?|french flag|eyebrow|lens case|lens shade/i.test(n)) return 'lensacc';
   if (/cooler|xlr-k[0-9]|audio adapter|rialto|extension system|giga t|changing tent|remote (timer|shutter)/i.test(n)) return 'camera';
   if (has(subs, 'Controlers') || /zoom|remote|\brcu\b|\bccu\b|\brm-|controller|pan-bar|motor|stream deck/i.test(n)) return 'control';
   return 'other';
