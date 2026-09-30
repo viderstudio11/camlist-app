@@ -1,5 +1,10 @@
 [
  {
+  "version": "v2.5.0",
+  "date": "2026-09-30",
+  "label": "Older accessories placed under their item; battery/card type rows; cages & handles, arms, lens accessories; stabilizers split; Hebrew shelf names; a cage per camera; long-press menu blocked; bidi fixes in every export"
+ },
+ {
   "version": "v2.4.1",
   "date": "2026-09-30",
   "label": "Accessories picked for an item are listed under it in the list and every export"
