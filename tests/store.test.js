@@ -93,3 +93,28 @@ test('versions snapshot the list and restoring never loses the current one', () 
   assert.equal(store.getProject(p.id).versions.some(v => v.id === v1.id), false);
   assert.equal(store.restoreVersion(p.id, 'nope'), false);
 });
+
+test('a corrupted save is kept aside, not overwritten, and the app says so', () => {
+  const kept = {};
+  const st = { get: () => '{"projects":[{"id":"p_1","name":"Big sh', set: () => {}, keep: (k, v) => { kept[k] = v; } };
+  const store = createStore(st);
+  assert.equal(store.state.projects.length, 0);
+  assert.ok(store.recovered, 'the app knows it started over');
+  assert.deepEqual(Object.values(kept), ['{"projects":[{"id":"p_1","name":"Big sh']);
+});
+
+test('saves carry a schema number', () => {
+  const st = mem();
+  createStore(st).setSettings({ lang: 'en' });
+  assert.equal(JSON.parse(st.get()).schema, 1);
+});
+
+test('a change saved in another window is taken in, not overwritten by this one', () => {
+  const st = mem();
+  const a = createStore(st), b = createStore(st);
+  const p = a.createProject({ name: 'From A' });
+  b.reloadFrom(st.get());                         // the browser's storage event, in the app
+  assert.equal(b.getProject(p.id)?.name, 'From A');
+  b.createProject({ name: 'From B' });
+  assert.deepEqual(JSON.parse(st.get()).projects.map(x => x.name).sort(), ['From A', 'From B']);
+});

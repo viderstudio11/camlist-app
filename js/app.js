@@ -229,6 +229,9 @@ store.subscribe(() => {
   if (!store.storageOk && !warned) { warned = true; toast(t('storage_warning'), { kind: 'err', ms: 4000 }); }
 });
 window.addEventListener('hashchange', render);
+// The same list open in two windows (the installed app and a browser tab): take in what the other one saved.
+window.addEventListener('storage', (e) => { if (e.key === 'camlist.v1' && e.newValue) { store.reloadFrom(e.newValue); render(); } });
+if (store.recovered) setTimeout(() => toast(t('save_recovered'), { kind: 'err', ms: 8000 }), 600);
 // An app, not a web page: a long press opens no browser menu ("copy", "search with Google", Google Lens
 // on a product photo). Android Chrome ignores -webkit-touch-callout, so the menu is stopped here —
 // except in fields and the export preview, where copying is the point.

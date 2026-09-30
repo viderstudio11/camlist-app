@@ -55,7 +55,9 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
     size: o.size || 22, bold: !!o.bold, color: o.color });
   const P = (text, o = {}) => new D.Paragraph({
     bidirectional: rtl,
-    alignment: o.center ? D.AlignmentType.CENTER : o.end ? (rtl ? D.AlignmentType.LEFT : D.AlignmentType.RIGHT) : (rtl ? D.AlignmentType.RIGHT : D.AlignmentType.LEFT),
+    // start / end follow the paragraph's direction: in a right-to-left paragraph Word reads "right" as the
+    // trailing edge, which put Hebrew headings on the left (seen in Adobe's render of the file)
+    alignment: o.center ? D.AlignmentType.CENTER : o.end ? D.AlignmentType.END : D.AlignmentType.START,
     spacing: { after: 60, ...(o.spacing || {}) },
     children: [run(text, o)],
   });
@@ -80,9 +82,12 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
     P(project.name || t('untitled'), { size: 40, bold: true }),
     ...(project.productionCo ? [P(project.productionCo, { size: 24, color: '444444' })] : []),
   ];
-  const meta = [project.techManager ? `${t('tech_manager')}: ${project.techManager}` : '', formatDateRange(project.dateFrom, project.dateTo)].filter(Boolean).join('   ·   ');
+  // Dates, phone and mail are left-to-right islands (LRM on each side, and around the dash of a range):
+  // without them a date range inside a Hebrew line came out reversed, 05.10–01.10.
+  const ltr = (s) => (s ? `‎${String(s).replace(/–/g, '‎–‎')}‎` : '');
+  const meta = [project.techManager ? `${t('tech_manager')}: ${project.techManager}` : '', ltr(formatDateRange(project.dateFrom, project.dateTo))].filter(Boolean).join('   ·   ');
   if (meta) children.push(P(meta, { color: '555555' }));
-  const contact = [project.phone, project.email].filter(Boolean).join('   ·   ');
+  const contact = [project.phone, project.email].filter(Boolean).map(ltr).join('   ·   ');
   if (contact) children.push(P(contact, { color: '777777', size: 20 }));
   if (project.notes) children.push(P(project.notes, { color: '555555' }));
   children.push(P('', { spacing: { after: 120 } }));
@@ -93,7 +98,7 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
       cell([P(t(`dept_${g.key}`), { bold: true, size: 22 })], { w: USABLE, span: cols.length, shade: 'EFEFEF', borders: headBorders }),
     ] }));
     for (const { item, product, accessory } of g.entries) {
-      const v = { qty: `${item.qty}×`, item: `${accessory ? '◦ ' : ''}${displayName(product)}`, notes: item.note || '', link: product.url || '' };
+      const v = { qty: `${item.qty}×`, item: `${accessory ? (rtl ? '‏◦ ' : '◦ ') : ''}${displayName(product)}`, notes: item.note || '', link: product.url || '' };
       rows.push(new D.TableRow({ cantSplit: true, children: cols.map(k => cell([P(v[k], {
         bold: k === 'qty', color: k === 'notes' || k === 'link' ? '666666' : undefined, size: k === 'notes' || k === 'link' ? 19 : 22,
       })], { w: W[k], borders: rowBorders })) }));
