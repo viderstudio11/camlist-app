@@ -1,5 +1,5 @@
 import { esc, icons, toast, openSheet, confirmDialog } from './dom.js';
-import { groupByDept, setQty, setNote, totalQty, addItem } from '../list.js';
+import { groupByDept, setQty, setNote, addItem } from '../list.js';
 import { gearKitFor, gearKitStatus, inTheBox } from '../gearkits.js';
 import { brandText } from '../brands.js';
 import { displayName, formatDateRange } from '../export-text.js';
@@ -13,7 +13,6 @@ import { allocFor, ensureAlloc } from '../kitalloc.js';
 const collapsed = new Set();
 let showKit = false;
 const openKits = new Set(); // items whose must-have checklist is open // set by "Build around": bring the new kit into view on the next draw
-let pickup = false; // prep day: the list turns into a check-off sheet
 
 // Each detail isolated, so a date range beside a Hebrew name never flips (02.10–01.10).
 const bidi = (s) => `<bdi${/^[0-9.–-]+$/.test(s) ? ' dir="ltr"' : ''}>${esc(s)}</bdi>`;
@@ -34,14 +33,10 @@ export function profileChips(prof, t) {
 export function render(ctx, { id }, root) {
   const { store, t, compat } = ctx;
   const p = store.getProject(id);
-  const n = totalQty(p.items);
-  const packed = p.packed || {};
-  const packedQty = p.items.reduce((s, i) => s + Math.min(packed[i.productId] || 0, i.qty), 0);
   ctx.setTopbar({
     title: `${esc(p.name || t('untitled'))}<small>${[p.techManager, formatDateRange(p.dateFrom, p.dateTo)].filter(Boolean).map(bidi).join(' · ')}</small>`,
     back: '#/',
     right: [
-      { icon: toolIcon('pickup'), label: t('pickup_mode'), onClick: () => { pickup = !pickup; ctx.render(); } },
       { icon: icons.edit, label: t('rename'), onClick: () => editProjectSheet(ctx, id) },
     ],
   });
@@ -85,37 +80,28 @@ export function render(ctx, { id }, root) {
   };
 
   const tailHTML = (item) => {
-    if (!pickup) return `<div class="stepper compact"><button data-d="-1" aria-label="-">−</button><span class="q">${item.qty}</span><button class="plus" data-d="1" aria-label="+">+</button></div>`;
-    const have = Math.min(packed[item.productId] || 0, item.qty);
-    return `<button class="packbtn ${have >= item.qty ? 'done' : ''}" data-pack aria-label="${t('pickup_mode')}"><span class="pk-check">${have >= item.qty ? '✓' : ''}</span><span class="pk-count">${have}/${item.qty}</span></button>`;
+    return `<div class="stepper compact"><button data-d="-1" aria-label="-">−</button><span class="q">${item.qty}</span><button class="plus" data-d="1" aria-label="+">+</button></div>`;
   };
 
   const sections = groups.map(g => `
     <section class="group ${collapsed.has(g.key) ? 'collapsed' : ''}" data-key="${g.key}">
       <div class="group-head"><span class="dept-ico sm">${deptIcon(g.key)}</span><h2>${t(`dept_${g.key}`)}</h2><span class="chev">${icons.chev}</span></div>
       <div class="group-body">${g.entries.map(({ item, product }) => `
-        <div class="row ${p.buildCameraId === product.id ? 'is-build' : ''} ${pickup && Math.min(packed[item.productId] || 0, item.qty) < item.qty ? 'unpacked' : ''}" data-pid="${esc(item.productId)}">
+        <div class="row ${p.buildCameraId === product.id ? 'is-build' : ''}" data-pid="${esc(item.productId)}">
           ${thumbHTML(product, g.key)}
           <div class="body">
             <div class="name">${esc(displayName(product))}</div>
-            <div class="sub">${brandText(product.brand, product.brandName)}${product.manual ? `<span class="chip">${t('manual_item')}</span>` : ''}${pickup ? '' : buildBtn(product) + kitChip(product)}</div>
-            ${pickup ? (item.note ? `<div class="sub dim" dir="auto">${esc(item.note)}</div>` : '') : `<input class="note" value="${esc(item.note)}" placeholder="${t('note_placeholder')}" data-note>`}
+            <div class="sub">${brandText(product.brand, product.brandName)}${product.manual ? `<span class="chip">${t('manual_item')}</span>` : ''}${buildBtn(product) + kitChip(product)}</div>
+            <input class="note" value="${esc(item.note)}" placeholder="${t('note_placeholder')}" data-note>
           </div>
           ${tailHTML(item)}
-        </div>${pickup ? '' : inlineKit(product)}`).join('')}</div>
+        </div>${inlineKit(product)}`).join('')}</div>
     </section>`);
 
-  // Prep day banner: how much of the list is already in the truck.
-  const pickHTML = !pickup ? '' : `<section class="card pickbar ${packedQty >= n && n ? 'done' : ''}">
-    <div class="pick-top"><b>${packedQty >= n && n ? t('pickup_done') : t('packed_of', { a: packedQty, b: n })}</b>
-      <div class="pick-acts"><button class="btn sm ghost" data-copy-missing>${t('pickup_report')}</button><button class="btn sm" data-mark-all>${t('mark_all')}</button></div></div>
-    <div class="m-bar"><i style="width:${n ? Math.round((packedQty / n) * 100) : 0}%"></i></div>
-    ${packedQty < n ? `<div class="m-note">${t('missing_items', { n: n - packedQty })}</div>` : ''}
-  </section>`;
 
   let kitHTML = '';
   // Base kit checklist for the active camera
-  if (active && activeProf && !pickup) {
+  if (active && activeProf) {
     const slots = compat.kitStatus(activeProf, p.items, ctx.resolve, allocFor(p, p.buildCameraId));
     const lang = ctx.lang();
     kitHTML = `<section class="kit">
@@ -134,7 +120,6 @@ export function render(ctx, { id }, root) {
     </section>`;
   }
 
-  root.classList.toggle('pickup', pickup);
   // A quiet project header: who it is for and what is in it, with the iris ring behind it.
   const headHTML = `<header class="phead">
     <span class="lbl">${t('gear_list')}</span>
@@ -146,30 +131,14 @@ export function render(ctx, { id }, root) {
     : `<div class="empty"><div class="big">🧰</div><h2>${t('list_empty')}</h2><p>${t('list_empty_hint')}</p></div>`;
   // The kit sits right under the cameras it is built around, not three screens down the list.
   const camAt = groups.findIndex(g => g.key === 'cameras');
-  if (!pickup && kitHTML) sections.splice(camAt + 1, 0, kitHTML);
-  root.innerHTML = headHTML + pickHTML + (groups.length ? sections.join('') : listHTML);
+  if (kitHTML) sections.splice(camAt + 1, 0, kitHTML);
+  root.innerHTML = headHTML + (groups.length ? sections.join('') : listHTML);
   if (showKit) { showKit = false; root.querySelector('.kit')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-  root.insertAdjacentHTML('beforeend', `<div class="bottombar">${pickup
-    ? `<button class="btn primary" data-pick-off>${t('pickup_off')}</button>`
-    : `<button class="btn primary" data-add>${icons.plus}${t('add_gear')}</button><button class="btn" data-export ${n ? '' : 'disabled'}>${icons.share}${t('export')}</button>`}</div>`);
+  root.insertAdjacentHTML('beforeend', `<div class="bottombar"><button class="btn primary" data-add>${icons.plus}${t('add_gear')}</button><button class="btn" data-export ${p.items.length ? '' : 'disabled'}>${icons.share}${t('export')}</button></div>`);
 
   // Adding gear starts from the departments page, not wherever the catalog was left.
   root.querySelector('[data-add]')?.addEventListener('click', () => { presetCatalog({}); ctx.navigate(`#/p/${id}/add`); });
   root.querySelector('[data-export]')?.addEventListener('click', () => ctx.navigate(`#/p/${id}/export`));
-  root.querySelector('[data-pick-off]')?.addEventListener('click', () => { pickup = false; ctx.render(); });
-  root.querySelector('[data-mark-all]')?.addEventListener('click', () => {
-    const all = packedQty < n;
-    store.getProject(id).items.forEach(i => store.setPacked(id, i.productId, all ? i.qty : 0));
-    ctx.render();
-  });
-  root.querySelector('[data-copy-missing]')?.addEventListener('click', async () => {
-    const lines = groups.flatMap(g => {
-      const miss = g.entries.filter(({ item }) => Math.min(packed[item.productId] || 0, item.qty) < item.qty);
-      return miss.length ? [`— ${t(`dept_${g.key}`)}`, ...miss.map(({ item, product }) => `• ${displayName(product)} ×${item.qty - Math.min(packed[item.productId] || 0, item.qty)}`)] : [];
-    });
-    const txt = [`${p.name || t('untitled')} — ${t('pickup_report')}`, t('packed_of', { a: packedQty, b: n }), '', ...lines].join('\n');
-    try { await navigator.clipboard.writeText(txt); toast(t('copied'), { kind: 'ok' }); } catch { toast(t('export_failed'), { kind: 'err' }); }
-  });
   root.querySelectorAll('.group-head').forEach(h => { h.onclick = () => { const k = h.parentElement.dataset.key; collapsed.has(k) ? collapsed.delete(k) : collapsed.add(k); h.parentElement.classList.toggle('collapsed'); }; });
   // Building around a different camera opens its own, empty kit; the first camera's progress is kept as its own.
   root.querySelectorAll('[data-build]').forEach(b => { b.onclick = () => {
@@ -216,12 +185,6 @@ export function render(ctx, { id }, root) {
       store.setItems(id, setQty(store.getProject(id).items, productId, next));
       if (next <= 0) { if (p.buildCameraId === productId) store.setBuildCamera(id, null); ctx.render(); } else { row.querySelector('.q').textContent = next; syncCounts(); }
     }; });
-    row.querySelector('[data-pack]')?.addEventListener('click', () => {
-      const item = store.getProject(id).items.find(i => i.productId === productId);
-      const have = Math.min((store.getProject(id).packed || {})[productId] || 0, item.qty);
-      store.setPacked(id, productId, have >= item.qty ? 0 : item.qty);
-      ctx.render();
-    });
     const note = row.querySelector('[data-note]');
     if (note) {
       note.onchange = () => store.setItems(id, setNote(store.getProject(id).items, productId, note.value.trim()));

@@ -26,20 +26,11 @@ let kind = null;        // kit slot kind (card / reader / battery / charger) —
 let kitSlot = null;     // { cam, slot } while choosing for one camera's kit slot: what is added counts for that camera
 export function presetCatalog(o) { preset = o; }
 const offered = new Set(); // products whose "goes with" window was already shown this session
-// What was added on the current shelf waits here; leaving the shelf (another department or shelf, clearing the
-// search, back to the list) opens one window for all of it — with the quantities already chosen.
-let pending = [];
-let pendingShelf = null; // the shelf the waiting items were added on
-let pendingPid = null;
 
 export function render(ctx, { id }, root) {
   const { store, t, catalog } = ctx;
   if (st.pid !== id) { st = { pid: id, q: '', view: 'depts', dept: null, subcat: null, brand: null, sub: null }; lf = { type: null, mount: null, format: null }; af = { kind: null, type: null, size: null }; }
   if (preset) { st = { pid: id, q: '', view: 'depts', dept: preset.dept ?? null, subcat: preset.subcat ?? null, brand: null, sub: null }; af = { kind: null, type: null, size: null }; strict = !!preset.strict; kind = preset.kind || null; kitSlot = preset.kitCam != null ? { cam: preset.kitCam, slot: preset.slot } : null; compatOnly = true; preset = null; }
-  if (st.pid !== pendingPid) { pending = []; pendingPid = st.pid; }
-  // the search box updates results in place, so the shelf is read when an item is added, not at render
-  const shelfNow = () => JSON.stringify([st.dept, st.subcat, st.brand, af.kind, st.q.trim() ? 'search' : '']);
-  const leftShelf = pending.length > 0 && shelfNow() !== pendingShelf;
   const lang = ctx.lang();
   const { compat, recency } = ctx;
   const project = store.getProject(id);
@@ -327,7 +318,7 @@ export function render(ctx, { id }, root) {
     if (k === 'brands') { st.brand = null; st.dept = null; }
     rerender();
   }; });
-  root.querySelector('[data-done]').onclick = () => (pending.length ? flushOffers(() => ctx.navigate(`#/p/${id}`)) : ctx.navigate(`#/p/${id}`));
+  root.querySelector('[data-done]').onclick = () => ctx.navigate(`#/p/${id}`);
   root.querySelectorAll('[data-jump]').forEach(b => { b.onclick = () => { const h = document.getElementById(b.dataset.jump); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); }; });
 
   const bindRow = (row) => {
@@ -343,11 +334,10 @@ export function render(ctx, { id }, root) {
       const fresh = document.createElement('template'); fresh.innerHTML = productRow(catalog.byId(productId), { showBrand });
       const nr = fresh.content.firstElementChild; row.replaceWith(nr); bindRow(nr);
       root.querySelector('[data-done]').innerHTML = `${icons.check}${t('back_to_list', { n: totalQty(items()) })}`;
-      if (!cur) { toast(t('added'), { kind: 'ok', ms: 900 }); if (!offered.has(p.id) && !pending.includes(p.id)) { if (!pending.length) pendingShelf = shelfNow(); pending.push(p.id); } }
+      if (!cur) { toast(t('added'), { kind: 'ok', ms: 900 }); openGoesWith(p); }
     }; });
   };
   root.querySelectorAll('.row').forEach(bindRow);
-  if (leftShelf) queueMicrotask(() => flushOffers());
 
   // "Goes with": right after something is added, what usually rides along with it. Shown once per product.
   // Gear with a kit (monitor, follow focus, gimbal…) offers that kit's missing pieces, sized to the model:
@@ -366,53 +356,67 @@ export function render(ctx, { id }, root) {
   // A slot label that only repeats the item's name ("Lens gear rings" under "Lens Gear Rings Set") says
   // nothing; the brand says more.
   const sameWords = (label, name) => { const n = normalize(name); return normalize(label).split(' ').every(w => n.includes(w.replace(/s$/, ''))); };
-  function flushOffers(after = null) {
-    const parents = pending.map(pid => catalog.byId(pid)).filter(Boolean);
-    pending = [];
-    const seen = new Set(items().map(i => String(i.productId)));
-    const groups = parents.map(p => {
-      offered.add(p.id);
-      const list = (kitOffers(p) || companionsFor(p, catalog, { items: items(), resolve: ctx.resolve }).map(c => ({ c, n: 1 })))
-        .filter(x => x.find || !seen.has(String(x.c.id)) || x.slot);
-      list.forEach(x => x.c && !x.slot && seen.add(String(x.c.id)));    // a charger offered for one battery isn't offered again
-      return { p, list };
-    }).filter(g => g.list.length);
-    if (!groups.length) { after?.(); return; }
-    const rowHTML = ({ c, n, slot, label, find }, gi) => (find
+  // The page row of a product, redrawn after a change made from the window.
+  const refreshRow = (pid) => {
+    const inPage = root.querySelector(`.row[data-pid="${CSS.escape(String(pid))}"]`);
+    if (inPage) { const tp = document.createElement('template'); tp.innerHTML = productRow(catalog.byId(pid), { showBrand: !!inPage.querySelector('.brandname') }); const nr = tp.content.firstElementChild; inPage.replaceWith(nr); bindRow(nr); }
+  };
+  const offersFor = (p) => kitOffers(p) || companionsFor(p, catalog, { items: items(), resolve: ctx.resolve }).map(c => ({ c, n: 1 }));
+  function openGoesWith(p) {
+    if (offered.has(p.id) || !offersFor(p).length) return;
+    offered.add(p.id);
+    const taken = new Set();     // slots / items picked in this window
+    const rowHTML = ({ c, n, slot, label, find }) => (find
       ? `<div class="row gw-row" data-gw-find="${esc(JSON.stringify(find))}"><div class="thumb"><span>${DEPT_EMOJI[find.dept] || '📦'}</span></div>
         <div class="body"><div class="name" dir="auto">${esc(label)}</div></div><button class="btn sm" data-gw-go>${t('choose')} ›</button></div>`
-      : `<div class="row gw-row" data-gw="${esc(c.id)}" data-n="${n}" ${slot ? `data-gw-slot="${gi}:${esc(slot)}"` : ''}>${thumbHTML(c, catalog.deptKey(c.dept))}
+      : `<div class="row gw-row ${slot && taken.has(slot) && !taken.has(String(c.id)) ? 'gw-skip' : ''}" data-gw="${esc(c.id)}" data-n="${n}" ${slot ? `data-gw-slot="${esc(slot)}"` : ''}>${thumbHTML(c, catalog.deptKey(c.dept))}
         <div class="body"><div class="name" dir="auto">${esc(c.name)}${n > 1 ? ` <b>× ${n}</b>` : ''}</div><div class="sub">${label && !sameWords(label, c.name) ? esc(label) : brandText(c.brand, c.brandName)}</div></div>
-        <button class="addbtn" data-gw-add aria-label="${t('add')}">+</button></div>`);
-    const one = groups.length === 1;
-    let navigated = false;
+        ${taken.has(String(c.id)) ? '<span class="gw-done">✓</span>' : slot && taken.has(slot) ? '' : `<button class="addbtn" data-gw-add aria-label="${t('add')}">+</button>`}</div>`);
+    const selfHTML = () => `<div class="gw-self"><div class="name" dir="auto">${esc(p.name)}</div>
+      <div class="stepper"><button data-gw-q="-1" aria-label="-">−</button><span class="q">${getQty(items(), p.id)}</span><button class="plus" data-gw-q="1" aria-label="+">+</button></div></div>`;
     const { body, close } = openSheet({
-      title: one ? t('goes_with', { name: groups[0].p.name }) : t('goes_with_added'),
-      bodyHTML: groups.map((g, gi) => `${one ? '' : `<div class="gw-head" dir="auto">${esc(g.p.name)}</div>`}<div class="gw-list">${g.list.map(x => rowHTML(x, gi)).join('')}</div>`).join(''),
+      title: t('goes_with', { name: p.name }),
+      bodyHTML: `${selfHTML()}<div class="gw-list"></div>`,
       actions: [{ label: t('done'), kind: 'primary' }],
     });
-    document.getElementById('sheet').addEventListener('close', () => { if (!navigated) after?.(); }, { once: true });
-    body.querySelectorAll('[data-gw-find]').forEach(row => {
-      row.querySelector('[data-gw-go]').onclick = () => {
-        const find = JSON.parse(row.dataset.gwFind);
-        const d = catalog.departments.find(x => x.slug === find.dept);
-        navigated = true; close();
-        if (d) { st.q = ''; st.dept = d.id; st.subcat = d.subcategories.find(x => x.en === find.subcat)?.id ?? null; st.brand = null; rerender(); }
+    const list = body.querySelector('.gw-list');
+    const draw = () => {
+      // what was picked stays listed with its ✓; the rest follows the current quantity
+      const now = offersFor(p);
+      for (const tid of taken) { if (/^\d+$|^x_/.test(tid) && !now.some(x => x.c && String(x.c.id) === tid)) { const c = catalog.byId(parseId(tid)); if (c) now.push({ c, n: 0 }); } }
+      list.innerHTML = now.map(rowHTML).join('');
+      list.querySelectorAll('[data-gw-find]').forEach(row => {
+        row.querySelector('[data-gw-go]').onclick = () => {
+          const find = JSON.parse(row.dataset.gwFind);
+          const d = catalog.departments.find(x => x.slug === find.dept);
+          close();
+          if (d) { st.q = ''; st.dept = d.id; st.subcat = d.subcategories.find(x => x.en === find.subcat)?.id ?? null; st.brand = null; rerender(); }
+        };
+      });
+      list.querySelectorAll('[data-gw-add]').forEach(bt => {
+        const row = bt.closest('[data-gw]');
+        bt.onclick = () => {
+          const c = catalog.byId(parseId(row.dataset.gw)), n = Number(row.dataset.n) || 1;
+          const cur = getQty(items(), c.id);
+          store.setItems(id, cur ? setQty(items(), c.id, cur + n) : addItem(items(), c, n));
+          taken.add(String(c.id)); if (row.dataset.gwSlot) taken.add(row.dataset.gwSlot);
+          row.querySelector('[data-gw-add]').outerHTML = '<span class="gw-done">✓</span>';
+          // one pick fills a choice slot: the other option steps back
+          if (row.dataset.gwSlot) list.querySelectorAll(`[data-gw-slot="${CSS.escape(row.dataset.gwSlot)}"] [data-gw-add]`).forEach(o => { o.closest('.gw-row').classList.add('gw-skip'); o.remove(); });
+          refreshRow(c.id);
+        };
+      });
+    };
+    body.querySelectorAll('[data-gw-q]').forEach(bt => {
+      bt.onclick = () => {
+        const next = Math.max(1, getQty(items(), p.id) + Number(bt.dataset.gwQ));
+        store.setItems(id, setQty(items(), p.id, next));
+        body.querySelector('.gw-self .q').textContent = next;
+        refreshRow(p.id);
+        draw();
       };
     });
-    body.querySelectorAll('[data-gw]').forEach(row => {
-      row.querySelector('[data-gw-add]').onclick = (e) => {
-        const c = catalog.byId(parseId(row.dataset.gw)), n = Number(row.dataset.n) || 1;
-        const cur = getQty(items(), c.id);
-        store.setItems(id, cur ? setQty(items(), c.id, cur + n) : addItem(items(), c, n));
-        e.currentTarget.outerHTML = '<span class="gw-done">✓</span>';
-        // one pick fills a choice slot: the other option steps back
-        if (row.dataset.gwSlot) body.querySelectorAll(`[data-gw-slot="${CSS.escape(row.dataset.gwSlot)}"] [data-gw-add]`).forEach(bt => { bt.closest('.gw-row').classList.add('gw-skip'); bt.remove(); });
-        root.querySelector('[data-done]').innerHTML = `${icons.check}${t('back_to_list', { n: totalQty(items()) })}`;
-        const inPage = root.querySelector(`.row[data-pid="${CSS.escape(String(c.id))}"]`);
-        if (inPage) { const tp = document.createElement('template'); tp.innerHTML = productRow(c, { showBrand: !!inPage.querySelector('.brandname') }); const nr = tp.content.firstElementChild; inPage.replaceWith(nr); bindRow(nr); }
-      };
-    });
+    draw();
   }
 
   const openManual = () => openSheet({

@@ -455,21 +455,7 @@ body.print-mode .view { padding: 0; max-width: none; }
 .m-note.dim { color: var(--dim); margin-top: 8px; }
 
 /* Pickup mode — the prep-day check-off sheet */
-.card.pickbar { margin-bottom: 12px; padding: 12px 14px 14px; }
-.card.pickbar.done .m-bar i { background: var(--ok); }
-.pick-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-.pick-top b { font-size: 14px; font-weight: 800; }
-.pick-acts { display: flex; gap: 6px; }
-.packbtn { flex: 0 0 auto; width: 58px; min-height: 52px; border-radius: 14px; border: var(--stroke) solid var(--border-2); background: var(--surface-2);
   display: grid; place-items: center; gap: 1px; align-content: center; transition: transform .4s var(--spring), background .2s, border-color .2s; }
-.packbtn:active { transform: scale(.94); }
-.packbtn .pk-check { font-size: 18px; font-weight: 900; line-height: 1; color: var(--dim); min-height: 18px; }
-.packbtn .pk-count { font-size: 11px; font-weight: 800; color: var(--muted); font-variant-numeric: tabular-nums; }
-.packbtn.done { background: var(--ok-soft); border-color: rgba(52,211,153,.4); }
-.packbtn.done .pk-check, .packbtn.done .pk-count { color: var(--ok); }
-.view.pickup .row.unpacked { background-image: repeating-linear-gradient(135deg, rgba(251,191,36,.07) 0 6px, transparent 6px 12px); }
-.view.pickup .row.unpacked .name { color: var(--text); }
-.view.pickup .row:not(.unpacked) .name { color: var(--muted); text-decoration: line-through; text-decoration-color: rgba(52,211,153,.5); }
 
 /* The brand in a list row: plain type, quieter than the product name it sits under. */
 .brandname { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .01em;
@@ -999,3 +985,5 @@ body.split .view { max-width: none; padding: 12px 16px 0; }
 .gw-row.gw-skip { opacity: .45; }
 .gw-head { font-weight: 700; font-size: 13px; color: var(--muted); margin: 12px 2px 6px; }
 .gw-head:first-child { margin-top: 0; }
+.gw-self { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 10px; border-radius: 14px; background: var(--surface-2); }
+.gw-self .name { flex: 1; font-weight: 700; }
