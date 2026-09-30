@@ -30,7 +30,6 @@ export const PICKS = {
   hours: ['ph', 'clipboard-text'],
   viewfinder: ['bs', 'eye-fill'],
   pickup: ['bs', 'clipboard2-check-fill'],
-  kelvin: ['bs', 'thermometer-sun'],
   expendables: ['fa', 'tape'],
 };
 

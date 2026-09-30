@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { DEPT_ICON, TOOL_ICON, deptIcon, toolIcon } from '../js/ui/icons.js';
 
 const DEPTS = ['cameras', 'lenses', 'video', 'media', 'tripods', 'grip', 'power', 'accessories', 'expendables', 'other'];
-const TOOLS = ['media', 'fov', 'shutter', 'kelvin', 'hours', 'offload', 'sun', 'luts', 'units', 'pickup', 'viewfinder'];
+const TOOLS = ['media', 'fov', 'shutter', 'hours', 'offload', 'sun', 'luts', 'units', 'pickup', 'viewfinder'];
 
 test('every department and tool has a solid, self-contained icon', () => {
   for (const [set, keys] of [[DEPT_ICON, DEPTS], [TOOL_ICON, TOOLS]]) {

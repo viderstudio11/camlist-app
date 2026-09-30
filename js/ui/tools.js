@@ -1,7 +1,6 @@
 import { esc, icons, toast } from './dom.js';
 import { toolIcon } from './icons.js';
 import { createMedia } from '../tools/media.js';
-import { kelvinTool, wireKelvin, stopKelvin } from './kelvin.js';
 import { timeFromAngle, angleFromTime, asFraction, flicker, slowMotion, FRAME_RATES, shutterChoices } from '../tools/shutter.js';
 import { PRIME_SET, SHOTS, lensFor, frameAt, pickLens, toUnit, fromUnit } from '../tools/fov.js';
 import { sunDay, sunStatus, zoneOf, localTime, todayIn } from '../tools/solar.js';
@@ -19,26 +18,6 @@ const L = {
   fov_sub:    { he: 'איזה מוקד מכסה את הפריים מהמרחק הזה', en: 'Which focal length covers the frame from there' },
   shutter:    { he: 'פריים רייט ושאטר', en: 'Frame rate & shutter' },
   shutter_sub:{ he: 'זווית תריס, מהירות, ופליקר', en: 'Shutter angle, speed and flicker' },
-  kelvin:     { he: 'מד קלווין', en: 'Kelvin meter' },
-  kelvin_sub: { he: 'טמפרטורת הצבע של האור, דרך מצלמת הטלפון', en: 'The light’s colour temperature, through the phone camera' },
-  k_intro:    { he: 'כוון את מצלמת הטלפון אל כרטיס לבן או אפור שמואר באור שאתה רוצה למדוד', en: 'Point the phone camera at a white or grey card lit by the light you want to measure' },
-  k_start:    { he: 'פתח את המצלמה', en: 'Open the camera' },
-  k_stop:     { he: 'עצור', en: 'Stop' },
-  k_aim:      { he: 'מלא את הריבוע בכרטיס לבן או אפור', en: 'Fill the square with a white or grey card' },
-  k_hold:     { he: 'החזק יציב — המספר מתייצב תוך שנייה', en: 'Hold steady — the number settles in a second' },
-  k_bright:   { he: 'חזק מדי — התרחק מעט או הטה את הכרטיס', en: 'Too bright — step back or tilt the card' },
-  k_dark:     { he: 'חשוך מדי — קרב את הכרטיס לאור', en: 'Too dark — bring the card into the light' },
-  k_unsupported: { he: 'הדפדפן בטלפון הזה לא מאפשר לנעול איזון לבן, ולכן אי אפשר למדוד — מצלמה שמאזנת לבד תמיד רואה את הכרטיס ניטרלי. נסה בכרום באנדרואיד.', en: 'This phone’s browser does not let an app lock white balance, so it cannot measure — a camera that balances itself always sees the card as neutral. Try Chrome on Android.' },
-  k_denied:   { he: 'אין גישה למצלמה', en: 'No access to the camera' },
-  k_badge:    { he: 'הערכה', en: 'Estimate' },
-  k_caveat:   { he: 'מצלמת טלפון, לא מד צבע — דיוק של בערך ±300K', en: 'a phone camera, not a colour meter — about ±300 K' },
-  k_how:      { he: 'איזון הלבן של המצלמה ננעל על 5500K; כרטיס ניטרלי שנראה חם או קר יותר מזה מראה עד כמה האור רחוק מ־5500K. החישוב: sRGB ← XYZ ← xy ← CCT (McCamy). חיישן הטלפון ועיבוד התמונה שלו משפיעים על התוצאה — להחלטות קריטיות השתמש במד צבע.', en: 'The camera’s white balance is locked at 5500 K; a neutral card that looks warmer or cooler shows how far the light is from 5500 K. The maths: sRGB → XYZ → xy → CCT (McCamy). The phone’s sensor and processing affect the result — for critical calls use a colour meter.' },
-  k_candle:   { he: 'נר / נורת להט עמומה', en: 'Candle / dim tungsten' },
-  k_tungsten: { he: 'טונגסטן', en: 'Tungsten' },
-  k_mixed:    { he: 'שקיעה / אור מעורב', en: 'Sunset / mixed light' },
-  k_daylight: { he: 'אור יום', en: 'Daylight' },
-  k_overcast: { he: 'מעונן', en: 'Overcast' },
-  k_shade:    { he: 'צל / שמיים כחולים', en: 'Shade / blue sky' },
   offload:    { he: 'זמן העתקה', en: 'Offload time' },
   offload_sub:{ he: 'כמה זמן ייקח הדאמפ בסוף היום', en: 'How long the dump takes at wrap' },
   sun:        { he: 'שקיעה וזריחה', en: 'Sun times' },
@@ -273,7 +252,7 @@ const eqHFov = (eq) => (2 * Math.atan(18 / eq) * 180) / Math.PI;
 // Short labels for places outside the tools screen (the home screen's tool row).
 export const toolLabel = (k, lang) => L[k]?.[lang] ?? L[k]?.he ?? k;
 
-const TOOLS = ['media', 'fov', 'shutter', 'kelvin', 'hours', 'offload', 'sun', 'luts', 'units'];
+const TOOLS = ['media', 'fov', 'shutter', 'hours', 'offload', 'sun', 'luts', 'units'];
 
 
 export function render(ctx, { tool: id }, root) {
@@ -282,7 +261,6 @@ export function render(ctx, { tool: id }, root) {
 
   if (!id) {
     if (vfStream) stopViewfinder(null);
-    stopKelvin();
     ctx.setTopbar({ title: esc(T('tools')), back: '#/' });
     root.innerHTML = `
       <p class="screen-sub">${esc(T('tools_sub'))}</p>
@@ -299,9 +277,8 @@ export function render(ctx, { tool: id }, root) {
   }
 
   if (id !== 'fov' && vfStream) stopViewfinder(null);
-  if (id !== 'kelvin') stopKelvin();
   ctx.setTopbar({ title: esc(T(id)), back: '#/tools' });
-  const body = { media: mediaTool, kelvin: kelvinTool, fov: fovTool, shutter: shutterTool, hours: hoursTool, offload: offloadTool, sun: sunTool, luts: lutsTool, units: unitsTool }[id];
+  const body = { media: mediaTool, fov: fovTool, shutter: shutterTool, hours: hoursTool, offload: offloadTool, sun: sunTool, luts: lutsTool, units: unitsTool }[id];
   if (!body) { ctx.navigate('#/tools'); return; }
   root.innerHTML = `<div class="tool">${body(T, lang, ctx)}</div>`;
   wire(root, ctx, id, T, lang);
@@ -1061,7 +1038,6 @@ function wire(root, ctx, id, T, lang) {
   for (const [attr, key] of [['hbase', 'base'], ['ht1h', 'tier1h'], ['ht1p', 'tier1pct'], ['ht2p', 'tier2pct'], ['hturn', 'turnaround']]) {
     root.querySelectorAll(`[data-${attr}]`).forEach(b => { b.onclick = () => { hr[key] = Number(b.dataset[attr]); ctx.render(); }; });
   }
-  if (id === 'kelvin') wireKelvin(root, ctx, T);
   root.querySelectorAll('[data-lutbrand]').forEach(b => { b.onclick = () => { S.luts.brand = b.dataset.lutbrand; S.luts.model = ''; ctx.render(); }; });
   root.querySelectorAll('[data-lutmodel]').forEach(b => { b.onclick = () => { S.luts.model = b.dataset.lutmodel; ctx.render(); }; });
   root.querySelectorAll('[data-lens]').forEach(b => { b.onclick = () => { S.fov.focal = Number(b.dataset.lens); ctx.render(); }; });
