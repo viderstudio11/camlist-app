@@ -1,5 +1,5 @@
 {
-  "_readme": "Supplementary products that Utopia does not carry. Merged into the catalog with source='extra' and shown with a 'not at Utopia' badge. dept = department slug, subcat = subcategory English name. Add entries freely. departments: new departments (slotted in after `after`); extend: subcategories added to existing departments; moves: re-file source products whose name matches `match` (first match wins) from subcategory `from` into department `to` / `subcat`. A product with brand null reads as General.",
+  "_readme": "Supplementary products that Utopia does not carry. Merged into the catalog with source='extra' and shown with a 'not at Utopia' badge. dept = department slug, subcat = subcategory English name. Add entries freely. departments: new departments (slotted in after `after`); extend: subcategories added to existing departments; moves: re-file source products whose name matches `match` (first match wins) from subcategory `from` into department `to` / `subcat`. A product with brand null reads as General. presets: named sets of { id, qty } a screen can add in one tap (expendables = the basic cart set).",
   "brands": [
     {
       "id": "prograde",
@@ -375,6 +375,195 @@
       "brand": null,
       "dept": "power",
       "subcat": "Power Cables"
+    },
+    {
+      "id": "x_exp_gaffer2",
+      "name": "Gaffer Tape 2\" Black",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Tape"
+    },
+    {
+      "id": "x_exp_gaffer1",
+      "name": "Gaffer Tape 1\" (colours)",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Tape"
+    },
+    {
+      "id": "x_exp_paper",
+      "name": "Paper Tape 1\" (Artist Tape)",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Tape"
+    },
+    {
+      "id": "x_exp_spike",
+      "name": "Spike Tape (colours)",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Tape"
+    },
+    {
+      "id": "x_exp_double",
+      "name": "Double-Sided Tape",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Tape"
+    },
+    {
+      "id": "x_exp_aa",
+      "name": "AA Batteries",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Batteries"
+    },
+    {
+      "id": "x_exp_aaa",
+      "name": "AAA Batteries",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Batteries"
+    },
+    {
+      "id": "x_exp_9v",
+      "name": "9V Batteries",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Batteries"
+    },
+    {
+      "id": "x_exp_cr2032",
+      "name": "CR2032 Coin Cells",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Batteries"
+    },
+    {
+      "id": "x_exp_sharpie",
+      "name": "Sharpie Markers",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Marking"
+    },
+    {
+      "id": "x_exp_dryerase",
+      "name": "Dry-Erase Markers (slate)",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Marking"
+    },
+    {
+      "id": "x_exp_chalk",
+      "name": "Chalk",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Marking"
+    },
+    {
+      "id": "x_exp_tissue",
+      "name": "Lens Tissue",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Lens Care"
+    },
+    {
+      "id": "x_exp_fluid",
+      "name": "Lens Cleaning Fluid",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Lens Care"
+    },
+    {
+      "id": "x_exp_microfiber",
+      "name": "Microfiber Cloths",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Lens Care"
+    },
+    {
+      "id": "x_exp_blower",
+      "name": "Air Blower",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Lens Care"
+    },
+    {
+      "id": "x_exp_dustoff",
+      "name": "Compressed Air (Dust-Off)",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Lens Care"
+    },
+    {
+      "id": "x_exp_zipties",
+      "name": "Cable Ties (Zip Ties)",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Rigging & Ties"
+    },
+    {
+      "id": "x_exp_velcro",
+      "name": "Velcro Cable Ties",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Rigging & Ties"
+    },
+    {
+      "id": "x_exp_bungee",
+      "name": "Bungee Cords",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Rigging & Ties"
+    },
+    {
+      "id": "x_exp_c47",
+      "name": "Clothespins (C-47)",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Rigging & Ties"
+    },
+    {
+      "id": "x_exp_blackwrap",
+      "name": "Black Wrap (Cinefoil)",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Rigging & Ties"
+    },
+    {
+      "id": "x_exp_rainbags",
+      "name": "Rain Bags / Plastic Covers",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "General Supplies"
+    },
+    {
+      "id": "x_exp_trash",
+      "name": "Trash Bags",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "General Supplies"
+    },
+    {
+      "id": "x_exp_gloves",
+      "name": "Work Gloves",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "General Supplies"
+    },
+    {
+      "id": "x_exp_headlamp",
+      "name": "Headlamp",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "General Supplies"
+    },
+    {
+      "id": "x_exp_silica",
+      "name": "Silica Gel Packs",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "General Supplies"
     }
   ],
   "departments": [
@@ -403,6 +592,38 @@
         {
           "he": "כבלים ומפצלים",
           "en": "Cables & Hubs"
+        }
+      ]
+    },
+    {
+      "slug": "expendables",
+      "he": "מתכלים",
+      "en": "Expendables",
+      "after": "accessories",
+      "subcategories": [
+        {
+          "he": "טייפים",
+          "en": "Tape"
+        },
+        {
+          "he": "סוללות",
+          "en": "Batteries"
+        },
+        {
+          "he": "סימון",
+          "en": "Marking"
+        },
+        {
+          "he": "ניקוי עדשות",
+          "en": "Lens Care"
+        },
+        {
+          "he": "קשירה ורידינג",
+          "en": "Rigging & Ties"
+        },
+        {
+          "he": "כללי",
+          "en": "General Supplies"
         }
       ]
     }
@@ -443,5 +664,93 @@
       "to": "media",
       "subcat": "Drives & SSD"
     }
-  ]
+  ],
+  "presets": {
+    "expendables": [
+      {
+        "id": "x_exp_gaffer2",
+        "qty": 2
+      },
+      {
+        "id": "x_exp_gaffer1",
+        "qty": 2
+      },
+      {
+        "id": "x_exp_paper",
+        "qty": 2
+      },
+      {
+        "id": "x_exp_spike",
+        "qty": 1
+      },
+      {
+        "id": "x_exp_aa",
+        "qty": 24
+      },
+      {
+        "id": "x_exp_aaa",
+        "qty": 12
+      },
+      {
+        "id": "x_exp_9v",
+        "qty": 4
+      },
+      {
+        "id": "x_exp_sharpie",
+        "qty": 4
+      },
+      {
+        "id": "x_exp_dryerase",
+        "qty": 4
+      },
+      {
+        "id": "x_exp_tissue",
+        "qty": 1
+      },
+      {
+        "id": "x_exp_fluid",
+        "qty": 1
+      },
+      {
+        "id": "x_exp_microfiber",
+        "qty": 4
+      },
+      {
+        "id": "x_exp_blower",
+        "qty": 1
+      },
+      {
+        "id": "x_exp_dustoff",
+        "qty": 2
+      },
+      {
+        "id": "x_exp_zipties",
+        "qty": 1
+      },
+      {
+        "id": "x_exp_velcro",
+        "qty": 20
+      },
+      {
+        "id": "x_exp_c47",
+        "qty": 10
+      },
+      {
+        "id": "x_exp_blackwrap",
+        "qty": 1
+      },
+      {
+        "id": "x_exp_rainbags",
+        "qty": 2
+      },
+      {
+        "id": "x_exp_trash",
+        "qty": 1
+      },
+      {
+        "id": "x_exp_headlamp",
+        "qty": 1
+      }
+    ]
+  }
 }

@@ -1,5 +1,5 @@
 export const LANGS = ['he', 'en'];
-export const DEPT_EMOJI = { cameras: '📷', lenses: '🔭', video: '📺', media: '💾', tripods: '🔺', grip: '🎬', power: '🔋', accessories: '🔧', other: '📦' };
+export const DEPT_EMOJI = { cameras: '📷', lenses: '🔭', video: '📺', media: '💾', expendables: '🧻', tripods: '🔺', grip: '🎬', power: '🔋', accessories: '🔧', other: '📦' };
 
 export const dict = {
   he: {
@@ -22,7 +22,7 @@ export const dict = {
     total: 'סה"כ', qty: 'כמות', item: 'פריט', link: 'קישור', gear_list: 'רשימת ציוד', storage_warning: 'לא ניתן לשמור — הנתונים יאבדו בסגירה',
     manual_in_use: 'הפריט בשימוש בפרויקטים: {names}', dept_cameras: 'מצלמות', dept_lenses: 'עדשות', dept_grip: 'גריפ',
     dept_accessories: 'אביזרים', dept_other: 'אחר', brand_general: 'כללי', untitled: 'ללא שם', signature: 'חתימה',
-    dept_video: 'וידאו', dept_media: 'מדיה ופריקה', dept_tripods: 'חצובות', dept_power: 'סוללות וכוח', jump_to_brand: 'קפיצה ליצרן', optional: 'אופציונלי', hero_sub: 'רשימות ציוד להפקות', stat_products: 'מוצרים', stat_brands: 'יצרנים', stat_projects: 'פרויקטים',
+    dept_video: 'וידאו', dept_media: 'מדיה ופריקה', dept_expendables: 'מתכלים', exp_add_set: 'הוסף סט מתכלים בסיסי ({n} פריטים)', exp_added: 'נוספו {n} פריטים', dept_tripods: 'חצובות', dept_power: 'סוללות וכוח', jump_to_brand: 'קפיצה ליצרן', optional: 'אופציונלי', hero_sub: 'רשימות ציוד להפקות', stat_products: 'מוצרים', stat_brands: 'יצרנים', stat_projects: 'פרויקטים',
     models_count: '{n} דגמים', all_brands: 'כל היצרנים', choose_brand: 'בחר יצרן', choose_subcat: 'בחר קטגוריה', no_brand: 'ללא יצרן', show_more: 'הצג עוד ({n})',
     lang_switch: 'EN', install_hint: 'טיפ: הוסף למסך הבית כדי לעבוד כמו אפליקציה', in_project: 'בפרויקט',
     build_around: 'בנה סביב', building_around: 'בונה סביב', active_camera: 'מצלמה פעילה', compat_only: 'רק תואם', show_all_items: 'הצג הכל',
@@ -58,7 +58,7 @@ export const dict = {
     total: 'Total', qty: 'Qty', item: 'Item', link: 'Link', gear_list: 'Gear list', storage_warning: "Can't save — data will be lost on close",
     manual_in_use: 'Item is used in projects: {names}', dept_cameras: 'Cameras', dept_lenses: 'Lenses', dept_grip: 'Grip',
     dept_accessories: 'Accessories', dept_other: 'Other', brand_general: 'General', untitled: 'Untitled', signature: 'Signature',
-    dept_video: 'Video', dept_media: 'Media & Offload', dept_tripods: 'Tripods & Heads', dept_power: 'Power', jump_to_brand: 'Jump to brand', optional: 'optional', hero_sub: 'Production gear lists', stat_products: 'products', stat_brands: 'brands', stat_projects: 'projects',
+    dept_video: 'Video', dept_media: 'Media & Offload', dept_expendables: 'Expendables', exp_add_set: 'Add the basic expendables set ({n} items)', exp_added: '{n} items added', dept_tripods: 'Tripods & Heads', dept_power: 'Power', jump_to_brand: 'Jump to brand', optional: 'optional', hero_sub: 'Production gear lists', stat_products: 'products', stat_brands: 'brands', stat_projects: 'projects',
     models_count: '{n} models', all_brands: 'All brands', choose_brand: 'Choose a brand', choose_subcat: 'Choose a category', no_brand: 'No brand', show_more: 'Show more ({n})',
     lang_switch: 'עב', install_hint: 'Tip: add to Home Screen to use it like an app', in_project: 'in project',
     build_around: 'Build around', building_around: 'Building around', active_camera: 'Active camera', compat_only: 'Compatible only', show_all_items: 'Show all',

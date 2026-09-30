@@ -129,6 +129,8 @@ export function createCatalog(data, manual = [], extra = null) {
     deptKey: (id) => deptMap.get(id)?.slug || 'other',
     brandName: (slug) => brandNames.get(slug) || slug,
     search, setManual,
+    // A named set from the supplement (the basic expendables cart), limited to items that exist.
+    preset: (name) => (extra?.presets?.[name] || []).filter(x => byIdMap.has(x.id)),
     generatedAt: data.generatedAt || null,
   };
 }

@@ -243,7 +243,8 @@ export function render(ctx, { id }, root) {
       crumbs = `<div class="crumbs"><button data-crumb="root">${t('departments')}</button>${arrow}${af.kind ? `<button data-crumb="dept">${esc(deptName(d))}</button>${arrow}<span>${t('acc_' + af.kind)}</span>` : `<span>${esc(deptName(d))}</span>`}</div>`;
     } else if (!st.subcat) {
       crumbs = `<div class="crumbs"><button data-crumb="root">${t('departments')}</button>${arrow}<span>${esc(deptName(d))}</span></div>`;
-      content = `<div class="section-title">${t('choose_subcat')}</div><div class="sub-list">${catalog.subcatsOf(st.dept).map(s => `<div class="card" data-sub="${s.id}"><b>${esc(subName(s))}</b><span class="n">${visible(catalog.bySubcat(s.id)).length}</span></div>`).join('')}</div>`;
+      const set = d.slug === 'expendables' ? catalog.preset('expendables').filter(x => !getQty(items(), x.id)) : [];
+      content = `${set.length ? `<button class="btn block primary exp-set" data-exp-set>${icons.plus}${t('exp_add_set', { n: set.length })}</button>` : ''}<div class="section-title">${t('choose_subcat')}</div><div class="sub-list">${catalog.subcatsOf(st.dept).map(s => `<div class="card" data-sub="${s.id}"><b>${esc(subName(s))}</b><span class="n">${visible(catalog.bySubcat(s.id)).length}</span></div>`).join('')}</div>`;
     } else {
       const s = d.subcategories.find(x => x.id === st.subcat);
       crumbs = `<div class="crumbs"><button data-crumb="root">${t('departments')}</button>${arrow}<button data-crumb="dept">${esc(deptName(d))}</button>${arrow}<span>${esc(subName(s))}</span></div>`;
@@ -292,6 +293,14 @@ export function render(ctx, { id }, root) {
   root.querySelector('[data-lf-clear]')?.addEventListener('click', () => { lf = { type: null, mount: null, format: null }; rerender(); });
   root.querySelectorAll('[data-tab]').forEach(b => { b.onclick = () => { st.view = b.dataset.tab; st.dept = null; st.subcat = null; st.brand = null; st.sub = null; rerender(); }; });
   root.querySelectorAll('[data-dept]').forEach(c => { c.onclick = () => { st.dept = Number(c.dataset.dept); st.brand = null; st.subcat = null; st.sub = null; lf = { type: null, mount: null, format: null }; af = { kind: null, type: null, size: null }; rerender(); }; });
+  root.querySelector('[data-exp-set]')?.addEventListener('click', () => {
+    const set = catalog.preset('expendables').filter(x => !getQty(items(), x.id));
+    let list = items();
+    for (const { id: pid, qty } of set) list = addItem(list, catalog.byId(pid), qty);
+    store.setItems(id, list);
+    toast(t('exp_added', { n: set.length }), { kind: 'ok' });
+    rerender();
+  });
   root.querySelectorAll('[data-sub]').forEach(c => { c.onclick = () => { st.subcat = Number(c.dataset.sub); rerender(); }; });
   root.querySelectorAll('[data-brand]').forEach(c => { c.onclick = () => { st.brand = c.dataset.brand; st.sub = null; if (st.view === 'brands') st.dept = null; rerender(); }; });
   root.querySelectorAll('[data-chip]').forEach(c => { c.onclick = () => { st.dept = c.dataset.chip ? Number(c.dataset.chip) : null; rerender(); }; });

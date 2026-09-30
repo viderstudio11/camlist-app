@@ -158,3 +158,16 @@ test('a supplement can add a department and move products into it by name', () =
   assert.equal(cat.byId('x_laptop_pc').brand, 'general');
   assert.equal(cat.bySubcat(sub('Computers')).length, 2);
 });
+
+test('expendables: its own department and a basic set that points at real items', async () => {
+  const { readFileSync } = await import('node:fs');
+  const read = (f) => JSON.parse(readFileSync(new URL(`../data/${f}`, import.meta.url), 'utf8'));
+  const cat = createCatalog(read('catalog.json'), [], read('extra.json'));
+  const d = cat.departments.find(x => x.slug === 'expendables');
+  assert.ok(d);
+  assert.equal(cat.departments[cat.departments.indexOf(d) - 1].slug, 'accessories');
+  const set = cat.preset('expendables');
+  assert.ok(set.length >= 15);
+  for (const { id, qty } of set) { assert.ok(cat.byId(id), id); assert.ok(qty > 0); assert.equal(cat.byId(id).dept, d.id); }
+  assert.equal(cat.byId('x_exp_gaffer2').brand, 'general');
+});

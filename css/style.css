@@ -963,3 +963,4 @@ body.split .view { max-width: none; padding: 12px 16px 0; }
 .fly-ok { color: var(--ok-ink); font-weight: var(--w-strong); }
 .fly-warn { color: var(--warn-ink); font-weight: var(--w-strong); }
 .fly-bad { color: #c0392b; font-weight: var(--w-strong); }
+.exp-set { margin-bottom: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
