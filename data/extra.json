@@ -591,7 +591,7 @@
       "name": "BNC Cable — Short (30 cm)",
       "brand": null,
       "dept": "video",
-      "subcat": "Converters"
+      "subcat": "Video Cables"
     }
   ],
   "departments": [
@@ -721,9 +721,96 @@
           "en": "Power Cables"
         }
       ]
+    },
+    {
+      "dept": "video",
+      "subcategories": [
+        {
+          "he": "כבלי וידאו",
+          "en": "Video Cables"
+        }
+      ]
     }
   ],
   "moves": [
+    {
+      "from": "General Accessories",
+      "match": "distance measure|udm-|tape measure",
+      "to": "lenscontrol",
+      "subcat": "Follow Focus Accessories"
+    },
+    {
+      "from": "General Accessories",
+      "match": "splitter|\\bda[- ]?box|bluebox|\\bda-\\d|distribution",
+      "to": "video",
+      "subcat": "Converters"
+    },
+    {
+      "from": "General Accessories",
+      "match": "steady bag|cinesaddle",
+      "to": "grip",
+      "subcat": "Grip Accessories"
+    },
+    {
+      "from": "General Accessories",
+      "match": "^ut arm$",
+      "to": "monitors",
+      "subcat": "Monitor Accessories"
+    },
+    {
+      "from": "General Accessories",
+      "match": "finder|\\bevf\\b",
+      "to": "monitors",
+      "subcat": "Viewfinders & EVF"
+    },
+    {
+      "from": "Matte Boxes",
+      "match": "vaxis|\\bfilter\\b",
+      "to": "accessories",
+      "subcat": "Round"
+    },
+    {
+      "fromDept": "accessories",
+      "match": "^bnc cable$|^hdmi cable$",
+      "to": "video",
+      "subcat": "Video Cables"
+    },
+    {
+      "fromDept": "accessories",
+      "match": "zoom motor",
+      "to": "lenscontrol",
+      "subcat": "Zoom & Remote Control"
+    },
+    {
+      "fromDept": "accessories",
+      "match": "puppeteer",
+      "to": "tripods",
+      "subcat": "Gimbals & Stabilizers"
+    },
+    {
+      "fromDept": "accessories",
+      "match": "gopro|nd filter",
+      "to": "accessories",
+      "subcat": "General Accessories"
+    },
+    {
+      "fromDept": "grip",
+      "match": "baby adapter",
+      "to": "grip",
+      "subcat": "Grip Accessories"
+    },
+    {
+      "fromDept": "lenses",
+      "match": "converter|b4 to pl",
+      "to": "lenses",
+      "subcat": "Lens Adapters"
+    },
+    {
+      "fromDept": "cameras",
+      "match": "pinhole|hidden camera",
+      "to": "cameras",
+      "subcat": "“Compact 1/3” -1/2"
+    },
     {
       "from": "Monitors",
       "match": "hyperdeck",
@@ -852,7 +939,7 @@
     },
     {
       "from": "Controlers",
-      "match": "motor|cforce|\bclm-",
+      "match": "motor|cforce|\\bclm-",
       "to": "lenscontrol",
       "subcat": "Wireless Follow Focus"
     },

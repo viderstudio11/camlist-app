@@ -47,14 +47,17 @@ export function createCatalog(data, manual = [], extra = null) {
   for (const b of extra?.brands || []) brandNames.set(b.id, b.name); // supplement's display names win
   // Moves re-file source products by name — e.g. cards and readers out of Video into Media & Offload.
   const subByName = (en) => sourceDepts.flatMap(d => d.subcategories.map(sc => ({ ...sc, dept: d.id }))).find(sc => sc.en === en || sc.he === en);
+  // A move names the shelf it takes from, or (fromDept) a department whose items sit on no shelf at all.
   const moves = (extra?.moves || []).map(m => {
-    const from = subByName(m.from);
+    const from = m.from ? subByName(m.from) : null;
+    const fromDept = m.fromDept ? sourceDepts.find(d => d.slug === m.fromDept) : null;
     const dept = departments.find(d => d.slug === m.to);
     const to = dept?.subcategories.find(sc => sc.en === m.subcat);
-    return from && dept ? { from: from.id, rx: new RegExp(m.match, 'i'), dept: dept.id, subcats: to ? [to.id] : [] } : null;
+    return (from || fromDept) && dept ? { from: from?.id ?? null, fromDept: fromDept?.id ?? null, rx: new RegExp(m.match, 'i'), dept: dept.id, subcats: to ? [to.id] : [] } : null;
   }).filter(Boolean);
+  const takes = (x, p) => (x.from != null ? (p.subcats || []).includes(x.from) : p.dept === x.fromDept && !(p.subcats || []).length);
   const moved = (p) => {
-    const m = moves.find(x => (p.subcats || []).includes(x.from) && x.rx.test(p.name));
+    const m = moves.find(x => takes(x, p) && x.rx.test(p.name));
     return m ? { ...p, dept: m.dept, subcats: m.subcats } : p;
   };
   const extraProducts = (extra?.products || []).map(x => {
