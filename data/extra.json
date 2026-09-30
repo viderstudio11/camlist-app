@@ -768,6 +768,104 @@
       "subcat": "Drives & SSD",
       "url": "https://www.atomos.com/product/ninja/",
       "src": "Atomos, Ninja: media AtomX SSDmini / SATA drives via Master Caddy"
+    },
+    {
+      "id": "x_gen_dummy_bpu",
+      "name": "Dummy Battery BP-U — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_fz100",
+      "name": "Dummy Battery NP-FZ100 — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_fw50",
+      "name": "Dummy Battery NP-FW50 — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_npf",
+      "name": "Dummy Battery NP-F (L-Series) — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_npfv",
+      "name": "Dummy Battery NP-FV — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_sa100",
+      "name": "Dummy Battery NP-SA100 — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_bpa",
+      "name": "Dummy Battery BP-A — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_bp9",
+      "name": "Dummy Battery BP-9 — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_lpe6",
+      "name": "Dummy Battery LP-E6 — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_blj31",
+      "name": "Dummy Battery DMW-BLJ31 — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_blk22",
+      "name": "Dummy Battery DMW-BLK22 — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_blf19",
+      "name": "Dummy Battery DMW-BLF19 — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_vbr",
+      "name": "Dummy Battery VBR — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
+    },
+    {
+      "id": "x_gen_dummy_w235",
+      "name": "Dummy Battery NP-W235 — D-Tap Cable",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Power Cables"
     }
   ],
   "departments": [

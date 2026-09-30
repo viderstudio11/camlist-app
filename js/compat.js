@@ -45,8 +45,16 @@ export const BATTERY = {
   'DMW-BLF19': /blf-?19/i, 'DMW-BLK22': /blk-?22/i, 'DMW-BLJ31': /blj-?31/i, 'NP-W235': /w-?235/i, 'TB50': /tb-?50/i, 'BP-FL': /bp-?fl/i,
   'GoPro': /\bhero\d*|gopro|aadbd/i, 'Insta360': /insta360|\bx[345]\b|למצלמת x|ace pro/i, 'Osmo': /osmo/i,
 };
+// A D-Tap-to-dummy-battery cable per battery family (the item it adds and how its name reads).
+export const DUMMY = {
+  'BP-U': { add: 'x_gen_dummy_bpu', rx: 'bp-?u' }, 'NP-FZ100': { add: 'x_gen_dummy_fz100', rx: 'np-?fz' }, 'NP-FW50': { add: 'x_gen_dummy_fw50', rx: 'np-?fw' },
+  'NP-F': { add: 'x_gen_dummy_npf', rx: 'np-?f\\b|np-?f5|l-series' }, 'NP-FV': { add: 'x_gen_dummy_npfv', rx: 'np-?fv' }, 'NP-SA100': { add: 'x_gen_dummy_sa100', rx: 'np-?sa' },
+  'BP-A': { add: 'x_gen_dummy_bpa', rx: 'bp-?a' }, 'BP-9': { add: 'x_gen_dummy_bp9', rx: 'bp-?9' }, 'LP-E6': { add: 'x_gen_dummy_lpe6', rx: 'lp-?e6' },
+  'DMW-BLJ31': { add: 'x_gen_dummy_blj31', rx: 'blj-?31' }, 'DMW-BLK22': { add: 'x_gen_dummy_blk22', rx: 'blk-?22' }, 'DMW-BLF19': { add: 'x_gen_dummy_blf19', rx: 'blf-?19' },
+  'VBR': { add: 'x_gen_dummy_vbr', rx: 'vbr' }, 'NP-W235': { add: 'x_gen_dummy_w235', rx: 'w-?235' },
+};
 // Power items that are not camera batteries/chargers (lighting/grid power, UPS, adapters).
-const POWER_IGNORE = /48v|power pack|portable power|\bups\b|\bgel\b|\b(12|24)v battery|24v battery charger|d-tap batt|li-ion 11\.1v|energy storage|vertex/i;
+const POWER_IGNORE = /dummy|48v|power pack|portable power|\bups\b|\bgel\b|\b(12|24)v battery|24v battery charger|d-tap batt|li-ion 11\.1v|energy storage|vertex/i;
 
 export function parseMounts(text) {
   const out = new Set();
@@ -160,6 +168,24 @@ export function createCompat(data, catalog) {
   // A slot with `kind` (card / reader / battery / charger) only counts items of that kind.
   // With `alloc` (what was added through this camera's own kit, per slot) a second camera starts empty instead
   // of counting the first camera's cards and batteries; the list still caps it.
+  // Power through V-Lock: a camera on its own battery family can run from a V-Lock battery on a plate,
+  // with a D-Tap cable into a dummy battery of that family. The battery slot then counts V-Lock batteries
+  // (half as many — each lasts longer), the charger slot V-Lock chargers, and a plate and a dummy cable join.
+  function canVlock(prof) {
+    const fam = prof?.battery?.[0];
+    return !!fam && !prof.battery.some(b => ['V-Mount', 'Gold', 'B-Mount'].includes(b)) && !!DUMMY[fam] && !['action', 'ptz'].includes(prof.type);
+  }
+  function powered(prof, route) {
+    if (route !== 'vlock' || !canVlock(prof)) return prof;
+    const fam = prof.battery[0], d = DUMMY[fam];
+    return { ...prof, battery: ['V-Mount'], native: prof.battery, route: 'vlock',
+      kit: (prof.kit || []).flatMap(s => (s.slot !== 'battery' ? [s] : [
+        { ...s, qty: Math.max(2, Math.ceil(s.qty / 2)), he: 'סוללות V-Lock', en: 'V-Lock batteries' },
+        { slot: 'vplate', he: 'פלטת V-Lock עם D-Tap', en: 'V-Lock plate with D-Tap', qty: 1, match: 'v-?(mount|lock) (battery )?plate', add: 'x_gen_plate_v' },
+        { slot: 'dummy', he: `כבל D-Tap לסוללת דמה ${fam}`, en: `D-Tap to ${fam} dummy battery`, qty: 1, match: `dummy.*(${d.rx})`, add: d.add },
+      ])) };
+  }
+
   function kitStatus(prof, items, resolve, alloc = null) {
     const chosen = chosenMedia(prof, items, resolve);
     return (prof?.kit || []).map(slot => {
@@ -172,8 +198,11 @@ export function createCompat(data, catalog) {
       const wanted = [where.subcat].flat().filter(Boolean);
       const subIds = wanted.map(en => (dept?.subcategories || []).find(s => s.en === en)?.id).filter(x => x != null);
       const subId = subIds[0] ?? null;
+      // A slot that names its item (the V-Lock plate, a dummy battery) counts by name, wherever it is filed.
+      const rx = slot.match ? new RegExp(slot.match, 'i') : null;
       const have = items.reduce((n, it) => {
         const p = resolve(it.productId) || { dept: it.snapshot?.dept, subcats: [] };
+        if (rx) return rx.test(p.name || '') ? n + it.qty : n;
         if (p.dept !== deptId || (subIds.length && !subIds.some(x => (p.subcats || []).includes(x)))) return n;
         if (slot.kind && p.name && verdict(p, prof, { chosenMedia: chosen }).kind !== slot.kind) return n;
         return n + it.qty;
@@ -185,7 +214,7 @@ export function createCompat(data, catalog) {
     });
   }
 
-  return { profileFor, isCamera, lensInfo, verdict, kitStatus, chosenMedia, readersFor, profiles };
+  return { profileFor, isCamera, lensInfo, verdict, kitStatus, chosenMedia, readersFor, profiles, canVlock, powered };
 }
 
 export async function loadCompat(url = 'data/compat.json') {

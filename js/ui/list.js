@@ -8,7 +8,7 @@ import { deptIcon } from './icons-dept.js';
 import { toolIcon } from './icons.js';
 import { editProjectSheet } from './projects.js';
 import { presetCatalog } from './catalog.js';
-import { allocFor, ensureAlloc } from '../kitalloc.js';
+import { allocFor, ensureAlloc, bump } from '../kitalloc.js';
 
 const collapsed = new Set();
 let showKit = false;
@@ -42,7 +42,9 @@ export function render(ctx, { id }, root) {
   });
 
   const active = p.buildCameraId != null ? ctx.resolve(p.buildCameraId) : null;
-  const activeProf = active ? compat.profileFor(active) : null;
+  // The camera's own profile, and the one the kit runs on: its native batteries or V-Lock, as chosen.
+  const baseProf = active ? compat.profileFor(active) : null;
+  const activeProf = baseProf ? compat.powered(baseProf, (p.powerRoute || {})[p.buildCameraId]) : null;
   const groups = groupByDept(p.items, ctx.resolve, ctx.deptOrder());
 
   const gearKit = (product) => gearKitFor(ctx.catalog, product);
@@ -99,6 +101,7 @@ export function render(ctx, { id }, root) {
     </section>`);
 
 
+  const powerSwitch = () => { const v = activeProf.route === 'vlock'; return `<span class="seg pwr"><button class="${v ? '' : 'active'}" data-power="native">${esc(t('power_native', { fam: baseProf.battery[0] }))}</button><button class="${v ? 'active' : ''}" data-power="vlock">V-Lock</button></span>`; };
   let kitHTML = '';
   // Base kit checklist for the active camera
   if (active && activeProf) {
@@ -113,9 +116,9 @@ export function render(ctx, { id }, root) {
       <div class="slots">${slots.map(s => `
         <div class="slot ${s.done ? 'done' : ''}" data-slot="${esc(s.slot)}">
           <span class="slot-check">${s.done ? '✓' : ''}</span>
-          <span class="slot-label">${esc(lang === 'he' ? s.he : s.en)}${s.missing?.length ? `<small class="slot-warn">⚠ ${t('no_reader_short', { fam: esc(s.missing.join(' / ')) })}</small>` : ''}</span>
+          <span class="slot-label">${esc(lang === 'he' ? s.he : s.en)}${s.slot === 'battery' && compat.canVlock(baseProf) ? powerSwitch() : ''}${s.missing?.length ? `<small class="slot-warn">⚠ ${t('no_reader_short', { fam: esc(s.missing.join(' / ')) })}</small>` : ''}</span>
           <span class="slot-have">${s.have} / ${s.qty}</span>
-          <button class="btn sm ${s.done ? 'ghost' : ''}" data-choose="${esc(s.slot)}">${s.done ? '+' : t('choose')}</button>
+          ${s.add ? (s.done ? '' : `<button class="btn sm" data-slotadd="${esc(s.slot)}">${t('add')}</button>`) : `<button class="btn sm ${s.done ? 'ghost' : ''}" data-choose="${esc(s.slot)}">${s.done ? '+' : t('choose')}</button>`}
         </div>`).join('')}</div>
     </section>`;
   }
@@ -170,6 +173,20 @@ export function render(ctx, { id }, root) {
     const sub = d?.subcategories.find(x => x.en === slot.find.subcat);
     presetCatalog(d ? { dept: d.id, subcat: sub?.id ?? null } : {});
     ctx.navigate(`#/p/${id}/add`);
+  }; });
+  root.querySelectorAll('[data-power]').forEach(b => { b.onclick = () => {
+    store.updateProject(id, { powerRoute: { ...(p.powerRoute || {}), [p.buildCameraId]: b.dataset.power } });
+    ctx.render();
+  }; });
+  // The plate and the dummy cable are single items: one tap adds what is missing, counted for this camera.
+  root.querySelectorAll('[data-slotadd]').forEach(b => { b.onclick = () => {
+    const pr = store.getProject(id);
+    const slot = compat.kitStatus(activeProf, pr.items, ctx.resolve, allocFor(pr, p.buildCameraId)).find(s => s.slot === b.dataset.slotadd);
+    const n = Math.max(1, slot.qty - slot.have), alloc0 = ensureAlloc(pr, compat, ctx.resolve);
+    const cur = pr.items.find(i => i.productId === slot.add)?.qty || 0;
+    store.setItems(id, cur ? setQty(pr.items, slot.add, cur + n) : addItem(pr.items, ctx.resolve(slot.add), n));
+    if (pr.kitAlloc || Object.keys(alloc0).length) store.updateProject(id, { kitAlloc: bump(alloc0, p.buildCameraId, slot.slot, n) });
+    ctx.render();
   }; });
   root.querySelectorAll('[data-choose]').forEach(b => { b.onclick = () => {
     const slot = compat.kitStatus(activeProf, p.items, ctx.resolve, allocFor(p, p.buildCameraId)).find(s => s.slot === b.dataset.choose);

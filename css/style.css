@@ -987,3 +987,5 @@ body.split .view { max-width: none; padding: 12px 16px 0; }
 .gw-head:first-child { margin-top: 0; }
 .gw-self { display: flex; align-items: center; gap: 12px; padding: 10px 12px; margin-bottom: 10px; border-radius: 14px; background: var(--surface-2); }
 .gw-self .name { flex: 1; font-weight: 700; }
+.slot-label .seg.pwr { display: inline-flex; margin-inline-start: 8px; vertical-align: middle; }
+.slot-label .seg.pwr button { font-size: 11px; padding: 3px 8px; }

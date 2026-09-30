@@ -35,7 +35,8 @@ export function render(ctx, { id }, root) {
   const { compat, recency } = ctx;
   const project = store.getProject(id);
   const active = project.buildCameraId != null ? ctx.resolve(project.buildCameraId) : null;
-  const prof = active ? compat.profileFor(active) : null;
+  // the kit's power choice (native or V-Lock) decides which batteries and chargers fit
+  const prof = active ? compat.powered(compat.profileFor(active), (project.powerRoute || {})[project.buildCameraId]) : null;
   const verdicts = new Map();
   const chosenMedia = prof ? compat.chosenMedia(prof, project.items, ctx.resolve) : [];
   const verdictOf = (p) => { if (!verdicts.has(p.id)) verdicts.set(p.id, prof ? compat.verdict(p, prof, { chosenMedia }) : { status: 'neutral' }); return verdicts.get(p.id); };
