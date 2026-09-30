@@ -1,6 +1,7 @@
 import { esc, icons, openSheet, toast } from './dom.js';
 import { addItem, setQty, getQty, totalQty } from '../list.js';
 import { logoHTML, slugify, brandText } from '../brands.js';
+import { normalize } from '../catalog.js';
 import { thumbHTML, parseId, profileChips } from './list.js';
 import { lensTypes, LENS_TYPES } from '../lens.js';
 import { deptIcon } from './icons-dept.js';
@@ -348,13 +349,16 @@ export function render(ctx, { id }, root) {
       .flatMap(s => [s.add].flat().map(id => ({ c: catalog.byId(id), n: s.need - s.have, slot: s.key, label: lang === 'he' ? s.he : s.en })))
       .filter(x => x.c);
   }
+  // A slot label that only repeats the item's name ("Lens gear rings" under "Lens Gear Rings Set") says
+  // nothing; the brand says more.
+  const sameWords = (label, name) => { const n = normalize(name); return normalize(label).split(' ').every(w => n.includes(w.replace(/s$/, ''))); };
   function offerCompanions(p) {
     if (offered.has(p.id)) return;
     const list = kitOffers(p) || companionsFor(p, catalog, { items: items(), resolve: ctx.resolve }).map(c => ({ c, n: 1 }));
     if (!list.length) return;
     offered.add(p.id);
     const rowHTML = ({ c, n, slot, label }) => `<div class="row gw-row" data-gw="${esc(c.id)}" data-n="${n}" ${slot ? `data-gw-slot="${esc(slot)}"` : ''}>${thumbHTML(c, catalog.deptKey(c.dept))}
-      <div class="body"><div class="name" dir="auto">${esc(c.name)}${n > 1 ? ` <b>× ${n}</b>` : ''}</div><div class="sub">${label ? esc(label) : brandText(c.brand, c.brandName)}</div></div>
+      <div class="body"><div class="name" dir="auto">${esc(c.name)}${n > 1 ? ` <b>× ${n}</b>` : ''}</div><div class="sub">${label && !sameWords(label, c.name) ? esc(label) : brandText(c.brand, c.brandName)}</div></div>
       <button class="addbtn" data-gw-add aria-label="${t('add')}">+</button></div>`;
     const { body } = openSheet({
       title: t('goes_with', { name: p.name }),
