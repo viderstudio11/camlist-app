@@ -1,5 +1,10 @@
 [
  {
+  "version": "v2.6.0",
+  "date": "2026-09-30",
+  "label": "UX: three-to-a-row departments, named home strip, compatible-only switch, haptic add"
+ },
+ {
   "version": "v2.5.2",
   "date": "2026-09-30",
   "label": "Word alignment and date order fixed (checked in Adobe); safe saving: unreadable save kept aside, schema number, two windows no longer overwrite each other"
