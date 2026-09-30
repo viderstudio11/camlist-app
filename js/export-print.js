@@ -16,7 +16,7 @@ export function renderPrint(ctx, project, groups, root, { includeNotes = true, i
   const sections = groups.map(g => {
     return `<section class="pdept">
       <h2><span>${esc(t(`dept_${g.key}`))}</span></h2>
-      ${g.entries.map(({ item, product }) => `<div class="pline">
+      ${g.entries.map(({ item, product, accessory }) => `<div class="pline ${accessory ? 'acc' : ''}">
         <span class="q">${item.qty}×</span>
         ${includeImages ? `<span class="im">${product.image ? `<img src="${esc(product.image)}" alt="" onerror="this.remove()">` : ''}</span>` : ''}
         <span class="nm" dir="auto">${esc(displayName(product))}${includeNotes && item.note ? `<small dir="auto">${esc(item.note)}</small>` : ''}</span>

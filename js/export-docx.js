@@ -89,8 +89,8 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
     rows.push(new D.TableRow({ cantSplit: true, children: [
       cell([P(t(`dept_${g.key}`), { bold: true, size: 22 })], { w: USABLE, span: cols.length, shade: 'EFEFEF', borders: headBorders }),
     ] }));
-    for (const { item, product } of g.entries) {
-      const v = { qty: `${item.qty}×`, item: displayName(product), notes: item.note || '', link: product.url || '' };
+    for (const { item, product, accessory } of g.entries) {
+      const v = { qty: `${item.qty}×`, item: `${accessory ? '◦ ' : ''}${displayName(product)}`, notes: item.note || '', link: product.url || '' };
       rows.push(new D.TableRow({ cantSplit: true, children: cols.map(k => cell([P(v[k], {
         bold: k === 'qty', color: k === 'notes' || k === 'link' ? '666666' : undefined, size: k === 'notes' || k === 'link' ? 19 : 22,
       })], { w: W[k], borders: rowBorders })) }));

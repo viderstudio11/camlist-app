@@ -88,8 +88,8 @@ export function render(ctx, { id }, root) {
   const sections = groups.map(g => `
     <section class="group ${collapsed.has(g.key) ? 'collapsed' : ''}" data-key="${g.key}">
       <div class="group-head"><span class="dept-ico sm">${deptIcon(g.key)}</span><h2>${t(`dept_${g.key}`)}</h2><span class="chev">${icons.chev}</span></div>
-      <div class="group-body">${g.entries.map(({ item, product }) => `
-        <div class="row ${p.buildCameraId === product.id ? 'is-build' : ''}" data-pid="${esc(item.productId)}">
+      <div class="group-body">${g.entries.map(({ item, product, accessory }) => `
+        <div class="row ${p.buildCameraId === product.id ? 'is-build' : ''} ${accessory ? 'acc' : ''}" data-pid="${esc(item.productId)}">
           ${thumbHTML(product, g.key)}
           <div class="body">
             <div class="name">${esc(displayName(product))}</div>
@@ -158,7 +158,7 @@ export function render(ctx, { id }, root) {
     const put = (pid) => {
       const items = store.getProject(id).items, cur = items.find(i => i.productId === pid)?.qty || 0;
       const n = slot.need - slot.have;
-      store.setItems(id, cur ? setQty(items, pid, cur + n) : addItem(items, ctx.resolve(pid), n));
+      store.setItems(id, cur ? setQty(items, pid, cur + n) : addItem(items, ctx.resolve(pid), n, parent.id));   // listed under the item it was picked for
       ctx.render();
     };
     const choices = [slot.add].flat();
@@ -189,7 +189,7 @@ export function render(ctx, { id }, root) {
     const slot = compat.kitStatus(activeProf, pr.items, ctx.resolve, allocFor(pr, p.buildCameraId)).find(s => s.slot === b.dataset.slotadd);
     const n = Math.max(1, slot.qty - slot.have), alloc0 = ensureAlloc(pr, compat, ctx.resolve);
     const cur = pr.items.find(i => i.productId === slot.add)?.qty || 0;
-    store.setItems(id, cur ? setQty(pr.items, slot.add, cur + n) : addItem(pr.items, ctx.resolve(slot.add), n));
+    store.setItems(id, cur ? setQty(pr.items, slot.add, cur + n) : addItem(pr.items, ctx.resolve(slot.add), n, p.buildCameraId));
     if (pr.kitAlloc || Object.keys(alloc0).length) store.updateProject(id, { kitAlloc: bump(alloc0, p.buildCameraId, slot.slot, n) });
     ctx.render();
   }; });

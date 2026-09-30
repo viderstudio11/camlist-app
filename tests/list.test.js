@@ -44,3 +44,37 @@ test('groupByDept keeps dept order, insertion order, falls back to snapshot, put
   assert.equal(g[2].entries[0].product.name, 'Shogun');
   assert.equal(g[0].entries[0].product, fx6);
 });
+
+test('an accessory picked for an item sits right under it, in that item’s department', () => {
+  const products = {
+    mon: { id: 'mon', name: 'Ninja', dept: 'monitors' }, cam: { id: 'cam', name: 'FX6', dept: 'cameras' },
+    dtap: { id: 'dtap', name: 'D-Tap to 4-pin', dept: 'cables' }, bat: { id: 'bat', name: 'NP-F570', dept: 'power' },
+    vbat: { id: 'vbat', name: 'V-Mount 150', dept: 'power' },
+  };
+  const resolve = (id) => products[id];
+  const order = [{ id: 'cameras', key: 'cameras' }, { id: 'monitors', key: 'monitors' }, { id: 'power', key: 'power' }, { id: 'cables', key: 'cables' }];
+  let items = addItem([], products.cam, 1);
+  items = addItem(items, products.vbat, 2);
+  items = addItem(items, products.mon, 1);
+  items = addItem(items, products.dtap, 1, 'mon');
+  items = addItem(items, products.bat, 2, 'mon');
+  const g = groupByDept(items, resolve, order);
+  assert.deepEqual(g.map(x => x.key), ['cameras', 'monitors', 'power']);
+  const mons = g.find(x => x.key === 'monitors').entries;
+  assert.deepEqual(mons.map(e => e.product.id), ['mon', 'dtap', 'bat']);
+  assert.deepEqual(mons.map(e => !!e.accessory), [false, true, true]);
+  assert.deepEqual(g.find(x => x.key === 'power').entries.map(e => e.product.id), ['vbat'], 'a battery chosen on its own stays in Power');
+  // the parent gone: the accessory goes back to its own department
+  const g2 = groupByDept(removeItem(items, 'mon'), resolve, order);
+  assert.deepEqual(g2.find(x => x.key === 'cables').entries.map(e => [e.product.id, !!e.accessory]), [['dtap', false]]);
+});
+
+test('adding more of an item keeps the context it was first picked in; an item first added on its own stays on its own', () => {
+  const p = { id: 'x', name: 'X', dept: 'd' };
+  let items = addItem([], p, 1, 'mon');
+  items = addItem(items, p, 1);
+  assert.equal(items[0].for, 'mon');
+  let solo = addItem([], p, 1);
+  solo = addItem(solo, p, 1, 'mon');
+  assert.equal(solo[0].for, undefined);
+});

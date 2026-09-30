@@ -33,10 +33,12 @@ export function buildShareText(project, groups, { lang = 'he', includeNotes = tr
   if (includeNotes && project.notes) lines.push(project.notes);
   for (const g of groups) {
     lines.push('', `*${deptLabel(g.key, lang)}*`);
-    for (const { item, product } of g.entries) {
-      lines.push(`• ${item.qty} × ${displayName(product)}`);
-      if (includeNotes && item.note) lines.push(`   ↳ ${item.note}`);
-      if (includeLinks && product.url) lines.push(`   ${product.url}`);
+    for (const { item, product, accessory } of g.entries) {
+      // an accessory picked for the item above is set in under it
+      const pad = accessory ? '   ' : '';
+      lines.push(`${pad}${accessory ? '◦' : '•'} ${item.qty} × ${displayName(product)}`);
+      if (includeNotes && item.note) lines.push(`${pad}   ↳ ${item.note}`);
+      if (includeLinks && product.url) lines.push(`${pad}   ${product.url}`);
     }
   }
   // Only each item's quantity is a number on the page — no department counts and no total, which read as more quantities.

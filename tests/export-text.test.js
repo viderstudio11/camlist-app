@@ -56,3 +56,12 @@ test('english, no notes, with links', () => {
   assert.ok(txt.endsWith('CamList · 17.09.2026'));
   assert.ok(!/items|Total/.test(txt), 'no counts beyond each item’s quantity');
 });
+
+test('an accessory picked for an item is set in under it', () => {
+  const g = [{ dept: 1, key: 'monitors', entries: [
+    { item: { productId: 'm', qty: 1, note: '' }, product: { name: 'Ninja', brandName: 'Atomos' } },
+    { item: { productId: 'd', qty: 1, note: 'short' }, product: { name: 'D-Tap to DC Cable', brandName: null }, accessory: true },
+  ] }];
+  const txt = buildShareText({ name: 'X' }, g, { lang: 'en', now: new Date('2026-09-30T10:00:00Z') });
+  assert.ok(txt.includes('• 1 × Atomos Ninja\n   ◦ 1 × D-Tap to DC Cable\n      ↳ short'));
+});

@@ -13,7 +13,7 @@ const FORMATS = [['text', null], ['pdf', 'PDF'], ['xlsx', 'Excel'], ['docx', 'Wo
 // The share text as WhatsApp shows it: *bold* headings, one line per item, notes indented under it.
 const textPreview = (txt) => txt.split('\n').map(l => {
   const bold = /^\*(.+)\*$/.exec(l);
-  const cls = bold ? 'tx-h' : l.startsWith('   ') ? 'tx-note' : '';
+  const cls = bold ? 'tx-h' : l.trim().startsWith('◦') ? 'tx-acc' : l.startsWith('   ') ? 'tx-note' : '';
   return `<div dir="auto" class="${cls}">${bold ? `<b>${esc(bold[1])}</b>` : esc(l) || '&nbsp;'}</div>`;
 }).join('');
 
@@ -23,8 +23,8 @@ function docPreview(p, groups, t, sheet) {
   const range = formatDateRange(p.dateFrom, p.dateTo);
   const meta = [p.productionCo && `<bdi>${esc(p.productionCo)}</bdi>`, p.techManager && `${esc(t('tech_manager'))}: <bdi>${esc(p.techManager)}</bdi>`, range && `<bdi dir="ltr">${esc(range)}</bdi>`].filter(Boolean);
   const rows = groups.map(g => {
-    const items = g.entries.map(({ item, product }) => `
-      <div class="dp-row"><b>${item.qty}×</b><span dir="auto">${esc(displayName(product))}${opts.includeNotes && item.note ? `<small dir="auto">${esc(item.note)}</small>` : ''}</span></div>`).join('');
+    const items = g.entries.map(({ item, product, accessory }) => `
+      <div class="dp-row ${accessory ? 'acc' : ''}"><b>${item.qty}×</b><span dir="auto">${esc(displayName(product))}${opts.includeNotes && item.note ? `<small dir="auto">${esc(item.note)}</small>` : ''}</span></div>`).join('');
     return `<div class="dp-dept"><span>${esc(t(`dept_${g.key}`))}</span></div>${items}`;
   }).join('');
   return `<div class="docprev ${sheet ? 'sheet' : ''}">

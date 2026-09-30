@@ -20,8 +20,8 @@ export async function exportXlsx(project, groups, { lang, includeNotes = true, i
   rows.push(head);
   for (const g of groups) {
     rows.push([t(`dept_${g.key}`)]);
-    for (const { item, product } of g.entries) {
-      const r = [t(`dept_${g.key}`), product.brandName || '', displayName(product), item.qty];
+    for (const { item, product, accessory } of g.entries) {
+      const r = [t(`dept_${g.key}`), product.brandName || '', `${accessory ? '◦ ' : ''}${displayName(product)}`, item.qty];
       if (includeNotes) r.push(item.note || '');
       if (includeLinks) r.push(product.url || '');
       rows.push(r);

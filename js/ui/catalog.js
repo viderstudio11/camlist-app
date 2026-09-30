@@ -422,7 +422,7 @@ export function render(ctx, { id }, root) {
         bt.onclick = () => {
           const c = catalog.byId(parseId(row.dataset.gw)), n = Number(row.dataset.n) || 1;
           const cur = getQty(items(), c.id);
-          store.setItems(id, cur ? setQty(items(), c.id, cur + n) : addItem(items(), c, n));
+          store.setItems(id, cur ? setQty(items(), c.id, cur + n) : addItem(items(), c, n, p.id));   // picked for p: listed under it
           taken.add(String(c.id)); if (row.dataset.gwSlot) taken.add(row.dataset.gwSlot);
           row.querySelector('[data-gw-add]').outerHTML = '<span class="gw-done">✓</span>';
           // one pick fills a choice slot: the other option steps back
