@@ -31,17 +31,14 @@ function sortRunProperties(node, seen = new Set()) {
   }
 }
 
-// Fonts. Word on Android carries a Latin-only Arial and does not fall back for Hebrew, so a run whose
-// complex-script font is Arial draws empty boxes there. The complex-script slot gets a Hebrew font the
-// Office apps fetch on demand, and every run says it is Hebrew (w:lang bidi), which is what the mobile
-// apps read to pick a font. `FONT_VARIANT` exists only while the fix is being tried on a phone.
-export const FONT_VARIANTS = {
-  a: { latin: 'Arial', cs: 'Arial' },
-  b: { latin: 'Arial', cs: 'David' },
-  c: { latin: null, cs: null },
-};
-let FONT_VARIANT = 'b';
-export const setFontVariant = (v) => { FONT_VARIANT = v; };
+// Every run is marked Hebrew (w:lang bidi) with Arial in each font slot, so the complex-script text has
+// a font and a language to shape with in any Word.
+const FONT = { ascii: 'Arial', hAnsi: 'Arial', eastAsia: 'Arial', cs: 'Arial' };
+
+// Widths are absolute (twentieths of a point). Word on Android reads percentage widths as next to nothing
+// and lays each column out one letter wide; a fixed grid in twips reads the same everywhere.
+const PAGE = { width: 11906, margin: 900 };   // A4
+const USABLE = PAGE.width - PAGE.margin * 2;
 
 // The document reads like the printed list: each department a shaded heading row with its count,
 // then quantity first, the item (its brand already in the name), and the note in grey.
@@ -49,8 +46,7 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
   await loadScript('vendor/docx.umd.js');
   const D = globalThis.docx;
   const rtl = lang === 'he';
-  const F = FONT_VARIANTS[FONT_VARIANT];
-  const font = F.latin ? { ascii: F.latin, hAnsi: F.latin, eastAsia: F.latin, cs: F.cs, hint: rtl ? 'cs' : undefined } : undefined;
+  const font = { ...FONT, hint: rtl ? 'cs' : undefined };
   const language = rtl ? { value: 'en-US', bidirectional: 'he-IL' } : { value: 'en-US' };
   const run = (text, o = {}) => new D.TextRun({ text: String(text ?? ''), rightToLeft: rtl, font, language,
     size: o.size || 22, bold: !!o.bold, color: o.color });
@@ -60,9 +56,12 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
     spacing: { after: 60, ...(o.spacing || {}) },
     children: [run(text, o)],
   });
-  const W = { qty: 10, item: includeNotes ? 58 : 90, notes: 32, link: 30 };
+  const cols = ['qty', 'item', ...(includeNotes ? ['notes'] : []), ...(includeLinks ? ['link'] : [])];
+  const share = { qty: 10, item: 58, notes: 32, link: 30 };
+  const sum = cols.reduce((n, k) => n + share[k], 0);
+  const W = Object.fromEntries(cols.map(k => [k, Math.round((share[k] / sum) * USABLE)]));
   const cell = (children, o = {}) => new D.TableCell({
-    width: { size: o.w, type: D.WidthType.PERCENTAGE }, columnSpan: o.span,
+    width: { size: o.w, type: D.WidthType.DXA }, columnSpan: o.span,
     shading: o.shade ? { fill: o.shade, type: D.ShadingType.CLEAR, color: 'auto' } : undefined,
     margins: { top: 50, bottom: 50, left: 110, right: 110 },
     verticalAlign: D.VerticalAlign.CENTER,
@@ -73,7 +72,6 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
   const hair = { style: D.BorderStyle.SINGLE, size: 2, color: 'DDDDDD' };
   const rowBorders = { top: none, left: none, right: none, bottom: hair };
   const headBorders = { top: none, left: none, right: none, bottom: { style: D.BorderStyle.SINGLE, size: 8, color: '111111' } };
-  const cols = ['qty', 'item', ...(includeNotes ? ['notes'] : []), ...(includeLinks ? ['link'] : [])];
 
   const children = [
     P(project.name || t('untitled'), { size: 40, bold: true }),
@@ -91,7 +89,7 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
   for (const g of groups) {
     const count = g.entries.reduce((n, e) => n + e.item.qty, 0);
     rows.push(new D.TableRow({ cantSplit: true, children: [
-      cell([P(`${t(`dept_${g.key}`)}  ·  ${count}`, { bold: true, size: 22 })], { w: 100, span: cols.length, shade: 'EFEFEF', borders: headBorders }),
+      cell([P(`${t(`dept_${g.key}`)}  ·  ${count}`, { bold: true, size: 22 })], { w: USABLE, span: cols.length, shade: 'EFEFEF', borders: headBorders }),
     ] }));
     for (const { item, product } of g.entries) {
       total += item.qty;
@@ -101,12 +99,12 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
       })], { w: W[k], borders: rowBorders })) }));
     }
   }
-  children.push(new D.Table({ width: { size: 100, type: D.WidthType.PERCENTAGE }, visuallyRightToLeft: rtl, rows }));
+  children.push(new D.Table({ width: { size: USABLE, type: D.WidthType.DXA }, columnWidths: cols.map(k => W[k]), layout: D.TableLayoutType.FIXED, visuallyRightToLeft: rtl, rows }));
   children.push(P(t('items_count', { n: total }), { bold: true, spacing: { before: 200 } }));
 
   const doc = new D.Document({ creator: 'CamList', title: project.name || 'Gear list',
     styles: { default: { document: { run: { ...(font ? { font } : {}), language, size: 22 } } } },
-    sections: [{ properties: { page: { margin: { top: 900, bottom: 900, left: 900, right: 900 } } }, children }] });
+    sections: [{ properties: { page: { size: { width: PAGE.width, height: 16838 }, margin: { top: 900, bottom: 900, left: PAGE.margin, right: PAGE.margin } } }, children }] });
   sortRunProperties(doc);
   const blob = await D.Packer.toBlob(doc);
   download(`${safeName(project.name)}-gearlist.docx`, blob);
