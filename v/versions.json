@@ -1,5 +1,10 @@
 [
  {
+  "version": "v2.5.1",
+  "date": "2026-09-30",
+  "label": "Accessibility pass (WCAG 2.1 AA): contrast, focus, keyboard, 44px targets, localized labels; top-bar date no longer cut"
+ },
+ {
   "version": "v2.5.0",
   "date": "2026-09-30",
   "label": "Older accessories placed under their item; battery/card type rows; cages & handles, arms, lens accessories; stabilizers split; Hebrew shelf names; a cage per camera; long-press menu blocked; bidi fixes in every export"
