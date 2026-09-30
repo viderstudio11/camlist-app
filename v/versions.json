@@ -1,5 +1,10 @@
 [
  {
+  "version": "v2.2.0",
+  "date": "2026-09-30",
+  "label": "Hours report with overtime tiers and pay; unit converter with battery, ND and temperature"
+ },
+ {
   "version": "v2.1.2",
   "date": "2026-09-29",
   "label": "D-Tap cable per monitor model; kit detection fixes"

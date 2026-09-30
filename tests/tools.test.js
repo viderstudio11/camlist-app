@@ -391,3 +391,43 @@ test('LUTs: every camera leads to the maker’s own download page', () => {
   const c70 = luts.logs.filter(g => g.cameras.some(c => c.name === 'EOS C70')).map(g => g.id);
   assert.deepEqual(c70, ['clog3', 'clog2']);
 });
+
+test('hours: regular time, the first overtime tier, the rest, and the pay', async () => {
+  const { hoursReport } = await import('../js/tools/convert.js');
+  // 07:00–20:30 with an hour's break = 12:30 worked; a 10-hour day, 2 h at 125%, then 150%
+  const r = hoursReport({ call: '07:00', wrap: '20:30', breaks: 60, base: 10, tier1h: 2, tier1pct: 125, tier2pct: 150, turnaround: 11, dayRate: 1000 });
+  assert.equal(r.worked, 12.5);
+  assert.deepEqual([r.regular, r.tier1, r.tier2], [10, 2, 0.5]);
+  // hourly = 1000 / 10; pay = 1000 + 2 × 100 × 1.25 + 0.5 × 100 × 1.5
+  assert.equal(r.pay, 1000 + 250 + 75);
+  assert.equal(r.nextCall, '07:30');
+  assert.equal(r.nextDay, true);
+  // a short day: all regular, no overtime, the day rate stands
+  const s = hoursReport({ call: '08:00', wrap: '14:00', breaks: 0, base: 10, tier1h: 2, tier1pct: 125, tier2pct: 150, turnaround: 11, dayRate: 1000 });
+  assert.deepEqual([s.worked, s.tier1, s.tier2, s.pay], [6, 0, 0, 1000]);
+  // past midnight
+  const n = hoursReport({ call: '18:00', wrap: '02:00', breaks: 0, base: 10, tier1h: 2, tier1pct: 125, tier2pct: 150, turnaround: 10 });
+  assert.equal(n.worked, 8);
+  assert.equal(n.pay, null, 'no day rate, no pay line');
+});
+
+test('ND: density, factor and stops are one number three ways', async () => {
+  const { ndFrom } = await import('../js/tools/convert.js');
+  const a = ndFrom('density', 0.9);
+  assert.equal(Math.round(a.stops * 10) / 10, 3);
+  assert.equal(Math.round(a.factor), 8);
+  const b = ndFrom('factor', 64);
+  assert.equal(Math.round(b.stops), 6);
+  assert.equal(Math.round(b.density * 10) / 10, 1.8);
+  assert.equal(ndFrom('density', 1.8).factor, 64, 'ND 1.8 reads ND64, as the filters are labelled');
+  const c = ndFrom('stops', 10);
+  assert.equal(Math.round(c.factor), 1024);
+});
+
+test('battery: watt-hours and whether it may fly', async () => {
+  const { flightCheck } = await import('../js/tools/convert.js');
+  assert.equal(flightCheck(98).key, 'fly_ok');
+  assert.equal(flightCheck(150).key, 'fly_approval');
+  assert.equal(flightCheck(250).key, 'fly_no');
+  assert.ok(Math.abs(mahToWh(6600, 14.4) - 95.04) < 1e-9);
+});

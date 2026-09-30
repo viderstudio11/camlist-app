@@ -1,0 +1,86 @@
+export const LANGS = ['he', 'en'];
+export const DEPT_EMOJI = { cameras: '📷', lenses: '🔭', video: '📺', media: '💾', tripods: '🔺', grip: '🎬', power: '🔋', accessories: '🔧', other: '📦' };
+
+export const dict = {
+  he: {
+    app_name: 'CamList', projects: 'פרויקטים', new_project: 'פרויקט חדש', no_projects: 'אין עדיין פרויקטים',
+    no_projects_hint: 'צור פרויקט ראשון והתחל לבנות רשימת ציוד', project_name: 'שם ההפקה', tech_manager: 'עוזר צלם',
+    date_from: 'מתאריך', date_to: 'עד תאריך', notes: 'הערות', save: 'שמור', cancel: 'ביטול', delete: 'מחק', duplicate: 'שכפל',
+    rename: 'ערוך פרטים', confirm_delete_project: 'למחוק את הפרויקט "{name}"? הפעולה אינה הפיכה.',
+    items_count: '{n} פריטים', item_count_one: 'פריט אחד', updated: 'עודכן', add_gear: 'הוסף ציוד', export: 'ייצוא / שיתוף',
+    list_empty: 'הרשימה ריקה', list_empty_hint: 'לחץ "הוסף ציוד" כדי להתחיל', note_placeholder: 'הערה (Cam A, גיבוי…)',
+    remove: 'הסר', search_placeholder: 'חיפוש: fx6, arri, 24-70…', departments: 'מחלקות', brands: 'יצרנים',
+    back_to_list: 'חזרה לרשימה ({n})', not_found_add_manual: 'לא מצאת? הוסף פריט ידני', manual_item: 'פריט ידני', my_item: 'פריט משלי', kit_short: 'קיט', must_have_for: 'אביזרי חובה ל־{name}', goes_with: 'הולך עם {name}', done: 'סיום',
+    item_name: 'שם הפריט', brand: 'יצרן', department: 'מחלקה', other: 'אחר / ידני', add: 'הוסף', added: 'נוסף לרשימה',
+    no_results: 'אין תוצאות עבור "{q}"', all: 'הכל', in_list: 'ברשימה',
+    share: 'שתף / העתק', copied: 'הועתק ללוח', excel: 'Excel', word: 'Word', pdf: 'PDF', include_notes: 'כלול הערות',
+    include_links: 'כלול קישורים לאתר היצרן', preview: 'תצוגה מקדימה', export_failed: 'הייצוא נכשל', pdf_hint: 'בחלון ההדפסה בחר "שמור כ-PDF"',
+    settings: 'הגדרות', language: 'שפה', default_tech_manager: 'עוזר צלם (ברירת מחדל)', backup: 'גיבוי', export_backup: 'ייצוא גיבוי (JSON)',
+    import_backup: 'ייבוא גיבוי', import_ok: 'יובאו {projects} פרויקטים ו-{manual} פריטים ידניים', import_failed: 'קובץ גיבוי לא תקין',
+    about: 'אודות', catalog_date: 'מאגר עודכן', products: 'מוצרים', logos_hint: 'לוגואים: שים קובץ logos/<יצרן>.png או .svg',
+    catalog_error: 'המאגר לא נטען', retry: 'נסה שוב', new_version: 'גרסה חדשה זמינה', refresh: 'רענן',
+    total: 'סה"כ', qty: 'כמות', item: 'פריט', link: 'קישור', gear_list: 'רשימת ציוד', storage_warning: 'לא ניתן לשמור — הנתונים יאבדו בסגירה',
+    manual_in_use: 'הפריט בשימוש בפרויקטים: {names}', dept_cameras: 'מצלמות', dept_lenses: 'עדשות', dept_grip: 'גריפ',
+    dept_accessories: 'אביזרים', dept_other: 'אחר', brand_general: 'כללי', untitled: 'ללא שם', signature: 'חתימה',
+    dept_video: 'וידאו', dept_media: 'מדיה ופריקה', dept_tripods: 'חצובות', dept_power: 'סוללות וכוח', jump_to_brand: 'קפיצה ליצרן', optional: 'אופציונלי', hero_sub: 'רשימות ציוד להפקות', stat_products: 'מוצרים', stat_brands: 'יצרנים', stat_projects: 'פרויקטים',
+    models_count: '{n} דגמים', all_brands: 'כל היצרנים', choose_brand: 'בחר יצרן', choose_subcat: 'בחר קטגוריה', no_brand: 'ללא יצרן', show_more: 'הצג עוד ({n})',
+    lang_switch: 'EN', install_hint: 'טיפ: הוסף למסך הבית כדי לעבוד כמו אפליקציה', in_project: 'בפרויקט',
+    build_around: 'בנה סביב', building_around: 'בונה סביב', active_camera: 'מצלמה פעילה', compat_only: 'רק תואם', show_all_items: 'הצג הכל',
+    tag_native: 'תואם', tag_adapter: 'דרך מתאם', tag_partial: 'קרופ / כיסוי חלקי', tag_unknown: 'לא ידוע', tag_no: 'לא תואם',
+    base_kit: 'ערכת בסיס', choose: 'בחר', kit_done: 'יש', no_profile: 'אין פרופיל תאימות למצלמה זו', clear_build: 'בטל בנייה סביב', hidden_count: '{n} פריטים לא תואמים מוסתרים', strict_note: 'מוצג רק מה שמתאים ל-{cam} ({n} הוסתרו)',
+    u_hour: 'שעה', u_hours: 'שעות', u_batt: 'סוללה', u_batts: 'סוללות', u_card: 'כרטיס', u_cards: 'כרטיסים', power_media: 'כוח ומדיה', shoot_hours: 'שעות צילום ביום', rec_format: 'פורמט הקלטה', hours_short: '{n}',
+    power_have: 'כוח · {n}', media_have: 'מדיה · {n}', add_batteries: 'חסר {gap} — הוסף {n}',
+    add_cards: 'חסר {gap} — הוסף {n}', enough: 'מספיק', no_batteries: 'אין עדיין סוללות מתאימות',
+    no_cards: 'אין עדיין כרטיסים מתאימים', unknown_wh: '{n} ללא נתון קיבולת', draw_w: 'צריכה {n}W',
+    pickup_mode: 'מצב איסוף', pickup_on: 'איסוף ציוד', pickup_off: 'חזרה לרשימה', packed_of: 'נארזו {a} מתוך {b}',
+    pickup_done: 'הכל נארז', missing_items: 'חסרים {n} פריטים', pickup_report: 'דוח איסוף', mark_all: 'סמן הכל',
+    tools: 'כלי עזר', active_project: 'פרויקט פעיל', open_list: 'המשך לרשימה', design: 'עיצוב', skin: 'סגנון עיצוב', appearance: 'מראה', versions_past: 'גרסאות קודמות', versions_past_hint: 'פתח גרסה ישנה להשוואה', versions: 'גרסאות', save_version: 'שמור גרסה נוכחית', version_label: 'שם הגרסה (לא חובה)', restore: 'שחזר', no_versions: 'עוד לא נשמרו גרסאות', version_saved: 'הגרסה נשמרה', version_restored: 'הגרסה שוחזרה', before_restore: 'לפני שחזור', auto_version: 'גרסה אוטומטית', items_in_version: '{n} פריטים', theme: 'מצב תצוגה', home: 'בית', back_btn: 'חזרה', menu: 'תפריט', version: 'גרסה', date: 'תאריך', received_by: 'התקבל על ידי · חתימה', date_received: 'תאריך קבלה', dates: 'ימי צילום', contact: 'ליצירת קשר', include_images: 'תמונות מוצר בהדפסה', production_co: 'חברת הפקה', phone: 'טלפון', email: 'אימייל', doc_lang: 'שפת המסמך', filters: 'סינון מהיר', f_type: 'סוג', f_kind: 'מדף', f_size: 'גודל', acc_filters: 'פילטרים', acc_mattebox: 'מטבוקס', acc_follow: 'פולו פוקוס', acc_lenssupport: 'תמיכת עדשה', acc_control: 'שליטת זום ומנועים', acc_timecode: 'טיימקוד וקלאפרים', acc_viewfinder: 'וויפיינדרים', acc_action: 'מצלמות אקשן', acc_underwater: 'צלילה', acc_other: 'אחר', ft_nd: 'ND', ft_irnd: 'IRND', ft_vnd: 'ND משתנה', ft_grad: 'מדורג', ft_diffusion: 'מרככים', ft_pola: 'פולרייזר', ft_color: 'צבע', ft_effects: 'אפקטים', ft_closeup: 'קלוז־אפ', ft_protect: 'מגן', 'fs_4x5.65': '4×5.65', fs_4x4: '4×4', fs_6x6: '6.6×6.6', fs_round: 'עגול', fs_osmo: 'Osmo',  f_mount: 'מאונט', f_format: 'פורמט',
+    lt_prime: 'פריים', lt_zoom: 'זום', lt_set: 'סטים', lt_anamorphic: 'אנמורפי', lt_macro: 'מאקרו', lt_vintage: 'וינטג׳', lt_adapter: 'מתאמים',
+    clear_filters: 'נקה סינון', results_count: '{n} תוצאות', no_reader_at_utopia: 'אין בקטלוג קורא כרטיסים ל-{fam}', no_reader_hint: 'הוסף אותו כפריט ידני (מספק אחר / ציוד משלך):', no_reader_short: 'אין קורא ל-{fam} בקטלוג', brand_at_utopia: 'יצרן קיים באוטופיה', not_at_utopia: 'יצרן לא באוטופיה', mount: 'מאונט', sensor: 'חיישן', media: 'מדיה', battery: 'סוללה', fmt_FF: 'Full Frame', fmt_S35: 'Super 35', fmt_MFT: 'MFT', fmt_MF: 'Medium Format', 'fmt_2/3': '2/3"', fmt_1in: '1"', fmt_16: '16mm', fmt_action: 'Action',
+  },
+  en: {
+    app_name: 'CamList', projects: 'Projects', new_project: 'New project', no_projects: 'No projects yet',
+    no_projects_hint: 'Create your first project and start building a gear list', project_name: 'Production name', tech_manager: '1st AC',
+    date_from: 'From', date_to: 'To', notes: 'Notes', save: 'Save', cancel: 'Cancel', delete: 'Delete', duplicate: 'Duplicate',
+    rename: 'Edit details', confirm_delete_project: 'Delete project "{name}"? This cannot be undone.',
+    items_count: '{n} items', item_count_one: '1 item', updated: 'Updated', add_gear: 'Add gear', export: 'Export / Share',
+    list_empty: 'List is empty', list_empty_hint: 'Tap "Add gear" to start', note_placeholder: 'Note (Cam A, backup…)',
+    remove: 'Remove', search_placeholder: 'Search: fx6, arri, 24-70…', departments: 'Departments', brands: 'Brands',
+    back_to_list: 'Back to list ({n})', not_found_add_manual: "Can't find it? Add manually", manual_item: 'Manual item', my_item: 'My item', kit_short: 'Kit', must_have_for: 'Must-haves for {name}', goes_with: 'Goes with {name}', done: 'Done',
+    item_name: 'Item name', brand: 'Brand', department: 'Department', other: 'Other / manual', add: 'Add', added: 'Added to list',
+    no_results: 'No results for "{q}"', all: 'All', in_list: 'in list',
+    share: 'Share / Copy', copied: 'Copied to clipboard', excel: 'Excel', word: 'Word', pdf: 'PDF', include_notes: 'Include notes',
+    include_links: 'Include links to the maker’s site', preview: 'Preview', export_failed: 'Export failed', pdf_hint: 'In the print dialog choose "Save as PDF"',
+    settings: 'Settings', language: 'Language', default_tech_manager: 'Default 1st AC', backup: 'Backup', export_backup: 'Export backup (JSON)',
+    import_backup: 'Import backup', import_ok: 'Imported {projects} projects and {manual} manual items', import_failed: 'Invalid backup file',
+    about: 'About', catalog_date: 'Catalog updated', products: 'products', logos_hint: 'Logos: drop logos/<brand>.png or .svg',
+    catalog_error: 'Catalog failed to load', retry: 'Retry', new_version: 'New version available', refresh: 'Refresh',
+    total: 'Total', qty: 'Qty', item: 'Item', link: 'Link', gear_list: 'Gear list', storage_warning: "Can't save — data will be lost on close",
+    manual_in_use: 'Item is used in projects: {names}', dept_cameras: 'Cameras', dept_lenses: 'Lenses', dept_grip: 'Grip',
+    dept_accessories: 'Accessories', dept_other: 'Other', brand_general: 'General', untitled: 'Untitled', signature: 'Signature',
+    dept_video: 'Video', dept_media: 'Media & Offload', dept_tripods: 'Tripods & Heads', dept_power: 'Power', jump_to_brand: 'Jump to brand', optional: 'optional', hero_sub: 'Production gear lists', stat_products: 'products', stat_brands: 'brands', stat_projects: 'projects',
+    models_count: '{n} models', all_brands: 'All brands', choose_brand: 'Choose a brand', choose_subcat: 'Choose a category', no_brand: 'No brand', show_more: 'Show more ({n})',
+    lang_switch: 'עב', install_hint: 'Tip: add to Home Screen to use it like an app', in_project: 'in project',
+    build_around: 'Build around', building_around: 'Building around', active_camera: 'Active camera', compat_only: 'Compatible only', show_all_items: 'Show all',
+    tag_native: 'Compatible', tag_adapter: 'Via adapter', tag_partial: 'Crop / partial coverage', tag_unknown: 'Unknown', tag_no: 'Not compatible',
+    base_kit: 'Base kit', choose: 'Choose', kit_done: 'Have', no_profile: 'No compatibility profile for this camera', clear_build: 'Stop building around', hidden_count: '{n} incompatible items hidden', strict_note: 'Showing only what fits {cam} ({n} hidden)',
+    u_hour: 'hour', u_hours: 'hours', u_batt: 'battery', u_batts: 'batteries', u_card: 'card', u_cards: 'cards', power_media: 'Power & media', shoot_hours: 'Shoot hours per day', rec_format: 'Recording format', hours_short: '{n} h',
+    power_have: 'Power · {n}', media_have: 'Media · {n}', add_batteries: '{gap} short — add {n}',
+    add_cards: '{gap} short — add {n}', enough: 'Enough', no_batteries: 'No matching batteries yet',
+    no_cards: 'No matching cards yet', unknown_wh: '{n} with no capacity data', draw_w: '{n}W draw',
+    pickup_mode: 'Pickup mode', pickup_on: 'Equipment pickup', pickup_off: 'Back to list', packed_of: '{a} of {b} packed',
+    pickup_done: 'All packed', missing_items: '{n} items missing', pickup_report: 'Pickup report', mark_all: 'Mark all',
+    tools: 'Tools', active_project: 'Active project', open_list: 'Open list', design: 'Design', skin: 'Design skin', appearance: 'Appearance', versions_past: 'Past versions', versions_past_hint: 'Open an older version to compare', versions: 'Versions', save_version: 'Save current version', version_label: 'Version name (optional)', restore: 'Restore', no_versions: 'No versions saved yet', version_saved: 'Version saved', version_restored: 'Version restored', before_restore: 'before restore', auto_version: 'Automatic version', items_in_version: '{n} items', theme: 'Display mode', home: 'Home', back_btn: 'Back', menu: 'Menu', version: 'Version', date: 'Date', received_by: 'Received by · signature', date_received: 'Date received', dates: 'Shoot dates', contact: 'Contact', include_images: 'Product photos when printing', production_co: 'Production company', phone: 'Phone', email: 'Email', doc_lang: 'Document language', filters: 'Quick filters', f_type: 'Type', f_kind: 'Shelf', f_size: 'Size', acc_filters: 'Filters', acc_mattebox: 'Matte boxes', acc_follow: 'Follow focus', acc_lenssupport: 'Lens support', acc_control: 'Zoom & motor control', acc_timecode: 'Timecode & slates', acc_viewfinder: 'Viewfinders', acc_action: 'Action cams', acc_underwater: 'Underwater', acc_other: 'Other', ft_nd: 'ND', ft_irnd: 'IRND', ft_vnd: 'Variable ND', ft_grad: 'Grad', ft_diffusion: 'Diffusion', ft_pola: 'Polarizer', ft_color: 'Color', ft_effects: 'Effects', ft_closeup: 'Close-up', ft_protect: 'Protector', 'fs_4x5.65': '4×5.65', fs_4x4: '4×4', fs_6x6: '6.6×6.6', fs_round: 'Round', fs_osmo: 'Osmo',  f_mount: 'Mount', f_format: 'Format',
+    lt_prime: 'Primes', lt_zoom: 'Zooms', lt_set: 'Sets', lt_anamorphic: 'Anamorphic', lt_macro: 'Macro', lt_vintage: 'Vintage', lt_adapter: 'Adapters',
+    clear_filters: 'Clear filters', results_count: '{n} results', no_reader_at_utopia: 'The catalog has no card reader for {fam}', no_reader_hint: 'Add it as a manual item (other supplier / your own gear):', no_reader_short: 'No {fam} reader in the catalog', brand_at_utopia: 'Brand carried by Utopia', not_at_utopia: 'Brand not at Utopia', mount: 'Mount', sensor: 'Sensor', media: 'Media', battery: 'Battery', fmt_FF: 'Full Frame', fmt_S35: 'Super 35', fmt_MFT: 'MFT', fmt_MF: 'Medium Format', 'fmt_2/3': '2/3"', fmt_1in: '1"', fmt_16: '16mm', fmt_action: 'Action',
+  },
+};
+
+let current = 'he';
+export const getLang = () => current;
+export const setLang = (lang) => { current = LANGS.includes(lang) ? lang : 'he'; return current; };
+export const dirFor = (lang) => (lang === 'he' ? 'rtl' : 'ltr');
+export function t(key, params = {}, lang = current) {
+  const s = dict[lang]?.[key] ?? dict.he[key] ?? key;
+  return s.replace(/\{(\w+)\}/g, (_, k) => (params[k] ?? `{${k}}`));
+}
