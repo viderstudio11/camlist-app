@@ -196,8 +196,8 @@
       "id": "x_gen_monitor_stand",
       "name": "Monitor Stand",
       "brand": null,
-      "dept": "grip",
-      "subcat": "Grip Accessories"
+      "dept": "monitors",
+      "subcat": "Monitor Accessories"
     },
     {
       "id": "x_gen_c_stand",
@@ -254,15 +254,15 @@
       "id": "x_gen_sunhood",
       "name": "Monitor Sunhood",
       "brand": null,
-      "dept": "video",
-      "subcat": "Monitors"
+      "dept": "monitors",
+      "subcat": "Monitor Accessories"
     },
     {
       "id": "x_gen_rain_cover",
       "name": "Monitor Rain Cover",
       "brand": null,
-      "dept": "video",
-      "subcat": "Monitors"
+      "dept": "monitors",
+      "subcat": "Monitor Accessories"
     },
     {
       "id": "x_gen_ac_cable",
@@ -303,22 +303,22 @@
       "id": "x_gen_monitor_arm",
       "name": "Monitor Arm",
       "brand": null,
-      "dept": "grip",
-      "subcat": "Grip Accessories"
+      "dept": "monitors",
+      "subcat": "Monitor Accessories"
     },
     {
       "id": "x_gen_rods15",
       "name": "15mm Rods",
       "brand": null,
-      "dept": "grip",
-      "subcat": "Camera Support & Rigs"
+      "dept": "lenscontrol",
+      "subcat": "Lens Support & Rods"
     },
     {
       "id": "x_gen_gear_rings",
       "name": "Lens Gear Rings Set",
       "brand": null,
-      "dept": "accessories",
-      "subcat": "Follow Focus"
+      "dept": "lenscontrol",
+      "subcat": "Follow Focus Accessories"
     },
     {
       "id": "x_gen_top_flag",
@@ -564,6 +564,34 @@
       "brand": null,
       "dept": "expendables",
       "subcat": "General Supplies"
+    },
+    {
+      "id": "x_gen_marking_rings",
+      "name": "Focus Marking Rings",
+      "brand": null,
+      "dept": "lenscontrol",
+      "subcat": "Follow Focus Accessories"
+    },
+    {
+      "id": "x_gen_ff_strap",
+      "name": "Hand Unit Wrist Strap",
+      "brand": null,
+      "dept": "lenscontrol",
+      "subcat": "Follow Focus Accessories"
+    },
+    {
+      "id": "x_gen_noga_arm",
+      "name": "Noga Arm",
+      "brand": null,
+      "dept": "monitors",
+      "subcat": "Monitor Accessories"
+    },
+    {
+      "id": "x_gen_bnc_short",
+      "name": "BNC Cable — Short (30 cm)",
+      "brand": null,
+      "dept": "video",
+      "subcat": "Converters"
     }
   ],
   "departments": [
@@ -626,6 +654,62 @@
           "en": "General Supplies"
         }
       ]
+    },
+    {
+      "slug": "lenscontrol",
+      "he": "שליטה ותמיכה בעדשה",
+      "en": "Lens Control & Support",
+      "after": "lenses",
+      "subcategories": [
+        {
+          "he": "פולו פוקוס אלחוטי",
+          "en": "Wireless Follow Focus"
+        },
+        {
+          "he": "פולו פוקוס ידני",
+          "en": "Manual Follow Focus"
+        },
+        {
+          "he": "אביזרי פולו פוקוס",
+          "en": "Follow Focus Accessories"
+        },
+        {
+          "he": "שליטת זום ושלט מרחוק",
+          "en": "Zoom & Remote Control"
+        },
+        {
+          "he": "תמיכת עדשה ומוטות",
+          "en": "Lens Support & Rods"
+        }
+      ]
+    },
+    {
+      "slug": "monitors",
+      "he": "מוניטורים",
+      "en": "Monitors",
+      "after": "video",
+      "subcategories": [
+        {
+          "he": "מוניטורי שטח (13″ ומעלה)",
+          "en": "Field Monitors"
+        },
+        {
+          "he": "מוניטורים על המצלמה",
+          "en": "On-Camera Monitors"
+        },
+        {
+          "he": "מוניטורים מקליטים",
+          "en": "Monitor-Recorders"
+        },
+        {
+          "he": "וויפיינדרים",
+          "en": "Viewfinders & EVF"
+        },
+        {
+          "he": "אביזרי מוניטור",
+          "en": "Monitor Accessories"
+        }
+      ]
     }
   ],
   "extend": [
@@ -640,6 +724,156 @@
     }
   ],
   "moves": [
+    {
+      "from": "Monitors",
+      "match": "hyperdeck",
+      "to": "video",
+      "subcat": "Recorders & Media"
+    },
+    {
+      "from": "Monitors",
+      "match": "viewfinder|\\bevf|z-?finder|gratical",
+      "to": "monitors",
+      "subcat": "Viewfinders & EVF"
+    },
+    {
+      "from": "Monitors",
+      "match": "sun ?hood|rain cover|cage",
+      "to": "monitors",
+      "subcat": "Monitor Accessories"
+    },
+    {
+      "from": "Monitors",
+      "match": "recorder|recording|ninja|shogun|sumo|video assist|\\bpix\\b|odyssey|apollo|memory (7|i)\\b",
+      "to": "monitors",
+      "subcat": "Monitor-Recorders"
+    },
+    {
+      "from": "Monitors",
+      "match": "^(?!.*hyperdeck).*((?:^|[^\\d.])(?:[3-9]|1[0-2])(?:\\.\\d)?\\s*(?:[\"″”]|inch)|[“\"]\\s*(?:[3-9]|1[0-2])(?:\\.\\d)?\\b|\\bbm[57]|\\b70[23]\\b|ultra [57]\\b|cine 7\\b|starlite|pyro 7|\\bf7s\\b)",
+      "to": "monitors",
+      "subcat": "On-Camera Monitors"
+    },
+    {
+      "from": "Monitors",
+      "match": "^(?!.*hyperdeck).*(monitor|lcd|oled|\\blmd\\b|\\bpvm\\b|\\bbsm|\\bbxm|\\bbt-lh|screen|th-l|at-2151|cine \\d|1303|obm|k15|s-1093)",
+      "to": "monitors",
+      "subcat": "Field Monitors"
+    },
+    {
+      "from": "On Camera",
+      "match": "viewfinder|\\bevf|z-?finder|gratical",
+      "to": "monitors",
+      "subcat": "Viewfinders & EVF"
+    },
+    {
+      "from": "On Camera",
+      "match": "sun ?hood|rain cover|cage",
+      "to": "monitors",
+      "subcat": "Monitor Accessories"
+    },
+    {
+      "from": "On Camera",
+      "match": "recorder|recording|ninja|shogun|sumo|video assist|\\bpix\\b|odyssey|apollo|memory (7|i)\\b",
+      "to": "monitors",
+      "subcat": "Monitor-Recorders"
+    },
+    {
+      "from": "On Camera",
+      "match": "^(?!.*hyperdeck).*((?:^|[^\\d.])(?:[3-9]|1[0-2])(?:\\.\\d)?\\s*(?:[\"″”]|inch)|[“\"]\\s*(?:[3-9]|1[0-2])(?:\\.\\d)?\\b|\\bbm[57]|\\b70[23]\\b|ultra [57]\\b|cine 7\\b|starlite|pyro 7|\\bf7s\\b)",
+      "to": "monitors",
+      "subcat": "On-Camera Monitors"
+    },
+    {
+      "from": "On Camera",
+      "match": "^(?!.*hyperdeck).*(monitor|lcd|oled|\\blmd\\b|\\bpvm\\b|\\bbsm|\\bbxm|\\bbt-lh|screen|th-l|at-2151|cine \\d|1303|obm|k15|s-1093)",
+      "to": "monitors",
+      "subcat": "Field Monitors"
+    },
+    {
+      "from": "Production Monitors",
+      "match": "viewfinder|\\bevf|z-?finder|gratical",
+      "to": "monitors",
+      "subcat": "Viewfinders & EVF"
+    },
+    {
+      "from": "Production Monitors",
+      "match": "sun ?hood|rain cover|cage",
+      "to": "monitors",
+      "subcat": "Monitor Accessories"
+    },
+    {
+      "from": "Production Monitors",
+      "match": "recorder|recording|ninja|shogun|sumo|video assist|\\bpix\\b|odyssey|apollo|memory (7|i)\\b",
+      "to": "monitors",
+      "subcat": "Monitor-Recorders"
+    },
+    {
+      "from": "Production Monitors",
+      "match": "^(?!.*hyperdeck).*((?:^|[^\\d.])(?:[3-9]|1[0-2])(?:\\.\\d)?\\s*(?:[\"″”]|inch)|[“\"]\\s*(?:[3-9]|1[0-2])(?:\\.\\d)?\\b|\\bbm[57]|\\b70[23]\\b|ultra [57]\\b|cine 7\\b|starlite|pyro 7|\\bf7s\\b)",
+      "to": "monitors",
+      "subcat": "On-Camera Monitors"
+    },
+    {
+      "from": "Production Monitors",
+      "match": "^(?!.*hyperdeck).*(monitor|lcd|oled|\\blmd\\b|\\bpvm\\b|\\bbsm|\\bbxm|\\bbt-lh|screen|th-l|at-2151|cine \\d|1303|obm|k15|s-1093)",
+      "to": "monitors",
+      "subcat": "Field Monitors"
+    },
+    {
+      "from": "Wireless Follow Focus",
+      "match": ".",
+      "to": "lenscontrol",
+      "subcat": "Wireless Follow Focus"
+    },
+    {
+      "from": "Manual Follow Focus",
+      "match": ".",
+      "to": "lenscontrol",
+      "subcat": "Manual Follow Focus"
+    },
+    {
+      "from": "Follow Focus",
+      "match": ".",
+      "to": "lenscontrol",
+      "subcat": "Follow Focus Accessories"
+    },
+    {
+      "from": "Controlers",
+      "match": "stream deck",
+      "to": "video",
+      "subcat": "Mixers & Matrix"
+    },
+    {
+      "from": "Controlers",
+      "match": "rialto",
+      "to": "accessories",
+      "subcat": "General Accessories"
+    },
+    {
+      "from": "Controlers",
+      "match": "motor|cforce|\bclm-",
+      "to": "lenscontrol",
+      "subcat": "Wireless Follow Focus"
+    },
+    {
+      "from": "Controlers",
+      "match": ".",
+      "to": "lenscontrol",
+      "subcat": "Zoom & Remote Control"
+    },
+    {
+      "from": "General Accessories",
+      "match": "lens support|\\bls-?\\d|15 ?mm",
+      "to": "lenscontrol",
+      "subcat": "Lens Support & Rods"
+    },
+    {
+      "from": "General Accessories",
+      "match": "zoom|remote control|\\brcu\\b|\\bccu\\b|\\brm-|pan-bar|controller",
+      "to": "lenscontrol",
+      "subcat": "Zoom & Remote Control"
+    },
     {
       "from": "Recorders & Media",
       "match": "reader|dock|station",

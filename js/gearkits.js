@@ -12,13 +12,14 @@ const inches = (name) => {
 };
 // Accessories, switchers and viewfinders share the monitors' shelves; they carry no kit of their own.
 const NOT_A_UNIT = /sun ?hood|rain cover|cage|stand\b|\barm\b|mixer|switcher|\batem\b|\bevf\b|viewfinder|gratical|antenna|router|\bserv\b|vidiu|streaming|extension unit/i;
-const isMonitor = (catalog, p) => catalog.deptKey(p.dept) === 'video' && !NOT_A_UNIT.test(p.name)
-  && !SUB(catalog, p).includes('Recorders & Media') && !SUB(catalog, p).includes('Wireless Video')
+// Monitors have a department of their own; a catalog from before the split still files them under Video.
+const isMonitor = (catalog, p) => ['video', 'monitors'].includes(catalog.deptKey(p.dept)) && !NOT_A_UNIT.test(p.name)
+  && !SUB(catalog, p).some(s => ['Recorders & Media', 'Wireless Video', 'Viewfinders & EVF', 'Monitor Accessories'].includes(s))
   && /monitor|lcd|oled|\blmd\b|\bpvm\b|\bbvm\b|smallhd|\bcine \d/i.test(p.name);
 
 const slot = (key, he, en, qty, match, add) => ({ key, he, en, qty, match, add });
 // On-camera by the screen size in the name (under 13″), else by the source's own subcategory.
-const onCamera = (catalog, p) => { const size = inches(p.name); return size != null ? size < 13 : SUB(catalog, p).includes('On Camera'); };
+const onCamera = (catalog, p) => { const size = inches(p.name); return size != null ? size < 13 : SUB(catalog, p).some(s => s === 'On-Camera Monitors' || s === 'On Camera'); };
 
 // Where each model takes its power, from the maker's specifications. The kit's D-Tap slot then asks for
 // a cable with D-Tap on one end and that plug on the other. A model not listed keeps the plain D-Tap cable.

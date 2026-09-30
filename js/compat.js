@@ -163,14 +163,18 @@ export function createCompat(data, catalog) {
   function kitStatus(prof, items, resolve, alloc = null) {
     const chosen = chosenMedia(prof, items, resolve);
     return (prof?.kit || []).map(slot => {
-      // Cards and readers live in Media & Offload; a catalog without that department keeps them in Video.
-      const hasMedia = catalog.departments.some(d => d.slug === 'media');
-      const where = slot.dept === 'media' && !hasMedia ? { dept: 'video', subcat: 'Recorders & Media' } : slot;
-      const deptId = catalog.departments.find(d => d.slug === where.dept)?.id;
-      const subId = where.subcat ? catalog.departments.flatMap(d => d.subcategories).find(s => s.en === where.subcat)?.id : null;
+      // A slot names where its gear lives (Media & Offload, Monitors, Lens Control…) and where it used to be:
+      // a catalog without the newer department still finds it in the old place. A subcat may be a list.
+      const has = (slug) => catalog.departments.some(d => d.slug === slug);
+      const where = !has(slot.dept) && slot.fallback ? slot.fallback : slot;
+      const dept = catalog.departments.find(d => d.slug === where.dept);
+      const deptId = dept?.id;
+      const wanted = [where.subcat].flat().filter(Boolean);
+      const subIds = wanted.map(en => (dept?.subcategories || []).find(s => s.en === en)?.id).filter(x => x != null);
+      const subId = subIds[0] ?? null;
       const have = items.reduce((n, it) => {
         const p = resolve(it.productId) || { dept: it.snapshot?.dept, subcats: [] };
-        if (p.dept !== deptId || (subId && !(p.subcats || []).includes(subId))) return n;
+        if (p.dept !== deptId || (subIds.length && !subIds.some(x => (p.subcats || []).includes(x)))) return n;
         if (slot.kind && p.name && verdict(p, prof, { chosenMedia: chosen }).kind !== slot.kind) return n;
         return n + it.qty;
       }, 0);

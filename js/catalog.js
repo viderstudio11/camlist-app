@@ -13,6 +13,7 @@ const HOUSE_BRANDS = new Set(['utopia']);
 const brandOf = (b) => (!b || HOUSE_BRANDS.has(b) ? GENERAL : b);
 export function createCatalog(data, manual = [], extra = null) {
   const departments = (data.departments || []).map(d => ({ ...d })).sort((a, b) => a.order - b.order);
+  const sourceDepts = departments.slice();   // moves name the source's shelves, never the supplement's namesakes
   // The supplement can add departments of its own (numeric ids, like the source's, so the screens treat
   // them the same) and slot each one in after a named department.
   (extra?.departments || []).forEach((x, i) => {
@@ -45,7 +46,7 @@ export function createCatalog(data, manual = [], extra = null) {
   brandNames.set(GENERAL, 'General');
   for (const b of extra?.brands || []) brandNames.set(b.id, b.name); // supplement's display names win
   // Moves re-file source products by name — e.g. cards and readers out of Video into Media & Offload.
-  const subByName = (en) => departments.flatMap(d => d.subcategories.map(sc => ({ ...sc, dept: d.id }))).find(sc => sc.en === en || sc.he === en);
+  const subByName = (en) => sourceDepts.flatMap(d => d.subcategories.map(sc => ({ ...sc, dept: d.id }))).find(sc => sc.en === en || sc.he === en);
   const moves = (extra?.moves || []).map(m => {
     const from = subByName(m.from);
     const dept = departments.find(d => d.slug === m.to);

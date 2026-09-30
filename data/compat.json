@@ -1529,9 +1529,16 @@
         "slot": "ff",
         "he": "פולופוקוס",
         "en": "Follow focus",
-        "dept": "accessories",
-        "subcat": "Follow Focus",
-        "qty": 1
+        "dept": "lenscontrol",
+        "subcat": [
+          "Wireless Follow Focus",
+          "Manual Follow Focus"
+        ],
+        "qty": 1,
+        "fallback": {
+          "dept": "accessories",
+          "subcat": "Follow Focus"
+        }
       },
       {
         "slot": "filters",
@@ -1548,7 +1555,11 @@
         "dept": "media",
         "subcat": "Memory Cards",
         "qty": 4,
-        "kind": "card"
+        "kind": "card",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "reader",
@@ -1557,7 +1568,11 @@
         "dept": "media",
         "subcat": "Card Readers",
         "qty": 1,
-        "kind": "reader"
+        "kind": "reader",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "battery",
@@ -1581,9 +1596,16 @@
         "slot": "monitor",
         "he": "מוניטור על המצלמה",
         "en": "On-camera monitor",
-        "dept": "video",
-        "subcat": "On Camera",
-        "qty": 1
+        "dept": "monitors",
+        "subcat": [
+          "On-Camera Monitors",
+          "Monitor-Recorders"
+        ],
+        "qty": 1,
+        "fallback": {
+          "dept": "video",
+          "subcat": "On Camera"
+        }
       },
       {
         "slot": "wireless",
@@ -1597,9 +1619,13 @@
         "slot": "prodmon",
         "he": "מוניטור במאי / DIT",
         "en": "Director / DIT monitor",
-        "dept": "video",
-        "subcat": "Production Monitors",
-        "qty": 1
+        "dept": "monitors",
+        "subcat": "Field Monitors",
+        "qty": 1,
+        "fallback": {
+          "dept": "video",
+          "subcat": "Production Monitors"
+        }
       },
       {
         "slot": "head",
@@ -1633,7 +1659,11 @@
         "dept": "media",
         "subcat": "Memory Cards",
         "qty": 4,
-        "kind": "card"
+        "kind": "card",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "reader",
@@ -1642,7 +1672,11 @@
         "dept": "media",
         "subcat": "Card Readers",
         "qty": 1,
-        "kind": "reader"
+        "kind": "reader",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "battery",
@@ -1666,9 +1700,16 @@
         "slot": "monitor",
         "he": "מוניטור על המצלמה",
         "en": "On-camera monitor",
-        "dept": "video",
-        "subcat": "On Camera",
-        "qty": 1
+        "dept": "monitors",
+        "subcat": [
+          "On-Camera Monitors",
+          "Monitor-Recorders"
+        ],
+        "qty": 1,
+        "fallback": {
+          "dept": "video",
+          "subcat": "On Camera"
+        }
       },
       {
         "slot": "wireless",
@@ -1717,7 +1758,11 @@
         "dept": "media",
         "subcat": "Memory Cards",
         "qty": 4,
-        "kind": "card"
+        "kind": "card",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "reader",
@@ -1726,7 +1771,11 @@
         "dept": "media",
         "subcat": "Card Readers",
         "qty": 1,
-        "kind": "reader"
+        "kind": "reader",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "battery",
@@ -1750,9 +1799,16 @@
         "slot": "monitor",
         "he": "מוניטור / מקליט חיצוני",
         "en": "Monitor / external recorder",
-        "dept": "video",
-        "subcat": "On Camera",
-        "qty": 1
+        "dept": "monitors",
+        "subcat": [
+          "On-Camera Monitors",
+          "Monitor-Recorders"
+        ],
+        "qty": 1,
+        "fallback": {
+          "dept": "video",
+          "subcat": "On Camera"
+        }
       },
       {
         "slot": "rig",
@@ -1785,7 +1841,11 @@
         "dept": "media",
         "subcat": "Memory Cards",
         "qty": 4,
-        "kind": "card"
+        "kind": "card",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "reader",
@@ -1794,7 +1854,11 @@
         "dept": "media",
         "subcat": "Card Readers",
         "qty": 1,
-        "kind": "reader"
+        "kind": "reader",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "battery",
@@ -1838,7 +1902,11 @@
         "dept": "media",
         "subcat": "Memory Cards",
         "qty": 4,
-        "kind": "card"
+        "kind": "card",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "reader",
@@ -1847,7 +1915,11 @@
         "dept": "media",
         "subcat": "Card Readers",
         "qty": 1,
-        "kind": "reader"
+        "kind": "reader",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "battery",
@@ -1883,7 +1955,11 @@
         "dept": "media",
         "subcat": "Memory Cards",
         "qty": 3,
-        "kind": "card"
+        "kind": "card",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "reader",
@@ -1892,7 +1968,11 @@
         "dept": "media",
         "subcat": "Card Readers",
         "qty": 1,
-        "kind": "reader"
+        "kind": "reader",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "mounts",
@@ -1917,7 +1997,11 @@
         "dept": "media",
         "subcat": "Memory Cards",
         "qty": 2,
-        "kind": "card"
+        "kind": "card",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "reader",
@@ -1926,7 +2010,11 @@
         "dept": "media",
         "subcat": "Card Readers",
         "qty": 1,
-        "kind": "reader"
+        "kind": "reader",
+        "fallback": {
+          "dept": "video",
+          "subcat": "Recorders & Media"
+        }
       },
       {
         "slot": "controller",
