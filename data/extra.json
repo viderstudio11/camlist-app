@@ -676,6 +676,98 @@
       "dept": "power",
       "subcat": "Chargers & PSU",
       "src": "DJI RS 5 specs: charging time measured with a 65W PD charger"
+    },
+    {
+      "id": "x_sony_vct14",
+      "name": "VCT-14 Tripod Adaptor",
+      "brand": "sony",
+      "dept": "tripods",
+      "subcat": "Camera Support",
+      "url": "https://pro.sony/en_GB/products/camera-tripods-and-supports/vct-14",
+      "src": "Sony Pro: VCT-14 tripod adaptor for portable cameras/camcorders; compatible PXW-X400, PXW-Z450, PMW-350, PDW-F800"
+    },
+    {
+      "id": "x_gen_head_plate",
+      "name": "Quick-Release Camera Plate (for the head)",
+      "brand": null,
+      "dept": "tripods",
+      "subcat": "Camera Support",
+      "src": "CVP: tripod accessories — quick release plates (Sachtler Touch & Go, Ronford-Baker QR…)"
+    },
+    {
+      "id": "x_gen_euro_plate",
+      "name": "Euro Quick-Release Plate (ARRI-style)",
+      "brand": null,
+      "dept": "tripods",
+      "subcat": "Camera Support",
+      "src": "CVP: tripod accessories — quick release plates (ARRI QRP-1)"
+    },
+    {
+      "id": "x_gen_pan_bar",
+      "name": "Pan Bar (telescopic)",
+      "brand": null,
+      "dept": "tripods",
+      "subcat": "Camera Support",
+      "src": "CVP: tripod accessories — tripod pan bars"
+    },
+    {
+      "id": "x_gen_spreader",
+      "name": "Tripod Spreader (ground)",
+      "brand": null,
+      "dept": "tripods",
+      "subcat": "Camera Support",
+      "src": "CVP: tripod accessories — spreaders"
+    },
+    {
+      "id": "x_gen_wedges",
+      "name": "Dolly Wedges Set",
+      "brand": null,
+      "dept": "grip",
+      "subcat": "Track & Dolly Accessories"
+    },
+    {
+      "id": "x_gen_combo_stand",
+      "name": "Combo Stand",
+      "brand": null,
+      "dept": "grip",
+      "subcat": "Grip Accessories"
+    },
+    {
+      "id": "x_gen_counterweights",
+      "name": "Jib Counterweights Set",
+      "brand": null,
+      "dept": "grip",
+      "subcat": "Jib & Crane"
+    },
+    {
+      "id": "x_gen_ratchet",
+      "name": "Ratchet Strap",
+      "brand": null,
+      "dept": "grip",
+      "subcat": "Grip Accessories"
+    },
+    {
+      "id": "x_gen_safety_strap",
+      "name": "Safety Strap / Safety Cable",
+      "brand": null,
+      "dept": "grip",
+      "subcat": "Grip Accessories"
+    },
+    {
+      "id": "x_gen_sdi_long",
+      "name": "SDI Cable — Long (20 m)",
+      "brand": null,
+      "dept": "video",
+      "subcat": "Video Cables"
+    },
+    {
+      "id": "x_atomos_ssdmini",
+      "name": "AtomX SSDmini 1TB",
+      "brand": "atomos",
+      "dept": "media",
+      "subcat": "Drives & SSD",
+      "url": "https://www.atomos.com/product/ninja/",
+      "src": "Atomos, Ninja: media AtomX SSDmini / SATA drives via Master Caddy"
     }
   ],
   "departments": [

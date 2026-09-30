@@ -94,3 +94,32 @@ test('the D-Tap cable in a kit ends in the connector that model takes', () => {
   const st = gearKitStatus(gearKitFor(catalog, p), 1, [{ productId: 'x_gen_dtap_xlr4', qty: 1 }], (id) => catalog.byId(id), p);
   assert.equal(st.find(s => s.key === 'dtap').done, true);
 });
+
+test('big gear gets its kit: head, legs, dolly, slider, Dana Dolly, jib, car mount', () => {
+  const kitOf = (rx) => gearKitFor(catalog, find(rx))?.id;
+  assert.equal(kitOf(/^Video 18 Fluid Head$/), 'head');
+  assert.equal(kitOf(/^Tall Tripod Legs 150mm$/), 'legs');
+  assert.equal(kitOf(/^Classic Dolly$/), 'dolly');
+  assert.equal(kitOf(/^Slider 60cm 150mm Bowl$/), 'slider');
+  assert.equal(kitOf(/^Dana Dolly$/), 'dana');
+  assert.equal(kitOf(/^GF-Tele Jib$/), 'jib');
+  assert.equal(kitOf(/^Hydra Alien Car Mounting System$/), 'car');
+  for (const rx of [/^VCT-14 Tripod Adaptor$/, /^Tripod Spreader/, /^Dolly Wedges Set$/, /^Jib Counterweights Set$/]) assert.equal(kitOf(rx), undefined, String(rx));
+});
+
+test('a head: legs sized to its bowl, and the Sony VCT-14 plate when the camera is a Sony shoulder camcorder', () => {
+  const head = find(/^C20S 100mm Fluid Head$/);
+  const st = (camera) => gearKitStatus(gearKitFor(catalog, head), 1, [], (id) => catalog.byId(id), head, { camera });
+  const legs = st(null).find(s => s.key === 'legs');
+  assert.equal(legs.add, null, 'no 100 mm tall legs in the catalog: the slot opens the legs shelf');
+  assert.deepEqual(legs.find, { dept: 'tripods', subcat: 'Tripod Legs' });
+  assert.equal(catalog.byId(st(null).find(s => s.key === 'hihat').add).name, 'High Hat with 100mm Bowl');
+  assert.deepEqual(st(find(/PXW-X400/)).find(s => s.key === 'plate').add, 'x_sony_vct14');
+  assert.equal([st(find(/ILME-FX3/)).find(s => s.key === 'plate').add].flat().length, 3);
+});
+
+test('a Ninja asks for AtomX SSDmini media and NP-F batteries, per Atomos', () => {
+  const ninja = find(/^Ninja 5\.2″/);
+  const keys = gearKitStatus(gearKitFor(catalog, ninja), 1, [], (id) => catalog.byId(id), ninja).map(s => s.key);
+  assert.ok(keys.includes('media') && keys.includes('battery'));
+});

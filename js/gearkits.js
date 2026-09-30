@@ -17,7 +17,8 @@ const isMonitor = (catalog, p) => ['video', 'monitors'].includes(catalog.deptKey
   && !SUB(catalog, p).some(s => ['Recorders & Media', 'Wireless Video', 'Viewfinders & EVF', 'Monitor Accessories'].includes(s))
   && /monitor|lcd|oled|\blmd\b|\bpvm\b|\bbvm\b|smallhd|\bcine \d/i.test(p.name);
 
-const slot = (key, he, en, qty, match, add) => ({ key, he, en, qty, match, add });
+// `find` names the shelf to open when there is nothing single to add (legs to match a head's bowl).
+const slot = (key, he, en, qty, match, add, find = null) => ({ key, he, en, qty, match, add, find });
 // On-camera by the screen size in the name (under 13″), else by the source's own subcategory.
 const onCamera = (catalog, p) => { const size = inches(p.name); return size != null ? size < 13 : SUB(catalog, p).some(s => s === 'On-Camera Monitors' || s === 'On Camera'); };
 
@@ -86,7 +87,39 @@ export const GIMBAL_BOX = [
     combo: ['Extended Quick-Release Plate', 'Phone Holder', 'Focus Motor (2022)', 'Focus Motor Rod Kit', 'Focus Gear Strip', 'Ronin Image Transmitter', 'Hook-and-Loop Straps ×2', 'Additional cables'] },
 ];
 
-export const powerInputOf = (product) => (product ? POWER_INPUTS.find(x => x.rx.test(product.name)) || null : null);
+// Monitor-recorders: the media and batteries the maker names. Models not listed get the monitor kit only.
+const RECORDERS = [
+  { rx: /\bninja\b/i, src: 'Atomos, Ninja: records to AtomX SSDmini (or Master Caddy drives); powered by NP-F batteries on the rear L-series plate',
+    media: { add: 'x_atomos_ssdmini', qty: 2, match: /ssdmini|master caddy/i, he: 'מדיה AtomX SSDmini', en: 'AtomX SSDmini media' },
+    battery: { add: 3467, qty: 2, match: /np-?f\s?[5-9]\d0|l-series/i, he: 'סוללות NP-F', en: 'NP-F batteries' } },
+];
+const recorderExtras = (p) => {
+  const r = RECORDERS.find(x => x.rx.test(p.name || ''));
+  if (!r) return [];
+  return [r.media, r.battery].filter(Boolean).map((m, i) => ({ ...slot(i ? 'battery' : 'media', m.he, m.en, m.qty, m.match, m.add), src: r.src }));
+};
+
+// Tripods. A head's bowl from its name (100 / 150 mm, Mitchell); unnamed bowls offer both sizes.
+const bowlOf = (name) => (/150/.test(name) ? 150 : /100/.test(name) ? 100 : /mitchell|flat/i.test(name) ? 150 : null);
+const isHead = (catalog, p) => {
+  const subs = SUB(catalog, p);
+  if (subs.includes('Fluid Heads') || subs.includes('Gear Head')) return true;
+  return subs.includes('System / Friction Head') && /head/i.test(p.name) && !/tripod|legs|monopod|pedestal|platform|kit/i.test(p.name);
+};
+const SAND = /sand ?bag|shot ?bag/i;
+const LEGS = /tripod legs|baby (legs|tripod)|tall tripod/i;
+const LEGS_150 = [3562, 3569, 3571];                       // Ronford-Baker tall, heavy-duty, baby — 150 mm
+const TRIPOD_LEGS = { dept: 'tripods', subcat: 'Tripod Legs' };
+const FLUID_HEADS = { dept: 'tripods', subcat: 'Fluid Heads' };
+const FIELD_MONITORS = { dept: 'monitors', subcat: 'Field Monitors' };
+// The camera plate: Sony's shoulder camcorders take the VCT-14 (Sony lists the PXW-X400, PXW-Z450,
+// PMW-350 and PDW-F800); otherwise the head's own quick-release plate or a Euro plate.
+const VCT_CAMERAS = /pxw-?x400|pxw-?z450|pmw-?350|pdw-?f?800/i;
+const plateSlot = (ctx) => (ctx?.camera && VCT_CAMERAS.test(ctx.camera.name)
+  ? { ...slot('plate', 'פלטת Sony VCT-14', 'Sony VCT-14 tripod plate', 1, /vct-?14/i, 'x_sony_vct14'), src: 'Sony Pro, VCT-14 compatible products' }
+  : slot('plate', 'פלטת מצלמה — ראש / יורו / VCT', 'Camera plate — head / Euro / VCT', 1, /camera plate|quick-?release plate|euro|vct-?14/i, ['x_gen_head_plate', 'x_gen_euro_plate', 'x_sony_vct14']));
+
+export const powerInputOf =(product) => (product ? POWER_INPUTS.find(x => x.rx.test(product.name)) || null : null);
 
 export const GEAR_KITS = [
   {
@@ -106,8 +139,9 @@ export const GEAR_KITS = [
   {
     id: 'monitor-small', he: 'מוניטור על המצלמה', en: 'On-camera monitor',
     when: (catalog, p) => isMonitor(catalog, p) && onCamera(catalog, p),
-    slots: [
+    slots: (p) => [
       slot('arm', 'זרוע — UT Arm / Noga Arm', 'Arm — UT Arm / Noga Arm', 1, /monitor arm|^ut arm$|noga|magic arm/i, [4080, 'x_gen_noga_arm']),
+      ...recorderExtras(p),
       slot('hood', 'סאן־הוד', 'Sunhood', 1, /sun ?hood/i, 'x_gen_sunhood'),
       slot('dtap', 'כבל D-Tap', 'D-Tap power cable', 1, /d-?tap/i, 'x_gen_dtap'),
       slot('sdi', 'כבל BNC קצר', 'Short BNC cable', 1, /\bsdi cable|^bnc cable/i, 'x_gen_bnc_short'),
@@ -156,6 +190,93 @@ export const GEAR_KITS = [
     },
   },
   {
+    id: 'head', he: 'ראש חצובה', en: 'Tripod head',
+    when: (catalog, p) => catalog.deptKey(p.dept) === 'tripods' && isHead(catalog, p),
+    slots: (p, ctx) => {
+      const bowl = bowlOf(p.name);
+      return [
+        plateSlot(ctx),
+        slot('panbar', 'פאן־בר שני', 'Second pan bar', 1, /pan ?bar/i, 'x_gen_pan_bar'),
+        slot('legs', 'רגליים בקוטר הקערה של הראש', 'Legs for the head’s bowl', 1, LEGS, bowl === 100 ? null : LEGS_150, TRIPOD_LEGS),
+        slot('hihat', 'היי־האט', 'Hi-hat', 1, /hi-?hat|high hat/i, bowl === 100 ? 3723 : bowl === 150 ? 3720 : [3720, 3723]),
+        slot('spreader', 'ספרדר', 'Spreader', 1, /spreader/i, 'x_gen_spreader'),
+        slot('sand', 'שק חול', 'Sandbag', 1, SAND, 3896),
+      ];
+    },
+  },
+  {
+    id: 'tripod-system', he: 'מערכת חצובה', en: 'Tripod system',
+    when: (catalog, p) => catalog.deptKey(p.dept) === 'tripods' && /tripod|with .*legs/i.test(p.name) && !isHead(catalog, p)
+      && !SUB(catalog, p).includes('Tripod Legs') && !/monopod|pedestal|platform|\bpc tripod|baby|high hat|hi-?hat|adaptor|spreader|plate/i.test(p.name),
+    slots: (p, ctx) => [
+      plateSlot(ctx),
+      slot('spreader', 'ספרדר', 'Spreader', 1, /spreader/i, 'x_gen_spreader'),
+      slot('sand', 'שק חול', 'Sandbag', 1, SAND, 3896),
+    ],
+  },
+  {
+    id: 'legs', he: 'רגלי חצובה', en: 'Tripod legs',
+    when: (catalog, p) => SUB(catalog, p).includes('Tripod Legs'),
+    slots: (p) => [
+      slot('head', 'ראש בקוטר הקערה', 'A head for the bowl', 1, /fluid head|\bhead\b/i, null, FLUID_HEADS),
+      ...(/hi-?hat|high hat/i.test(p.name) ? [] : [slot('spreader', 'ספרדר', 'Spreader', 1, /spreader/i, 'x_gen_spreader')]),
+      slot('sand', 'שק חול', 'Sandbag', 1, SAND, 3896),
+    ],
+  },
+  {
+    id: 'dolly', he: 'דולי', en: 'Dolly',
+    when: (catalog, p) => catalog.deptKey(p.dept) === 'grip' && /dolly/i.test(p.name) && !/slider|spreader|skate|skater|floor|hot buttons|dana|wedge/i.test(p.name),
+    slots: [
+      slot('track', 'מסילה ישרה 8′', 'Straight track 8′', 4, /track straight|straight track/i, 4706),
+      slot('wedges', 'וודג׳ים', 'Wedges', 1, /wedge/i, 'x_gen_wedges'),
+      slot('apple', 'אפל בוקס', 'Apple boxes', 2, /apple box/i, 3910),
+      slot('sand', 'שקי חול', 'Sandbags', 4, SAND, 3896),
+      slot('hihat', 'היי־האט 150 / מיטשל', 'Hi-hat 150 / Mitchell', 1, /hi-?hat|high hat/i, [3720, 18529]),
+      slot('euro', 'אדפטר יורו', 'Euro adapter', 1, /euro/i, [27233, 'x_gen_euro_plate']),
+    ],
+  },
+  {
+    id: 'slider', he: 'סליידר', en: 'Slider',
+    when: (catalog, p) => catalog.deptKey(p.dept) === 'grip' && /slider/i.test(p.name) && !/dolly slider/i.test(p.name),
+    slots: [
+      slot('legs', 'רגלי חצובה 150', 'Tripod legs 150', 2, LEGS, [3571, 3562], TRIPOD_LEGS),
+      slot('head', 'ראש נוזלי', 'Fluid head', 1, /fluid head|\bhead\b/i, null, FLUID_HEADS),
+      slot('sand', 'שקי חול', 'Sandbags', 2, SAND, 3896),
+    ],
+  },
+  {
+    id: 'dana', he: 'דנה דולי', en: 'Dana Dolly',
+    when: (catalog, p) => /dana dolly/i.test(p.name),
+    slots: [
+      slot('pipe', 'צינור / ספיד־ריל', 'Pipe / speed rail', 2, /steel pipe|speed ?rail/i, [4583, 4585]),
+      slot('stand', 'קומבו סטנד', 'Combo stand', 2, /combo stand/i, 'x_gen_combo_stand'),
+      slot('sand', 'שקי חול', 'Sandbags', 4, SAND, 3896),
+      slot('hihat', 'היי־האט', 'Hi-hat', 1, /hi-?hat|high hat/i, [3720, 18529]),
+    ],
+  },
+  {
+    id: 'jib', he: 'ג׳יב', en: 'Jib',
+    when: (catalog, p) => catalog.deptKey(p.dept) === 'grip' && /jib|crane/i.test(p.name) && !/track|accessor|counter ?weight/i.test(p.name),
+    slots: [
+      slot('weights', 'משקולות נגד', 'Counterweights', 1, /counter ?weight/i, 'x_gen_counterweights'),
+      slot('legs', 'רגליים כבדות', 'Heavy-duty legs', 1, LEGS, 3569, TRIPOD_LEGS),
+      slot('head', 'ראש (רמוט או נוזלי)', 'Head (remote or fluid)', 1, /fluid head|remote head|\bhead\b/i, null, FLUID_HEADS),
+      slot('monitor', 'מוניטור שטח', 'Field monitor', 1, /monitor/i, null, FIELD_MONITORS),
+      slot('sdi', 'כבל SDI ארוך', 'Long SDI cable', 1, /sdi cable — long|long sdi/i, 'x_gen_sdi_long'),
+      slot('sand', 'שקי חול', 'Sandbags', 4, SAND, 3896),
+    ],
+  },
+  {
+    id: 'car', he: 'מתקן רכב', en: 'Car mount',
+    when: (catalog, p) => /car mount|car mounting|tank mount|hydra alien|megagrip|mokit/i.test(p.name),
+    slots: [
+      slot('suction', 'צלחת ואקום נוספת', 'Extra suction cup', 1, /suction/i, [26152, 3920]),
+      slot('ratchet', 'רצועות רצ׳ט', 'Ratchet straps', 4, /ratchet/i, 'x_gen_ratchet'),
+      slot('safety', 'רצועות ביטחון', 'Safety straps', 2, /safety (strap|cable)/i, 'x_gen_safety_strap'),
+      slot('sdi', 'כבל SDI ארוך', 'Long SDI cable', 1, /sdi cable — long|long sdi/i, 'x_gen_sdi_long'),
+    ],
+  },
+  {
     id: 'mattebox', he: 'מטבוקס', en: 'Matte box',
     when: (catalog, p) => SUB(catalog, p).includes('Matte Boxes'),
     slots: [
@@ -177,7 +298,8 @@ export const GEAR_KITS = [
 ];
 
 // A kit's slots may depend on the model (a follow focus's own battery, a gimbal's grip).
-export const kitSlotsOf = (kit, product) => (typeof kit.slots === 'function' ? kit.slots(product || {}) : kit.slots);
+// `ctx.camera` is the camera being built around, for slots that depend on it (a tripod's camera plate).
+export const kitSlotsOf = (kit, product, ctx = {}) => (typeof kit.slots === 'function' ? kit.slots(product || {}, ctx) : kit.slots);
 // What the maker packs in the box, for kits that know it (DJI gimbals).
 export const inTheBox = (kit, product) => (kit?.box && product ? kit.box(product) : null);
 
@@ -185,10 +307,10 @@ export const gearKitFor = (catalog, product) => (product && !product.manual ? GE
 
 // Slot progress for one kit, scaled by how many of the parent item the list holds. With the parent
 // product given, the D-Tap slot names the plug that model takes.
-export function gearKitStatus(kit, parentQty, items, resolve, parent = null) {
+export function gearKitStatus(kit, parentQty, items, resolve, parent = null, ctx = {}) {
   const products = items.map(it => ({ it, p: resolve(it.productId) })).filter(x => x.p);
   const input = powerInputOf(parent);
-  return kitSlotsOf(kit, parent).map(s0 => {
+  return kitSlotsOf(kit, parent, ctx).map(s0 => {
     const plug = s0.key === 'dtap' && input ? PLUGS[input.plug] : null;
     const s = plug ? { ...s0, he: `כבל D-Tap ל־${plug.he}`, en: `D-Tap to ${plug.en} cable`, add: plug.add, match: plug.match, src: input.src } : s0;
     const need = s.qty * Math.max(1, parentQty);

@@ -53,7 +53,9 @@ export function render(ctx, { id }, root) {
 
   const gearKit = (product) => gearKitFor(ctx.catalog, product);
   const qtyOf = (pid) => p.items.find(i => i.productId === pid)?.qty || 1;
-  const kitSlots = (product) => gearKitStatus(gearKit(product), qtyOf(product.id), p.items, ctx.resolve, product);
+  // The camera being built around (else the first camera in the list) — a tripod's plate depends on it.
+  const kitCamera = () => (p.buildCameraId != null ? ctx.resolve(p.buildCameraId) : p.items.map(i => ctx.resolve(i.productId)).find(x => x && compat.isCamera(x))) || null;
+  const kitSlots = (product) => gearKitStatus(gearKit(product), qtyOf(product.id), p.items, ctx.resolve, product, { camera: kitCamera() });
   // Monitors, wireless video, follow focus, matte boxes, laptops: a chip under the item opens its
   // must-have checklist in place, so several kits can be open side by side.
   const kitChip = (product) => {
@@ -66,7 +68,7 @@ export function render(ctx, { id }, root) {
         <span class="slot-check">${x.done ? '✓' : ''}</span>
         <span class="slot-label">${esc(ctx.lang() === 'he' ? x.he : x.en)}</span>
         <span class="slot-have">${x.have} / ${x.need}</span>
-        ${x.done ? '' : x.add != null ? `<button class="btn sm" data-kitadd="${esc(product.id)}" data-slot="${esc(x.key)}">${t('add')}</button>` : `<button class="btn sm" data-kitfind="${esc(x.key)}">${t('choose')}</button>`}
+        ${x.done ? '' : x.add != null ? `<button class="btn sm" data-kitadd="${esc(product.id)}" data-slot="${esc(x.key)}">${t('add')}</button>` : `<button class="btn sm" data-kitfind="${esc(product.id)}" data-slot="${esc(x.key)}">${t('choose')}</button>`}
       </div>`).join('');
   const inlineKit = (product) => (openKits.has(product.id) && gearKit(product)
     ? `<div class="gkit"><div class="gkit-head">${t('must_have_for', { name: esc(displayName(product)) })}</div><div class="slots">${slotRows(product)}</div>${boxNote(product)}</div>` : '');
@@ -194,7 +196,14 @@ export function render(ctx, { id }, root) {
     openSheet({ title: ctx.lang() === 'he' ? slot.he : slot.en, bodyHTML: '', stack: true,
       actions: choices.map(c => ({ label: ctx.resolve(c).name, onClick: () => put(c) })) });
   }; });
-  root.querySelectorAll('[data-kitfind]').forEach(b => { b.onclick = () => { presetCatalog({}); ctx.navigate(`#/p/${id}/add`); }; });
+  // "Choose" opens the shelf the slot names (legs for a head, a fluid head for a slider…), else the departments.
+  root.querySelectorAll('[data-kitfind]').forEach(b => { b.onclick = () => {
+    const slot = kitSlots(ctx.resolve(parseId(b.dataset.kitfind))).find(x => x.key === b.dataset.slot);
+    const d = slot?.find ? ctx.catalog.departments.find(x => x.slug === slot.find.dept) : null;
+    const sub = d?.subcategories.find(x => x.en === slot.find.subcat);
+    presetCatalog(d ? { dept: d.id, subcat: sub?.id ?? null } : {});
+    ctx.navigate(`#/p/${id}/add`);
+  }; });
   root.querySelectorAll('[data-choose]').forEach(b => { b.onclick = () => {
     const slot = compat.kitStatus(activeProf, p.items, ctx.resolve, allocFor(p, p.buildCameraId)).find(s => s.slot === b.dataset.choose);
     presetCatalog({ dept: slot.deptId, subcat: slot.subId, strict: true, kind: slot.kind || null, kitCam: p.buildCameraId, slot: slot.slot });

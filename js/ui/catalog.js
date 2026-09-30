@@ -6,6 +6,7 @@ import { thumbHTML, parseId, profileChips } from './list.js';
 import { lensTypes, LENS_TYPES } from '../lens.js';
 import { deptIcon } from './icons-dept.js';
 import { companionsFor } from '../companions.js';
+import { DEPT_EMOJI } from '../i18n.js';
 import { gearKitFor, gearKitStatus } from '../gearkits.js';
 import { ensureAlloc, bump } from '../kitalloc.js';
 import { accessoryKind, filterType, filterSize, ACC_KINDS, FILTER_TYPES, FILTER_SIZES } from '../accessory.js';
@@ -25,11 +26,20 @@ let kind = null;        // kit slot kind (card / reader / battery / charger) —
 let kitSlot = null;     // { cam, slot } while choosing for one camera's kit slot: what is added counts for that camera
 export function presetCatalog(o) { preset = o; }
 const offered = new Set(); // products whose "goes with" window was already shown this session
+// What was added on the current shelf waits here; leaving the shelf (another department or shelf, clearing the
+// search, back to the list) opens one window for all of it — with the quantities already chosen.
+let pending = [];
+let pendingShelf = null; // the shelf the waiting items were added on
+let pendingPid = null;
 
 export function render(ctx, { id }, root) {
   const { store, t, catalog } = ctx;
   if (st.pid !== id) { st = { pid: id, q: '', view: 'depts', dept: null, subcat: null, brand: null, sub: null }; lf = { type: null, mount: null, format: null }; af = { kind: null, type: null, size: null }; }
   if (preset) { st = { pid: id, q: '', view: 'depts', dept: preset.dept ?? null, subcat: preset.subcat ?? null, brand: null, sub: null }; af = { kind: null, type: null, size: null }; strict = !!preset.strict; kind = preset.kind || null; kitSlot = preset.kitCam != null ? { cam: preset.kitCam, slot: preset.slot } : null; compatOnly = true; preset = null; }
+  if (st.pid !== pendingPid) { pending = []; pendingPid = st.pid; }
+  // the search box updates results in place, so the shelf is read when an item is added, not at render
+  const shelfNow = () => JSON.stringify([st.dept, st.subcat, st.brand, af.kind, st.q.trim() ? 'search' : '']);
+  const leftShelf = pending.length > 0 && shelfNow() !== pendingShelf;
   const lang = ctx.lang();
   const { compat, recency } = ctx;
   const project = store.getProject(id);
@@ -317,7 +327,7 @@ export function render(ctx, { id }, root) {
     if (k === 'brands') { st.brand = null; st.dept = null; }
     rerender();
   }; });
-  root.querySelector('[data-done]').onclick = () => ctx.navigate(`#/p/${id}`);
+  root.querySelector('[data-done]').onclick = () => (pending.length ? flushOffers(() => ctx.navigate(`#/p/${id}`)) : ctx.navigate(`#/p/${id}`));
   root.querySelectorAll('[data-jump]').forEach(b => { b.onclick = () => { const h = document.getElementById(b.dataset.jump); if (h) h.scrollIntoView({ behavior: 'smooth', block: 'start' }); }; });
 
   const bindRow = (row) => {
@@ -333,37 +343,62 @@ export function render(ctx, { id }, root) {
       const fresh = document.createElement('template'); fresh.innerHTML = productRow(catalog.byId(productId), { showBrand });
       const nr = fresh.content.firstElementChild; row.replaceWith(nr); bindRow(nr);
       root.querySelector('[data-done]').innerHTML = `${icons.check}${t('back_to_list', { n: totalQty(items()) })}`;
-      if (!cur) { toast(t('added'), { kind: 'ok', ms: 900 }); offerCompanions(p); }
+      if (!cur) { toast(t('added'), { kind: 'ok', ms: 900 }); if (!offered.has(p.id) && !pending.includes(p.id)) { if (!pending.length) pendingShelf = shelfNow(); pending.push(p.id); } }
     }; });
   };
   root.querySelectorAll('.row').forEach(bindRow);
+  if (leftShelf) queueMicrotask(() => flushOffers());
 
   // "Goes with": right after something is added, what usually rides along with it. Shown once per product.
   // Gear with a kit (monitor, follow focus, gimbal…) offers that kit's missing pieces, sized to the model:
   // the D-Tap cable ends in its plug, the hand unit gets its own battery, a choice (UT / Noga arm) shows both.
+  const kitCamera = () => { const pr = store.getProject(id); return (pr.buildCameraId != null ? ctx.resolve(pr.buildCameraId) : pr.items.map(i => ctx.resolve(i.productId)).find(x => x && compat.isCamera(x))) || null; };
   function kitOffers(p) {
     const kit = gearKitFor(catalog, p);
     if (!kit) return null;
     const qty = items().find(i => i.productId === p.id)?.qty || 1;
-    return gearKitStatus(kit, qty, items(), ctx.resolve, p).filter(s => !s.done && s.add != null)
-      .flatMap(s => [s.add].flat().map(id => ({ c: catalog.byId(id), n: s.need - s.have, slot: s.key, label: lang === 'he' ? s.he : s.en })))
-      .filter(x => x.c);
+    return gearKitStatus(kit, qty, items(), ctx.resolve, p, { camera: kitCamera() }).filter(s => !s.done && (s.add != null || s.find))
+      .flatMap(s => (s.add != null
+        ? [s.add].flat().map(pid => ({ c: catalog.byId(pid), n: s.need - s.have, slot: s.key, label: lang === 'he' ? s.he : s.en }))
+        : [{ find: s.find, label: lang === 'he' ? s.he : s.en }]))
+      .filter(x => x.c || x.find);
   }
   // A slot label that only repeats the item's name ("Lens gear rings" under "Lens Gear Rings Set") says
   // nothing; the brand says more.
   const sameWords = (label, name) => { const n = normalize(name); return normalize(label).split(' ').every(w => n.includes(w.replace(/s$/, ''))); };
-  function offerCompanions(p) {
-    if (offered.has(p.id)) return;
-    const list = kitOffers(p) || companionsFor(p, catalog, { items: items(), resolve: ctx.resolve }).map(c => ({ c, n: 1 }));
-    if (!list.length) return;
-    offered.add(p.id);
-    const rowHTML = ({ c, n, slot, label }) => `<div class="row gw-row" data-gw="${esc(c.id)}" data-n="${n}" ${slot ? `data-gw-slot="${esc(slot)}"` : ''}>${thumbHTML(c, catalog.deptKey(c.dept))}
-      <div class="body"><div class="name" dir="auto">${esc(c.name)}${n > 1 ? ` <b>× ${n}</b>` : ''}</div><div class="sub">${label && !sameWords(label, c.name) ? esc(label) : brandText(c.brand, c.brandName)}</div></div>
-      <button class="addbtn" data-gw-add aria-label="${t('add')}">+</button></div>`;
-    const { body } = openSheet({
-      title: t('goes_with', { name: p.name }),
-      bodyHTML: `<div class="gw-list">${list.map(rowHTML).join('')}</div>`,
+  function flushOffers(after = null) {
+    const parents = pending.map(pid => catalog.byId(pid)).filter(Boolean);
+    pending = [];
+    const seen = new Set(items().map(i => String(i.productId)));
+    const groups = parents.map(p => {
+      offered.add(p.id);
+      const list = (kitOffers(p) || companionsFor(p, catalog, { items: items(), resolve: ctx.resolve }).map(c => ({ c, n: 1 })))
+        .filter(x => x.find || !seen.has(String(x.c.id)) || x.slot);
+      list.forEach(x => x.c && !x.slot && seen.add(String(x.c.id)));    // a charger offered for one battery isn't offered again
+      return { p, list };
+    }).filter(g => g.list.length);
+    if (!groups.length) { after?.(); return; }
+    const rowHTML = ({ c, n, slot, label, find }, gi) => (find
+      ? `<div class="row gw-row" data-gw-find="${esc(JSON.stringify(find))}"><div class="thumb"><span>${DEPT_EMOJI[find.dept] || '📦'}</span></div>
+        <div class="body"><div class="name" dir="auto">${esc(label)}</div></div><button class="btn sm" data-gw-go>${t('choose')} ›</button></div>`
+      : `<div class="row gw-row" data-gw="${esc(c.id)}" data-n="${n}" ${slot ? `data-gw-slot="${gi}:${esc(slot)}"` : ''}>${thumbHTML(c, catalog.deptKey(c.dept))}
+        <div class="body"><div class="name" dir="auto">${esc(c.name)}${n > 1 ? ` <b>× ${n}</b>` : ''}</div><div class="sub">${label && !sameWords(label, c.name) ? esc(label) : brandText(c.brand, c.brandName)}</div></div>
+        <button class="addbtn" data-gw-add aria-label="${t('add')}">+</button></div>`);
+    const one = groups.length === 1;
+    let navigated = false;
+    const { body, close } = openSheet({
+      title: one ? t('goes_with', { name: groups[0].p.name }) : t('goes_with_added'),
+      bodyHTML: groups.map((g, gi) => `${one ? '' : `<div class="gw-head" dir="auto">${esc(g.p.name)}</div>`}<div class="gw-list">${g.list.map(x => rowHTML(x, gi)).join('')}</div>`).join(''),
       actions: [{ label: t('done'), kind: 'primary' }],
+    });
+    document.getElementById('sheet').addEventListener('close', () => { if (!navigated) after?.(); }, { once: true });
+    body.querySelectorAll('[data-gw-find]').forEach(row => {
+      row.querySelector('[data-gw-go]').onclick = () => {
+        const find = JSON.parse(row.dataset.gwFind);
+        const d = catalog.departments.find(x => x.slug === find.dept);
+        navigated = true; close();
+        if (d) { st.q = ''; st.dept = d.id; st.subcat = d.subcategories.find(x => x.en === find.subcat)?.id ?? null; st.brand = null; rerender(); }
+      };
     });
     body.querySelectorAll('[data-gw]').forEach(row => {
       row.querySelector('[data-gw-add]').onclick = (e) => {
@@ -372,10 +407,10 @@ export function render(ctx, { id }, root) {
         store.setItems(id, cur ? setQty(items(), c.id, cur + n) : addItem(items(), c, n));
         e.currentTarget.outerHTML = '<span class="gw-done">✓</span>';
         // one pick fills a choice slot: the other option steps back
-        if (row.dataset.gwSlot) body.querySelectorAll(`[data-gw-slot="${CSS.escape(row.dataset.gwSlot)}"] [data-gw-add]`).forEach(b => { b.closest('.gw-row').classList.add('gw-skip'); b.remove(); });
+        if (row.dataset.gwSlot) body.querySelectorAll(`[data-gw-slot="${CSS.escape(row.dataset.gwSlot)}"] [data-gw-add]`).forEach(bt => { bt.closest('.gw-row').classList.add('gw-skip'); bt.remove(); });
         root.querySelector('[data-done]').innerHTML = `${icons.check}${t('back_to_list', { n: totalQty(items()) })}`;
         const inPage = root.querySelector(`.row[data-pid="${CSS.escape(String(c.id))}"]`);
-        if (inPage) { const f = document.createElement('template'); f.innerHTML = productRow(c, { showBrand: !!inPage.querySelector('.brandname') }); const nr = f.content.firstElementChild; inPage.replaceWith(nr); bindRow(nr); }
+        if (inPage) { const tp = document.createElement('template'); tp.innerHTML = productRow(c, { showBrand: !!inPage.querySelector('.brandname') }); const nr = tp.content.firstElementChild; inPage.replaceWith(nr); bindRow(nr); }
       };
     });
   }
