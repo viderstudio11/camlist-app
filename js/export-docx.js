@@ -85,14 +85,11 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
   children.push(P('', { spacing: { after: 120 } }));
 
   const rows = [];
-  let total = 0;
   for (const g of groups) {
-    const count = g.entries.reduce((n, e) => n + e.item.qty, 0);
     rows.push(new D.TableRow({ cantSplit: true, children: [
-      cell([P(`${t(`dept_${g.key}`)}  ·  ${count}`, { bold: true, size: 22 })], { w: USABLE, span: cols.length, shade: 'EFEFEF', borders: headBorders }),
+      cell([P(t(`dept_${g.key}`), { bold: true, size: 22 })], { w: USABLE, span: cols.length, shade: 'EFEFEF', borders: headBorders }),
     ] }));
     for (const { item, product } of g.entries) {
-      total += item.qty;
       const v = { qty: `${item.qty}×`, item: displayName(product), notes: item.note || '', link: product.url || '' };
       rows.push(new D.TableRow({ cantSplit: true, children: cols.map(k => cell([P(v[k], {
         bold: k === 'qty', color: k === 'notes' || k === 'link' ? '666666' : undefined, size: k === 'notes' || k === 'link' ? 19 : 22,
@@ -100,7 +97,6 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
     }
   }
   children.push(new D.Table({ width: { size: USABLE, type: D.WidthType.DXA }, columnWidths: cols.map(k => W[k]), layout: D.TableLayoutType.FIXED, visuallyRightToLeft: rtl, rows }));
-  children.push(P(t('items_count', { n: total }), { bold: true, spacing: { before: 200 } }));
 
   const doc = new D.Document({ creator: 'CamList', title: project.name || 'Gear list',
     styles: { default: { document: { run: { ...(font ? { font } : {}), language, size: 22 } } } },

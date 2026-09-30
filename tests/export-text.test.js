@@ -35,23 +35,24 @@ test('hebrew share text snapshot', () => {
     '⁦050-1234567⁩ · ⁦a@b.com⁩',
     'יחידה 2 מצטרפת ב-20.10',
     '',
-    '*מצלמות · 3*',
+    '*מצלמות*',
     '• 2 × Sony FX6',
     '   ↳ Cam A+B',
     '• 1 × ARRI ALEXA 35',
     '',
-    '*אחר · 1*',
+    '*אחר*',
     '• 1 × Shogun 7',
     '',
-    '4 פריטים · CamList · 17.09.2026',
+    'CamList · 17.09.2026',
   ].join('\n'));
 });
 
 test('english, no notes, with links', () => {
   const txt = buildShareText(project, groups, { lang: 'en', includeNotes: false, includeLinks: true, now: new Date('2026-09-17T10:00:00Z') });
-  assert.ok(txt.includes('*Cameras · 3*'));
+  assert.ok(txt.includes('*Cameras*'));
   assert.ok(txt.includes('• 2 × Sony FX6\n   https://u/fx6'));
   assert.ok(!txt.includes('Cam A+B'));
   assert.ok(!txt.includes('יחידה 2'));
-  assert.ok(txt.endsWith('4 items · CamList · 17.09.2026'));
+  assert.ok(txt.endsWith('CamList · 17.09.2026'));
+  assert.ok(!/items|Total/.test(txt), 'no counts beyond each item’s quantity');
 });

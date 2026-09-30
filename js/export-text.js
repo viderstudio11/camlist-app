@@ -31,17 +31,15 @@ export function buildShareText(project, groups, { lang = 'he', includeNotes = tr
   const contact = [project.phone, project.email].filter(Boolean).map(iso);
   if (contact.length) lines.push(contact.join(' · '));
   if (includeNotes && project.notes) lines.push(project.notes);
-  let total = 0;
   for (const g of groups) {
-    const count = g.entries.reduce((n, x) => n + x.item.qty, 0);
-    lines.push('', `*${deptLabel(g.key, lang)} · ${count}*`);
+    lines.push('', `*${deptLabel(g.key, lang)}*`);
     for (const { item, product } of g.entries) {
-      total += item.qty;
       lines.push(`• ${item.qty} × ${displayName(product)}`);
       if (includeNotes && item.note) lines.push(`   ↳ ${item.note}`);
       if (includeLinks && product.url) lines.push(`   ${product.url}`);
     }
   }
-  lines.push('', `${t('items_count', { n: total }, lang)} · CamList · ${fmtDate(todayStr(now))}`);
+  // Only each item's quantity is a number on the page — no department counts and no total, which read as more quantities.
+  lines.push('', `CamList · ${fmtDate(todayStr(now))}`);
   return lines.join('\n');
 }

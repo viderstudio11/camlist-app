@@ -1,5 +1,5 @@
 import { esc, icons, toast } from './dom.js';
-import { groupByDept, totalQty } from '../list.js';
+import { groupByDept } from '../list.js';
 import { buildShareText, displayName, formatDateRange } from '../export-text.js';
 import { exportXlsx } from '../export-xlsx.js';
 import { exportDocx } from '../export-docx.js';
@@ -23,17 +23,16 @@ function docPreview(p, groups, t, sheet) {
   const range = formatDateRange(p.dateFrom, p.dateTo);
   const meta = [p.productionCo && `<bdi>${esc(p.productionCo)}</bdi>`, p.techManager && `${esc(t('tech_manager'))}: <bdi>${esc(p.techManager)}</bdi>`, range && `<bdi dir="ltr">${esc(range)}</bdi>`].filter(Boolean);
   const rows = groups.map(g => {
-    const count = g.entries.reduce((n, x) => n + x.item.qty, 0);
     const items = g.entries.map(({ item, product }) => `
       <div class="dp-row"><b>${item.qty}×</b><span dir="auto">${esc(displayName(product))}${opts.includeNotes && item.note ? `<small dir="auto">${esc(item.note)}</small>` : ''}</span></div>`).join('');
-    return `<div class="dp-dept"><span>${esc(t(`dept_${g.key}`))}</span><i>${count}</i></div>${items}`;
+    return `<div class="dp-dept"><span>${esc(t(`dept_${g.key}`))}</span></div>${items}`;
   }).join('');
   return `<div class="docprev ${sheet ? 'sheet' : ''}">
     ${sheet ? '' : '<div class="dp-stripe"></div>'}
     <div class="dp-title" dir="auto">${esc(p.name || t('untitled'))}</div>
     ${meta.length ? `<div class="dp-meta">${meta.join('  ·  ')}</div>` : ''}
     ${rows}
-    <div class="dp-foot">${esc(t('items_count', { n: totalQty(p.items) }))}</div>
+    <div class="dp-foot">CamList</div>
   </div>`;
 }
 
