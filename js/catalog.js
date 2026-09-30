@@ -128,7 +128,8 @@ export function createCatalog(data, manual = [], extra = null) {
     byDept: (deptId) => all().filter(p => p.dept === deptId),
     bySubcat: (id) => { const ids = withDescendants(id); return all().filter(p => p.subcats.some(x => ids.has(x))); },
     byBrand: (slug) => all().filter(p => p.brand === slug),
-    subcatsOf: (deptId) => (deptMap.get(deptId)?.subcategories || []).filter(s => s.parent === null),
+    // a shelf whose items all moved elsewhere (Monitors, Follow Focus…) is not shown
+    subcatsOf: (deptId) => (deptMap.get(deptId)?.subcategories || []).filter(s => s.parent === null && (() => { const ids = withDescendants(s.id); return all().some(p => p.subcats.some(x => ids.has(x))); })()),
     deptById: (id) => deptMap.get(id),
     deptKey: (id) => deptMap.get(id)?.slug || 'other',
     brandName: (slug) => brandNames.get(slug) || slug,

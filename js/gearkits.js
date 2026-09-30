@@ -129,8 +129,19 @@ export const BOWLS = [
   { rx: /atlas 40/i, bowl: 150, src: 'Ronford-Baker Atlas 40: head bases 150 mm or Mitchell (adaptor)' },
   { rx: /509hd/i, bowl: 100, src: 'Manfrotto 509HD: incorporated 100 mm half ball' },
 ];
-const bowlOf = (name) => BOWLS.find(b => b.rx.test(name))?.bowl
-  ?? (/150/.test(name) ? 150 : /100/.test(name) ? 100 : /mitchell|flat base/i.test(name) ? 'mitchell' : null);
+export const bowlOf = (name) => BOWLS.find(b => b.rx.test(name))?.bowl
+  // from the name only when it says millimetres (a model number like L100 or S100 is not a bowl)
+  ?? (/150\s?(mm|\/)/i.test(name) ? 150 : /\b100\s?mm/i.test(name) ? 100 : /\b75\s?mm|svt75/i.test(name) ? 75 : /mitchell|flat (base|head)/i.test(name) ? 'mitchell' : null);
+// What a tripod-department item is, for the department's own filter row.
+export function tripodKind(catalog, p) {
+  const subs = SUB(catalog, p);
+  if (subs.includes('Tripod Accessories')) return 'accessory';
+  if (subs.includes('Gimbals & Stabilizers')) return 'gimbal';
+  if (subs.includes('Tripod Legs')) return 'legs';
+  if (isHead(catalog, p)) return 'head';
+  if (/tripod|with .*legs|pedestal|monopod/i.test(p.name)) return 'system';
+  return 'support';
+}
 const LEGS_FOR = { 100: ['x_gen_legs100', 862], 150: [3562, 3569, 3571], mitchell: [3565, 3577], both: ['x_gen_legs100', 862, 3562, 3569, 3571] };
 const HIHAT_FOR = { 100: 3723, 150: 3720, mitchell: 18529, both: [3723, 3720] };
 const isHead = (catalog, p) => {
@@ -239,7 +250,7 @@ export const GEAR_KITS = [
   {
     id: 'tripod-system', he: 'מערכת חצובה', en: 'Tripod system',
     when: (catalog, p) => catalog.deptKey(p.dept) === 'tripods' && /tripod|with .*legs/i.test(p.name) && !isHead(catalog, p)
-      && !SUB(catalog, p).includes('Tripod Legs') && !/monopod|pedestal|platform|\bpc tripod|baby|high hat|hi-?hat|adaptor|spreader|plate/i.test(p.name),
+      && !SUB(catalog, p).some(x => ['Tripod Legs', 'Tripod Accessories', 'Hi-Hats & Low Hats'].includes(x)) && !/monopod|pedestal|platform|\bpc tripod|baby|high hat|hi-?hat|adaptor|spreader|plate/i.test(p.name),
     slots: (p, ctx) => [
       plateSlot(ctx),
       slot('spreader', 'ספרדר', 'Spreader', 1, /spreader/i, 'x_gen_spreader'),
@@ -248,7 +259,7 @@ export const GEAR_KITS = [
   },
   {
     id: 'legs', he: 'רגלי חצובה', en: 'Tripod legs',
-    when: (catalog, p) => SUB(catalog, p).includes('Tripod Legs'),
+    when: (catalog, p) => SUB(catalog, p).some(x => x === 'Tripod Legs' || x === 'Hi-Hats & Low Hats'),
     slots: (p) => [
       slot('head', 'ראש בקוטר הקערה', 'A head for the bowl', 1, /fluid head|\bhead\b/i, null, FLUID_HEADS),
       ...(/hi-?hat|high hat/i.test(p.name) ? [] : [slot('spreader', 'ספרדר', 'Spreader', 1, /spreader/i, 'x_gen_spreader')]),

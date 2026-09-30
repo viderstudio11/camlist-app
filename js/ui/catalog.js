@@ -7,20 +7,21 @@ import { lensTypes, LENS_TYPES } from '../lens.js';
 import { deptIcon } from './icons-dept.js';
 import { companionsFor } from '../companions.js';
 import { DEPT_EMOJI } from '../i18n.js';
-import { gearKitFor, gearKitStatus } from '../gearkits.js';
+import { gearKitFor, gearKitStatus, tripodKind, bowlOf } from '../gearkits.js';
 import { ensureAlloc, bump } from '../kitalloc.js';
 import { accessoryKind, filterType, filterSize, ACC_KINDS, FILTER_TYPES, FILTER_SIZES } from '../accessory.js';
 
 // Departments that drill Brand → models (the rest drill Subcategory → models grouped by brand).
 const BRAND_FIRST = new Set(['cameras', 'lenses', 'tripods']);
 // Preferred hero image per department (first matching product with an image wins).
-const HERO = { cameras: /alexa 35$|fx6|venice/i, lenses: /supreme prime|cooke|s7/i, video: /bolt|teradek/i, monitors: /smallhd|ultra 7|cine 13/i, lenscontrol: /nucleus|cforce|hi-5/i, tripods: /o'?connor|sachtler|fluid head/i, grip: /doorway dolly|dolly|slider/i, power: /v-?mount|battery/i, accessories: /matte ?box|mb-?\d|filter/i, media: /cfexpress|memory card/i };
+const HERO = { cameras: /alexa 35$|fx6|venice/i, lenses: /supreme prime|cooke|s7/i, video: /bolt|teradek/i, monitors: /smallhd|ultra 7|cine 13/i, lenscontrol: /nucleus|cforce|hi-5/i, cables: /d-?tap|bnc|hdmi/i, tripods: /o'?connor|sachtler|fluid head/i, grip: /doorway dolly|dolly|slider/i, power: /v-?mount|battery/i, accessories: /matte ?box|mb-?\d|filter/i, media: /cfexpress|memory card/i };
 
 let st = { pid: null, q: '', view: 'depts', dept: null, subcat: null, brand: null, sub: null };
 let preset = null;      // set by the list screen's kit slots before navigating here
 let compatOnly = true;  // "compatible only" toggle (per session)
 let strict = false;     // entered from a kit slot: show ONLY items that fit the active camera (no neutral/unknown noise)
 let lf = { type: null, mount: null, format: null };  // lens quick filters
+let tf = { kind: null, bowl: null };                  // tripod quick filters: what it is, and its bowl
 let af = { kind: null, type: null, size: null };      // accessory quick filters: shelf, then filter type and size
 let kind = null;        // kit slot kind (card / reader / battery / charger) — restricts the list to that kind
 let kitSlot = null;     // { cam, slot } while choosing for one camera's kit slot: what is added counts for that camera
@@ -29,7 +30,7 @@ const offered = new Set(); // products whose "goes with" window was already show
 
 export function render(ctx, { id }, root) {
   const { store, t, catalog } = ctx;
-  if (st.pid !== id) { st = { pid: id, q: '', view: 'depts', dept: null, subcat: null, brand: null, sub: null }; lf = { type: null, mount: null, format: null }; af = { kind: null, type: null, size: null }; }
+  if (st.pid !== id) { st = { pid: id, q: '', view: 'depts', dept: null, subcat: null, brand: null, sub: null }; lf = { type: null, mount: null, format: null }; af = { kind: null, type: null, size: null }; tf = { kind: null, bowl: null }; }
   if (preset) { st = { pid: id, q: '', view: 'depts', dept: preset.dept ?? null, subcat: preset.subcat ?? null, brand: null, sub: null }; af = { kind: null, type: null, size: null }; strict = !!preset.strict; kind = preset.kind || null; kitSlot = preset.kitCam != null ? { cam: preset.kitCam, slot: preset.slot } : null; compatOnly = true; preset = null; }
   const lang = ctx.lang();
   const { compat, recency } = ctx;
@@ -142,6 +143,22 @@ export function render(ctx, { id }, root) {
   const manualCTA = `<button class="btn block ghost" data-manual style="margin-top:8px">${t('not_found_add_manual')}</button>`;
   // ---- lens quick filters (type → mount → coverage) ----
   const lensDept = catalog.departments.find(d => d.slug === 'lenses');
+  const tripodDept = catalog.departments.find(d => d.slug === 'tripods');
+  const inTripods = st.dept === tripodDept?.id && !st.q;
+  const tfActive = !!(tf.kind || tf.bowl);
+  const TKINDS = ['head', 'legs', 'system', 'accessory', 'gimbal', 'support'];
+  const BOWL_OPTS = [75, 100, 150, 'mitchell'];
+  // a head that comes in both sizes (Focus 22) counts for 100 and for 150
+  const hasBowl = (p, b) => { const x = bowlOf(p.name); return x === b || (x === 'both' && (b === 100 || b === 150)); };
+  const applyTripod = (list) => list.filter(p => (!tf.kind || tripodKind(catalog, p) === tf.kind) && (!tf.bowl || hasBowl(p, tf.bowl)));
+  const tripodFilterBar = (pool) => {
+    const tchip = (key, options, current) => `<div class="chips fchips"><span class="frow-label">${t('f_' + key)}</span><button class="${current ? '' : 'active'}" data-tf="${key}" data-val="">${t('all')}</button>${options.map(o => `<button class="${String(current) === String(o.val) ? 'active' : ''}" data-tf="${key}" data-val="${esc(o.val)}">${esc(o.label)} <i>${o.n}</i></button>`).join('')}</div>`;
+    const byBowl = pool.filter(p => !tf.bowl || hasBowl(p, tf.bowl));
+    const byKind = pool.filter(p => !tf.kind || tripodKind(catalog, p) === tf.kind);
+    const kinds = TKINDS.map(k => ({ val: k, label: t('tk_' + k), n: byBowl.filter(p => tripodKind(catalog, p) === k).length })).filter(o => o.n);
+    const bowls = BOWL_OPTS.map(b => ({ val: b, label: b === 'mitchell' ? t('bowl_mitchell') : `${b} ${t('mm')}`, n: byKind.filter(p => hasBowl(p, b)).length })).filter(o => o.n);
+    return `<div class="filterbar">${tchip('tkind', kinds, tf.kind)}${bowls.length ? tchip('bowl', bowls, tf.bowl) : ''}${tfActive ? `<div class="fmeta"><span>${t('results_count', { n: applyTripod(pool).length })}</span><button data-tf-clear>${t('clear_filters')}</button></div>` : ''}</div>`;
+  };
   const inLenses = st.dept === lensDept?.id && !st.q;
   const subEnOf = (p) => p.subcats.map(sid => allSubcats.find(s2 => s2.id === sid)?.en).filter(Boolean);
   const typesOf = (p) => lensTypes(p, subEnOf(p));
@@ -226,15 +243,19 @@ export function render(ctx, { id }, root) {
           content = lensFilterBar() + (lfActive
             ? groupedByBrand(applyLens(deptProds))
             : `<div class="section-title">${t('choose_brand')}</div>${brandGrid(brandsIn(deptProds))}`);
+        } else if (inTripods) {
+          content = tripodFilterBar(deptProds) + (tfActive
+            ? groupedByBrand(applyTripod(deptProds))
+            : `<div class="section-title">${t('choose_brand')}</div>${brandGrid(brandsIn(deptProds))}`);
         } else {
           content = `<div class="section-title">${t('choose_brand')}</div>${brandGrid(brandsIn(deptProds))}`;
         }
       } else {
-        const all = (inLenses ? applyLens(deptProds) : deptProds).filter(p => p.brand === st.brand);
+        const all = (inLenses ? applyLens(deptProds) : inTripods ? applyTripod(deptProds) : deptProds).filter(p => p.brand === st.brand);
         const subs = catalog.subcatsOf(st.dept).filter(s => all.some(p => p.subcats.includes(s.id)));
         const prods = recency.sort(shown(st.sub ? all.filter(p => p.subcats.includes(st.sub)) : all));
         crumbs = `<div class="crumbs"><button data-crumb="root">${t('departments')}</button>${arrow}<button data-crumb="dept">${esc(deptName(d))}</button>${arrow}<span>${esc(catalog.brandName(st.brand))}</span></div>`;
-        content = `${inLenses ? lensFilterBar() : ''}<div class="brand-hero">${logoHTML(st.brand, catalog.brandName(st.brand), 'tile')}<div><small>${esc(deptName(d))} · ${t('models_count', { n: prods.length })}</small></div></div>
+        content = `${inLenses ? lensFilterBar() : ''}${inTripods ? tripodFilterBar(deptProds.filter(p => p.brand === st.brand)) : ''}<div class="brand-hero">${logoHTML(st.brand, catalog.brandName(st.brand), 'tile')}<div><small>${esc(deptName(d))} · ${t('models_count', { n: prods.length })}</small></div></div>
           ${subs.length > 1 ? `<div class="chips"><button class="${st.sub ? '' : 'active'}" data-sub-chip="">${t('all')}</button>${subs.map(s => `<button class="${st.sub === s.id ? 'active' : ''}" data-sub-chip="${s.id}">${esc(subName(s))}</button>`).join('')}</div>` : ''}
           ${prods.map(p => productRow(p, { showBrand: false })).join('')}${manualCTA}`;
       }
@@ -297,8 +318,10 @@ export function render(ctx, { id }, root) {
     rerender();
   }; });
   root.querySelector('[data-lf-clear]')?.addEventListener('click', () => { lf = { type: null, mount: null, format: null }; rerender(); });
+  root.querySelectorAll('[data-tf]').forEach(b => { b.onclick = () => { const v = b.dataset.val; tf[b.dataset.tf === 'tkind' ? 'kind' : 'bowl'] = v ? (/^\d+$/.test(v) ? Number(v) : v) : null; rerender(); }; });
+  root.querySelector('[data-tf-clear]')?.addEventListener('click', () => { tf = { kind: null, bowl: null }; rerender(); });
   root.querySelectorAll('[data-tab]').forEach(b => { b.onclick = () => { st.view = b.dataset.tab; st.dept = null; st.subcat = null; st.brand = null; st.sub = null; rerender(); }; });
-  root.querySelectorAll('[data-dept]').forEach(c => { c.onclick = () => { st.dept = Number(c.dataset.dept); st.brand = null; st.subcat = null; st.sub = null; lf = { type: null, mount: null, format: null }; af = { kind: null, type: null, size: null }; rerender(); }; });
+  root.querySelectorAll('[data-dept]').forEach(c => { c.onclick = () => { st.dept = Number(c.dataset.dept); st.brand = null; st.subcat = null; st.sub = null; lf = { type: null, mount: null, format: null }; af = { kind: null, type: null, size: null }; tf = { kind: null, bowl: null }; rerender(); }; });
   root.querySelector('[data-exp-set]')?.addEventListener('click', () => {
     const set = catalog.preset('expendables').filter(x => !getQty(items(), x.id));
     let list = items();

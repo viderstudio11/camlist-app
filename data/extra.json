@@ -182,8 +182,8 @@
       "id": "x_gen_usbc_usbc",
       "name": "USB-C to USB-C Cable",
       "brand": null,
-      "dept": "media",
-      "subcat": "Cables & Hubs",
+      "dept": "cables",
+      "subcat": "USB & Data",
       "image": "https://cdn.cvp.com/images/products/thumb150/06-08-20241722957019rode-sc17-usb-c-to-usb-c-cable---1.5m-copy-small.jpg",
       "imageSrc": "CVP: Rode SC17 USB-C to USB-C Cable - 1.5m — https://cvp.com/product/rode-sc17-usb-c-usb-c-cable-1.5m"
     },
@@ -191,8 +191,8 @@
       "id": "x_gen_usbc_usba",
       "name": "USB-C to USB-A Cable",
       "brand": null,
-      "dept": "media",
-      "subcat": "Cables & Hubs",
+      "dept": "cables",
+      "subcat": "USB & Data",
       "image": "https://cdn.cvp.com/images/products/thumb150/06-08-20241722951873rode-sc18-usb-c-to-usb-a-cable---1.5m-small.jpg",
       "imageSrc": "CVP: Rode SC18 USB-C to USB-A Cable - 1.5m — https://cvp.com/product/rode-sc18-usb-c-usb-c-cable-1.5m"
     },
@@ -200,8 +200,8 @@
       "id": "x_gen_usbc_hub",
       "name": "USB-C Hub",
       "brand": null,
-      "dept": "media",
-      "subcat": "Cables & Hubs",
+      "dept": "cables",
+      "subcat": "USB & Data",
       "image": "https://cdn.cvp.com/images/products/thumb150/16-09-20241726485534sr4598-small.jpg",
       "imageSrc": "CVP: SmallRig 4-in-1 USB-C Hub W/ Audio Adapter — https://cvp.com/product/smallrig-4-in-1-usb-c-hub-w-audio-adapter-sr4598"
     },
@@ -209,8 +209,8 @@
       "id": "x_gen_ext_cable",
       "name": "Power Extension Cable",
       "brand": null,
-      "dept": "power",
-      "subcat": "Power Cables",
+      "dept": "cables",
+      "subcat": "AC Power",
       "image": "https://www.adorama.com/images/product/MID16624025.jpg",
       "imageSrc": "Adorama: Milspec 25ft Pro Power Extension Cord — https://www.adorama.com/milspec-25-ft-pro-power-sjtw-extension-cord-12-3-awg/p/mid16624025"
     },
@@ -218,8 +218,8 @@
       "id": "x_gen_power_split",
       "name": "Power Splitter (Multi-Outlet Strip)",
       "brand": null,
-      "dept": "power",
-      "subcat": "Power Cables",
+      "dept": "cables",
+      "subcat": "AC Power",
       "image": "https://www.adorama.com/images/product/BEBE11223410.JPG",
       "imageSrc": "Adorama: Belkin 12-Outlet Surge Protector — https://www.adorama.com/belkin-12-outlet-surge-protector-10-ft/p/bebe11223410"
     },
@@ -318,8 +318,8 @@
       "id": "x_gen_ac_cable",
       "name": "AC Power Cable",
       "brand": null,
-      "dept": "power",
-      "subcat": "Power Cables",
+      "dept": "cables",
+      "subcat": "AC Power",
       "image": "https://cdn.cvp.com/images/products/thumb150/27%2008%2020131377600325AC%20Mains%20Power%20Cordset%20IEC%20Male%20-%20Bare%20Ends%20-%203%20Metres%20(Orange)%202%20-%20200px.jpg",
       "imageSrc": "CVP: Canford Audio AC Mains Power Cordset IEC Male — https://cvp.com/product/canford_audio_42-3066"
     },
@@ -327,8 +327,8 @@
       "id": "x_gen_xlr4",
       "name": "4-Pin XLR Power Cable",
       "brand": null,
-      "dept": "power",
-      "subcat": "Power Cables",
+      "dept": "cables",
+      "subcat": "D-Tap & DC Power",
       "image": "https://cdn.cvp.com/images/products/thumb150/27-01-20261769514112212300_1.jpg",
       "imageSrc": "CVP: Wooden Camera 4pin XLR Power Extension Cable — https://cvp.com/product/wooden-camera-212300-xlr-extension-cable"
     },
@@ -336,8 +336,8 @@
       "id": "x_gen_dtap",
       "name": "D-Tap Power Cable",
       "brand": null,
-      "dept": "power",
-      "subcat": "Power Cables",
+      "dept": "cables",
+      "subcat": "D-Tap & DC Power",
       "image": "https://cdn.cvp.com/images/products/thumb150/16-12-20241734364573shape-power-cable-d-tap-for-canon-eos-c80-538945-thumb.jpg",
       "imageSrc": "CVP: SHAPE D-TAP Cable For Canon EOS C80 — https://cvp.com/product/shape-d-tap-cable-for-eos-c80-c80pc"
     },
@@ -346,7 +346,7 @@
       "name": "V-Mount Battery Plate",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables",
+      "subcat": "Battery Plates",
       "image": "https://cdn.cvp.com/images/products/thumb150/08-01-20241704712697main.jpg",
       "imageSrc": "CVP: SmallRig V-Mount Battery Plate — https://cvp.com/product/smallrig-vm-battery-plate-sr4505"
     },
@@ -355,7 +355,7 @@
       "name": "Gold Mount Battery Plate",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables",
+      "subcat": "Battery Plates",
       "image": "https://cdn.cvp.com/images/products/thumb150/16%2009%2020151442419826191400-small.jpg",
       "imageSrc": "CVP: Wooden Camera Gold Mount Battery Plate — https://cvp.com/product/wooden_camera_191400"
     },
@@ -417,8 +417,8 @@
       "id": "x_gen_dtap_xlr4",
       "name": "D-Tap to 4-Pin XLR Cable",
       "brand": null,
-      "dept": "power",
-      "subcat": "Power Cables",
+      "dept": "cables",
+      "subcat": "D-Tap & DC Power",
       "image": "https://cdn.cvp.com/images/products/thumb150/06-11-20181541514925cgv8okla-small.jpg",
       "imageSrc": "CVP: SHAPE D-Tap to 4-Pin XLR Coiled Cable — https://cvp.com/product/shape-dtxlc-d-tap-4-pin-cable"
     },
@@ -426,8 +426,8 @@
       "id": "x_gen_dtap_xlr3",
       "name": "D-Tap to 3-Pin XLR Cable",
       "brand": null,
-      "dept": "power",
-      "subcat": "Power Cables",
+      "dept": "cables",
+      "subcat": "D-Tap & DC Power",
       "image": "https://cdn.cvp.com/images/products/thumb150/07-12-20171512665835small.jpg",
       "imageSrc": "CVP: Litepanels P-Tap to 3-Pin XLR — https://cvp.com/product/lite_panels_900-0024"
     },
@@ -435,8 +435,8 @@
       "id": "x_gen_dtap_lemo2",
       "name": "D-Tap to 2-Pin LEMO Cable",
       "brand": null,
-      "dept": "power",
-      "subcat": "Power Cables",
+      "dept": "cables",
+      "subcat": "D-Tap & DC Power",
       "image": "https://cdn.cvp.com/images/products/thumb150/01-09-2026178826404717-3000_1.jpg",
       "imageSrc": "CVP: SmallHD D-Tap to 2-pin Power Cable - 36in — https://cvp.com/product/smallhd-17-3000-d-tap-2-pin-power-cable"
     },
@@ -444,8 +444,8 @@
       "id": "x_gen_dtap_dc21",
       "name": "D-Tap to DC 2.1mm Barrel Cable",
       "brand": null,
-      "dept": "power",
-      "subcat": "Power Cables",
+      "dept": "cables",
+      "subcat": "D-Tap & DC Power",
       "image": "https://cdn.cvp.com/images/products/thumb150/30-01-20201580384477ao-atomdtpcb2-small.jpg",
       "imageSrc": "CVP: Atomos D-Tap to DC Lockable Cable — https://cvp.com/product/atomos-ao-atomdtpcb2-d-tap-dc-coiled-cable"
     },
@@ -453,15 +453,15 @@
       "id": "x_gen_dtap_hirose4",
       "name": "D-Tap to 4-Pin Hirose Cable",
       "brand": null,
-      "dept": "power",
-      "subcat": "Power Cables"
+      "dept": "cables",
+      "subcat": "D-Tap & DC Power"
     },
     {
       "id": "x_exp_gaffer2",
       "name": "Gaffer Tape 2\" Black",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Tape",
+      "subcat": "Tape & Adhesives",
       "image": "https://cdn.cvp.com/images/products/thumb150/13-03-202316787204301.jpg",
       "imageSrc": "CVP: CVP Non-Reflective Gaffer Tape Black 50m x 50mm — https://cvp.com/product/cvp-53949-00000-02-50-x-50-gaffer-tape-black"
     },
@@ -470,7 +470,7 @@
       "name": "Gaffer Tape 1\" (colours)",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Tape",
+      "subcat": "Tape & Adhesives",
       "image": "https://cdn.cvp.com/images/products/thumb150/24-11-20251764001072bluegaf_thumb.jpg",
       "imageSrc": "CVP: CVP NRG Matt Gaffer Tape - Blue — https://cvp.com/product/cvp-nrg-matt-gaffer-tape-24mm-25m-blue"
     },
@@ -479,7 +479,7 @@
       "name": "Paper Tape 1\" (Artist Tape)",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Tape",
+      "subcat": "Tape & Adhesives",
       "image": "https://cdn.cvp.com/images/products/thumb150/04-02-20261770198175pro-46_black.jpg",
       "imageSrc": "CVP: Pro Tapes ProTapes Pro 46 24mm x 55m Paper Tape Black — https://cvp.com/product/protapes-pro-46-24mmx55m-paper-tape-black-001upc46"
     },
@@ -488,7 +488,7 @@
       "name": "Spike Tape (colours)",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Tape",
+      "subcat": "Tape & Adhesives",
       "image": "https://cdn.cvp.com/images/products/thumb150/25-02-20261772031147001upcgs1220mfluor-main.jpg",
       "imageSrc": "CVP: Pro Tapes Pro Spike Stack 12mm x 18m 4x Fluorescent — https://cvp.com/product/pro-tapes-pro-spike-stack-12mm-x-18m-4-fluorescent"
     },
@@ -497,7 +497,7 @@
       "name": "Double-Sided Tape",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Tape"
+      "subcat": "Tape & Adhesives"
     },
     {
       "id": "x_exp_aa",
@@ -540,7 +540,7 @@
       "name": "Sharpie Markers",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Marking",
+      "subcat": "Markers & Chalk",
       "image": "https://cdn.cvp.com/images/products/thumb150/06-02-20241707230410filmsticks-re-useable-non-permanent-small.jpg",
       "imageSrc": "CVP: Filmsticks Re-Useable Marker Pen - Black — https://cvp.com/product/filmsticks-re-useable-marker-pen-frmp"
     },
@@ -549,21 +549,21 @@
       "name": "Dry-Erase Markers (slate)",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Marking"
+      "subcat": "Markers & Chalk"
     },
     {
       "id": "x_exp_chalk",
       "name": "Chalk",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Marking"
+      "subcat": "Markers & Chalk"
     },
     {
       "id": "x_exp_tissue",
       "name": "Lens Tissue",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Lens Care",
+      "subcat": "Cleaning & Lens Care",
       "image": "https://cdn.cvp.com/images/products/thumb150/14-07-2026178402649417-07-20101279360092tiffen_lens_paper.jpg",
       "imageSrc": "CVP: Tiffen Lens Cleaning Paper - 50 Pack — https://cvp.com/product/tiffen_lens-cleaning-paper"
     },
@@ -572,7 +572,7 @@
       "name": "Lens Cleaning Fluid",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Lens Care",
+      "subcat": "Cleaning & Lens Care",
       "image": "https://cdn.cvp.com/images/products/thumb150/08-01-20211610097102tiffen-lens-cleaning-fluid-200.jpg",
       "imageSrc": "CVP: Tiffen Lens Cleaning Fluid (1.25oz) — https://cvp.com/product/tiffen_lens-cleaning-fluid"
     },
@@ -581,7 +581,7 @@
       "name": "Microfiber Cloths",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Lens Care",
+      "subcat": "Cleaning & Lens Care",
       "image": "https://cdn.cvp.com/images/products/thumb150/01-04-2026177504112010-07-20191562774875_mg_2453.jpg",
       "imageSrc": "CVP: CVP Microfibre Lens Cloth — https://cvp.com/product/cvp_microfibre_lens_cloth"
     },
@@ -590,7 +590,7 @@
       "name": "Air Blower",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Lens Care",
+      "subcat": "Cleaning & Lens Care",
       "image": "https://www.adorama.com/images/product/GTRAB.jpg",
       "imageSrc": "Adorama: Giottos Rocket Air Blaster — https://www.adorama.com/giottos-rocket-air-blaster-manual-blower-extra-large/p/gtrab"
     },
@@ -599,7 +599,7 @@
       "name": "Compressed Air (Dust-Off)",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Lens Care",
+      "subcat": "Cleaning & Lens Care",
       "image": "https://cdn.cvp.com/images/products/thumb150/08-07-20261783499970kenr02-copy.jpg",
       "imageSrc": "CVP: Kenro Kenair Air Duster 360ml — https://cvp.com/product/kenro-r02-kenair-aerosol-360ml"
     },
@@ -608,7 +608,7 @@
       "name": "Cable Ties (Zip Ties)",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Rigging & Ties",
+      "subcat": "Ties & Clips",
       "image": "https://www.filmtools.com/media/catalog/product/h/e/hellermantyton_1000pcs_1.jpg",
       "imageSrc": "Filmtools: HellermannTyton 8 Inch Zip Ties T50 — https://www.filmtools.com/hellermantyton-8-inch-zip-ties-t50-100-pack-black.html"
     },
@@ -617,7 +617,7 @@
       "name": "Velcro Cable Ties",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Rigging & Ties",
+      "subcat": "Ties & Clips",
       "image": "https://cdn.cvp.com/images/products/thumb150/16-06-20171497604749206200-cable-ties-200px.jpg",
       "imageSrc": "CVP: Wooden Camera Velcro Cable Ties — https://cvp.com/product/wooden_camera_206200_cable_ties"
     },
@@ -626,14 +626,14 @@
       "name": "Bungee Cords",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Rigging & Ties"
+      "subcat": "Ties & Clips"
     },
     {
       "id": "x_exp_c47",
       "name": "Clothespins (C-47)",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Rigging & Ties",
+      "subcat": "Ties & Clips",
       "image": "https://www.filmtools.com/media/catalog/product/6/6/66684-1.jpg",
       "imageSrc": "Filmtools: Filmtools Clothespins C47 (50-Pack)"
     },
@@ -642,7 +642,7 @@
       "name": "Black Wrap (Cinefoil)",
       "brand": null,
       "dept": "expendables",
-      "subcat": "Rigging & Ties",
+      "subcat": "Fabrics & Plastics",
       "image": "https://cdn.cvp.com/images/products/thumb150/07-03-20241709805093matte-black-cinefoil---small.jpg",
       "imageSrc": "CVP: Rosco Blackwrap — https://cvp.com/product/rosco_360112_cinefoil"
     },
@@ -651,7 +651,7 @@
       "name": "Rain Bags / Plastic Covers",
       "brand": null,
       "dept": "expendables",
-      "subcat": "General Supplies",
+      "subcat": "Fabrics & Plastics",
       "image": "https://cdn.cvp.com/images/products/thumb150/21-02-20171487693318c7.jpg",
       "imageSrc": "CVP: Orca OR-102 Video Camera Rain Cover — https://cvp.com/product/orca_bags_or-102_rain_cover"
     },
@@ -660,21 +660,21 @@
       "name": "Trash Bags",
       "brand": null,
       "dept": "expendables",
-      "subcat": "General Supplies"
+      "subcat": "Fabrics & Plastics"
     },
     {
       "id": "x_exp_gloves",
       "name": "Work Gloves",
       "brand": null,
       "dept": "expendables",
-      "subcat": "General Supplies"
+      "subcat": "Safety & Work Gear"
     },
     {
       "id": "x_exp_headlamp",
       "name": "Headlamp",
       "brand": null,
       "dept": "expendables",
-      "subcat": "General Supplies",
+      "subcat": "Safety & Work Gear",
       "image": "https://cdn.cvp.com/images/products/thumb150/08-02-20241707402935filmsticks-led-head-torch-small.jpg",
       "imageSrc": "CVP: Filmsticks LED Head Torch — https://cvp.com/product/filmsticks-led-head-torch-ftorch-head"
     },
@@ -683,7 +683,7 @@
       "name": "Silica Gel Packs",
       "brand": null,
       "dept": "expendables",
-      "subcat": "General Supplies",
+      "subcat": "Cleaning & Lens Care",
       "image": "https://cdn.cvp.com/images/products/thumb150/03-07-202517515382771500-500-000_thumb.jpg",
       "imageSrc": "CVP: Peli Desiccant Silica Gel — https://cvp.com/product/peli-desiccant-silca-gel-1500-500-000"
     },
@@ -716,8 +716,8 @@
       "id": "x_gen_bnc_short",
       "name": "BNC Cable — Short (30 cm)",
       "brand": null,
-      "dept": "video",
-      "subcat": "Video Cables",
+      "dept": "cables",
+      "subcat": "SDI / BNC",
       "image": "https://cdn.cvp.com/images/products/thumb150/1319455703cvp_bnc-bnc-small.jpg",
       "imageSrc": "CVP: CVP SDI BNC-BNC Cable 30cm — https://cvp.com/product/cvp_bnc-bnc-sdi30cm"
     },
@@ -804,7 +804,7 @@
       "name": "VCT-14 Tripod Adaptor",
       "brand": "sony",
       "dept": "tripods",
-      "subcat": "Camera Support",
+      "subcat": "Tripod Accessories",
       "url": "https://pro.sony/en_GB/products/camera-tripods-and-supports/vct-14",
       "src": "Sony Pro: VCT-14 tripod adaptor for portable cameras/camcorders; compatible PXW-X400, PXW-Z450, PMW-350, PDW-F800",
       "image": "https://cdn.cvp.com/images/products/thumb150/24-11-2006-sony_vct-14-small.jpg",
@@ -815,7 +815,7 @@
       "name": "Quick-Release Camera Plate (for the head)",
       "brand": null,
       "dept": "tripods",
-      "subcat": "Camera Support",
+      "subcat": "Tripod Accessories",
       "src": "CVP: tripod accessories — quick release plates (Sachtler Touch & Go, Ronford-Baker QR…)",
       "image": "https://cdn.cvp.com/images/products/thumb150/04-07-2007-sachtler_1064small.jpg",
       "imageSrc": "CVP: Sachtler Touch and Go Camera Plate — https://cvp.com/product/sachtler_1064"
@@ -825,7 +825,7 @@
       "name": "Euro Quick-Release Plate (ARRI-style)",
       "brand": null,
       "dept": "tripods",
-      "subcat": "Camera Support",
+      "subcat": "Tripod Accessories",
       "src": "CVP: tripod accessories — quick release plates (ARRI QRP-1)",
       "image": "https://cdn.cvp.com/images/products/thumb150/15%2007%2020141405435526QRP1%20main.jpg",
       "imageSrc": "CVP: ARRI QRP-1 Quick Release Plate — https://cvp.com/product/arri_qrp-1"
@@ -835,7 +835,7 @@
       "name": "Pan Bar (telescopic)",
       "brand": null,
       "dept": "tripods",
-      "subcat": "Camera Support",
+      "subcat": "Tripod Accessories",
       "src": "CVP: tripod accessories — tripod pan bars",
       "image": "https://www.adorama.com/images/product/SCPBPRIGHT.jpg",
       "imageSrc": "Adorama: Sachtler Pan Bar Plus — https://www.adorama.com/sachtler-pan-bar-plus-right-telescopic-handle-video-18-20/p/scpbpright"
@@ -845,7 +845,7 @@
       "name": "Tripod Spreader (ground)",
       "brand": null,
       "dept": "tripods",
-      "subcat": "Camera Support",
+      "subcat": "Tripod Accessories",
       "src": "CVP: tripod accessories — spreaders",
       "image": "https://www.adorama.com/images/product/CCP732.jpg",
       "imageSrc": "Adorama: Cartoni Mid-Level Tripod Spreader — https://www.adorama.com/cartoni-mid-level-tripod-spreader-2-stage/p/ccp732"
@@ -895,8 +895,8 @@
       "id": "x_gen_sdi_long",
       "name": "SDI Cable — Long (20 m)",
       "brand": null,
-      "dept": "video",
-      "subcat": "Video Cables",
+      "dept": "cables",
+      "subcat": "SDI / BNC",
       "image": "https://www.adorama.com/images/product/BZBCABSDI50.JPG",
       "imageSrc": "Adorama: BZB GEAR 50ft 12G-SDI Cable — https://www.adorama.com/bzb-gear-bg-cab-12sdi50-50-ft-12g-sdi-coaxial-cable/p/bzbcabsdi50"
     },
@@ -916,7 +916,7 @@
       "name": "Dummy Battery BP-U — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables",
+      "subcat": "Dummy Batteries & Adapters",
       "image": "https://www.adorama.com/images/product/AB80750330.jpg",
       "imageSrc": "Adorama: Anton Bauer P-Tap to BP Dummy — https://www.adorama.com/anton-bauer-p-tap-bp-dummy-battery-adapter/p/ab80750330"
     },
@@ -925,7 +925,7 @@
       "name": "Dummy Battery NP-FZ100 — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables",
+      "subcat": "Dummy Batteries & Adapters",
       "image": "https://www.adorama.com/images/product/KBDTSA7SDB.jpg",
       "imageSrc": "Adorama: Kondor Blue D-Tap to NP-FZ100 — https://www.adorama.com/kondor-blue-d-tap-np-fz100-coiled-dummy-battery-cable-sony-a7s-iii-iv/p/kbdtsa7sdb"
     },
@@ -934,7 +934,7 @@
       "name": "Dummy Battery NP-FW50 — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables",
+      "subcat": "Dummy Batteries & Adapters",
       "image": "https://www.adorama.com/images/product/NE10101334.JPG",
       "imageSrc": "Adorama: Neewer NP-FW50 DC Coupler Dummy — https://www.adorama.com/neewer-np-fw50-dc-coupler-dummy-battery/p/ne10101334"
     },
@@ -943,7 +943,7 @@
       "name": "Dummy Battery NP-F (L-Series) — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables",
+      "subcat": "Dummy Batteries & Adapters",
       "image": "https://www.adorama.com/images/product/KBDTSLBK.jpg",
       "imageSrc": "Adorama: Kondor Blue D-Tap to NPF Coiled — https://www.adorama.com/kondor-blue-dtap-npf-dummy-battery-cable-sony-l-series/p/kbdtslbk"
     },
@@ -952,35 +952,35 @@
       "name": "Dummy Battery NP-FV — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables"
+      "subcat": "Dummy Batteries & Adapters"
     },
     {
       "id": "x_gen_dummy_sa100",
       "name": "Dummy Battery NP-SA100 — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables"
+      "subcat": "Dummy Batteries & Adapters"
     },
     {
       "id": "x_gen_dummy_bpa",
       "name": "Dummy Battery BP-A — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables"
+      "subcat": "Dummy Batteries & Adapters"
     },
     {
       "id": "x_gen_dummy_bp9",
       "name": "Dummy Battery BP-9 — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables"
+      "subcat": "Dummy Batteries & Adapters"
     },
     {
       "id": "x_gen_dummy_lpe6",
       "name": "Dummy Battery LP-E6 — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables",
+      "subcat": "Dummy Batteries & Adapters",
       "image": "https://www.adorama.com/images/product/GXDTLPE6NH.JPG",
       "imageSrc": "Adorama: Green Extreme D-Tap to LP-E6NH — https://www.adorama.com/green-extreme-dtap-lpe6nh-dummy-battery-power-cable/p/gxdtlpe6nh"
     },
@@ -989,14 +989,14 @@
       "name": "Dummy Battery DMW-BLJ31 — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables"
+      "subcat": "Dummy Batteries & Adapters"
     },
     {
       "id": "x_gen_dummy_blk22",
       "name": "Dummy Battery DMW-BLK22 — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables",
+      "subcat": "Dummy Batteries & Adapters",
       "image": "https://www.adorama.com/images/product/KBDTLS5GH5.JPG",
       "imageSrc": "Adorama: Kondor Blue D-Tap to DMW-BLK22 — https://www.adorama.com/kondor-blue-d-tap-dmw-blk22-coiled-dummy-battery-lumix-s5-gh5-gh6/p/kbdtls5gh5"
     },
@@ -1005,7 +1005,7 @@
       "name": "Dummy Battery DMW-BLF19 — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables",
+      "subcat": "Dummy Batteries & Adapters",
       "image": "https://www.adorama.com/images/product/IADBGHDCM25.jpg",
       "imageSrc": "Adorama: Tilta DMW-BLF19 Dummy Battery — https://www.adorama.com/tilta-dmw-blf19-dummy-battery-dc-cable-panasonic-gh-series/p/iadbghdcm25"
     },
@@ -1014,14 +1014,14 @@
       "name": "Dummy Battery VBR — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables"
+      "subcat": "Dummy Batteries & Adapters"
     },
     {
       "id": "x_gen_dummy_w235",
       "name": "Dummy Battery NP-W235 — D-Tap Cable",
       "brand": null,
       "dept": "power",
-      "subcat": "Power Cables",
+      "subcat": "Dummy Batteries & Adapters",
       "image": "https://www.adorama.com/images/product/IPDTNP235.JPG",
       "imageSrc": "Adorama: IndiPRO D-Tap to Fujifilm NP-W235 — https://www.adorama.com/indipro-24-inch-d-tap-fujifilm-np-w235-dummy-battery/p/ipdtnp235"
     },
@@ -1037,7 +1037,7 @@
       "name": "Tripod Dolly (wheels)",
       "brand": null,
       "dept": "tripods",
-      "subcat": "Camera Support",
+      "subcat": "Tripod Accessories",
       "image": "https://www.adorama.com/images/product/3PXTPD.JPG",
       "imageSrc": "Adorama: 3Pod VT-2 Universal Tripod Dolly — https://www.adorama.com/3pod-vt-2-professional-universal-tripod-dolly-handle-case/p/3pxtpd"
     },
@@ -1045,8 +1045,29 @@
       "id": "x_gen_dtap_bmdc",
       "name": "D-Tap to Locking DC Cable (Blackmagic)",
       "brand": null,
-      "dept": "power",
-      "subcat": "Power Cables"
+      "dept": "cables",
+      "subcat": "D-Tap & DC Power"
+    },
+    {
+      "id": "x_exp_duvetyne",
+      "name": "Duvetyne (black, per metre)",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Fabrics & Plastics"
+    },
+    {
+      "id": "x_exp_visqueen",
+      "name": "Visqueen Plastic Sheeting",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Fabrics & Plastics"
+    },
+    {
+      "id": "x_exp_firstaid",
+      "name": "First Aid Kit",
+      "brand": null,
+      "dept": "expendables",
+      "subcat": "Safety & Work Gear"
     }
   ],
   "departments": [
@@ -1085,28 +1106,32 @@
       "after": "accessories",
       "subcategories": [
         {
-          "he": "טייפים",
-          "en": "Tape"
+          "he": "סרטים ודבקים",
+          "en": "Tape & Adhesives"
+        },
+        {
+          "he": "טושים וגיר",
+          "en": "Markers & Chalk"
+        },
+        {
+          "he": "ניקוי ועדשות",
+          "en": "Cleaning & Lens Care"
         },
         {
           "he": "סוללות",
           "en": "Batteries"
         },
         {
-          "he": "סימון",
-          "en": "Marking"
+          "he": "אזיקונים ואטבים",
+          "en": "Ties & Clips"
         },
         {
-          "he": "ניקוי עדשות",
-          "en": "Lens Care"
+          "he": "בדים וניילונים",
+          "en": "Fabrics & Plastics"
         },
         {
-          "he": "קשירה ורידינג",
-          "en": "Rigging & Ties"
-        },
-        {
-          "he": "כללי",
-          "en": "General Supplies"
+          "he": "בטיחות ועבודה",
+          "en": "Safety & Work Gear"
         }
       ]
     },
@@ -1165,6 +1190,34 @@
           "en": "Monitor Accessories"
         }
       ]
+    },
+    {
+      "slug": "cables",
+      "he": "כבלים",
+      "en": "Cables",
+      "after": "power",
+      "subcategories": [
+        {
+          "he": "SDI / BNC",
+          "en": "SDI / BNC"
+        },
+        {
+          "he": "HDMI",
+          "en": "HDMI"
+        },
+        {
+          "he": "D-Tap ומתח DC",
+          "en": "D-Tap & DC Power"
+        },
+        {
+          "he": "חשמל AC",
+          "en": "AC Power"
+        },
+        {
+          "he": "USB ונתונים",
+          "en": "USB & Data"
+        }
+      ]
     }
   ],
   "extend": [
@@ -1174,6 +1227,14 @@
         {
           "he": "כבלי חשמל ופלייטים",
           "en": "Power Cables"
+        },
+        {
+          "he": "פלטות סוללה",
+          "en": "Battery Plates"
+        },
+        {
+          "he": "סוללות דמה ומתאמים",
+          "en": "Dummy Batteries & Adapters"
         }
       ]
     },
@@ -1185,9 +1246,43 @@
           "en": "Video Cables"
         }
       ]
+    },
+    {
+      "dept": "tripods",
+      "subcategories": [
+        {
+          "he": "אביזרי חצובה",
+          "en": "Tripod Accessories"
+        }
+      ]
+    },
+    {
+      "dept": "grip",
+      "subcategories": [
+        {
+          "he": "היי־האט ולואו־האט",
+          "en": "Hi-Hats & Low Hats"
+        },
+        {
+          "he": "ברידג׳ פלייט ומתאמים",
+          "en": "Bridge Plates & Adapters"
+        }
+      ]
     }
   ],
   "moves": [
+    {
+      "fromDept": "accessories",
+      "match": "^bnc cable$",
+      "to": "cables",
+      "subcat": "SDI / BNC"
+    },
+    {
+      "fromDept": "accessories",
+      "match": "^hdmi cable$",
+      "to": "cables",
+      "subcat": "HDMI"
+    },
     {
       "from": "General Accessories",
       "match": "distance measure|udm-|tape measure",
@@ -1223,12 +1318,6 @@
       "match": "vaxis|\\bfilter\\b",
       "to": "accessories",
       "subcat": "Round"
-    },
-    {
-      "fromDept": "accessories",
-      "match": "^bnc cable$|^hdmi cable$",
-      "to": "video",
-      "subcat": "Video Cables"
     },
     {
       "fromDept": "accessories",
@@ -1439,6 +1528,54 @@
       "match": "\\bssd\\b|external",
       "to": "media",
       "subcat": "Drives & SSD"
+    },
+    {
+      "from": "Camera Support",
+      "match": "v-?mount battery plate",
+      "to": "power",
+      "subcat": "Battery Plates"
+    },
+    {
+      "from": "Batteries",
+      "match": "d-?tap battery adaptor|dummy",
+      "to": "power",
+      "subcat": "Dummy Batteries & Adapters"
+    },
+    {
+      "from": "Tripod Legs",
+      "match": "high hat|hi-?hat",
+      "to": "grip",
+      "subcat": "Hi-Hats & Low Hats"
+    },
+    {
+      "from": "Camera Support & Rigs",
+      "match": "hi-?hat|high hat",
+      "to": "grip",
+      "subcat": "Hi-Hats & Low Hats"
+    },
+    {
+      "from": "Camera Support",
+      "match": "bridge plate|\\bcbp-|shoulder (set|pad)|vertical (format|viewfinder)|quick release shoulder",
+      "to": "grip",
+      "subcat": "Bridge Plates & Adapters"
+    },
+    {
+      "from": "Gimbals & Stabilizers",
+      "match": "shoulder pad",
+      "to": "grip",
+      "subcat": "Bridge Plates & Adapters"
+    },
+    {
+      "from": "Grip Accessories",
+      "match": "euro camera adapter",
+      "to": "tripods",
+      "subcat": "Tripod Accessories"
+    },
+    {
+      "from": "Dolly & Sliders",
+      "match": "\\btrack\\b|starter ramp|hot buttons|speed wheels|dolly spreader",
+      "to": "grip",
+      "subcat": "Track & Dolly Accessories"
     }
   ],
   "presets": {
