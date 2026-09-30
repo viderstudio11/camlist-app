@@ -965,3 +965,28 @@ body.split .view { max-width: none; padding: 12px 16px 0; }
 .fly-bad { color: #c0392b; font-weight: var(--w-strong); }
 .exp-set { margin-bottom: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
 
+
+/* Export: pick a format, see it, one action. */
+.ex-formats .tnote { margin-top: 8px; }
+.ex-preview { margin-top: 12px; }
+.preview.tx { font-family: var(--font); white-space: normal; line-height: 1.55; font-size: 14.5px; }
+.preview.tx .tx-h { margin-top: 6px; }
+.preview.tx .tx-h b { font-weight: 800; }
+.preview.tx .tx-note { color: var(--text-3); font-size: 13px; }
+.docprev { background: #fff; color: #111; border: var(--stroke) solid var(--border); border-radius: 12px; padding: 14px 16px 12px; box-shadow: var(--shadow-s); font-size: 13.5px; }
+.docprev .dp-stripe { height: 7px; margin: -2px 0 10px; background: repeating-linear-gradient(65deg, #111 0 6px, #fff 6px 12px); border-block: 1px solid #111; }
+.docprev .dp-title { font-family: var(--font-head); font-weight: 700; font-size: 26px; line-height: 1; }
+.docprev .dp-meta { color: #555; font-size: 12px; margin-top: 4px; }
+.docprev .dp-dept { display: flex; justify-content: space-between; margin-top: 12px; padding-bottom: 3px; border-bottom: 1px solid #111; font-family: var(--mono); font-weight: 700; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+.docprev .dp-dept i { font-style: normal; }
+.docprev .dp-row { display: flex; gap: 10px; padding: 3px 0; align-items: baseline; }
+.docprev .dp-row b { min-width: 28px; font-family: var(--mono); }
+.docprev .dp-row small { display: block; color: #777; font-size: 11.5px; }
+.docprev.sheet .dp-dept { background: #efefef; border: 0; padding: 4px 6px; }
+.docprev.sheet .dp-row { border-bottom: 1px solid #e3e3e3; padding: 4px 6px; }
+.docprev .dp-foot { margin-top: 12px; color: #777; font-family: var(--mono); font-size: 11px; }
+.ex-go { margin-top: 12px; display: inline-flex; align-items: center; justify-content: center; gap: 8px; }
+.ex-opts { margin-top: 12px; padding: 10px 16px 4px; }
+.ex-opts summary { cursor: pointer; font-weight: var(--w-strong); padding-bottom: 8px; list-style: none; }
+.ex-opts summary span { color: var(--text-3); font-weight: 400; font-size: 13px; margin-inline-start: 6px; }
+.ex-preview .preview { max-height: none; }
