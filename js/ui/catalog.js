@@ -5,6 +5,7 @@ import { thumbHTML, parseId, profileChips } from './list.js';
 import { lensTypes, LENS_TYPES } from '../lens.js';
 import { deptIcon } from './icons-dept.js';
 import { companionsFor } from '../companions.js';
+import { gearKitFor, gearKitStatus } from '../gearkits.js';
 import { ensureAlloc, bump } from '../kitalloc.js';
 import { accessoryKind, filterType, filterSize, ACC_KINDS, FILTER_TYPES, FILTER_SIZES } from '../accessory.js';
 
@@ -337,13 +338,23 @@ export function render(ctx, { id }, root) {
   root.querySelectorAll('.row').forEach(bindRow);
 
   // "Goes with": right after something is added, what usually rides along with it. Shown once per product.
+  // Gear with a kit (monitor, follow focus, gimbal…) offers that kit's missing pieces, sized to the model:
+  // the D-Tap cable ends in its plug, the hand unit gets its own battery, a choice (UT / Noga arm) shows both.
+  function kitOffers(p) {
+    const kit = gearKitFor(catalog, p);
+    if (!kit) return null;
+    const qty = items().find(i => i.productId === p.id)?.qty || 1;
+    return gearKitStatus(kit, qty, items(), ctx.resolve, p).filter(s => !s.done && s.add != null)
+      .flatMap(s => [s.add].flat().map(id => ({ c: catalog.byId(id), n: s.need - s.have, slot: s.key, label: lang === 'he' ? s.he : s.en })))
+      .filter(x => x.c);
+  }
   function offerCompanions(p) {
     if (offered.has(p.id)) return;
-    const list = companionsFor(p, catalog, { items: items(), resolve: ctx.resolve });
+    const list = kitOffers(p) || companionsFor(p, catalog, { items: items(), resolve: ctx.resolve }).map(c => ({ c, n: 1 }));
     if (!list.length) return;
     offered.add(p.id);
-    const rowHTML = (c) => `<div class="row gw-row" data-gw="${esc(c.id)}">${thumbHTML(c, catalog.deptKey(c.dept))}
-      <div class="body"><div class="name" dir="auto">${esc(c.name)}</div><div class="sub">${brandText(c.brand, c.brandName)}</div></div>
+    const rowHTML = ({ c, n, slot, label }) => `<div class="row gw-row" data-gw="${esc(c.id)}" data-n="${n}" ${slot ? `data-gw-slot="${esc(slot)}"` : ''}>${thumbHTML(c, catalog.deptKey(c.dept))}
+      <div class="body"><div class="name" dir="auto">${esc(c.name)}${n > 1 ? ` <b>× ${n}</b>` : ''}</div><div class="sub">${label ? esc(label) : brandText(c.brand, c.brandName)}</div></div>
       <button class="addbtn" data-gw-add aria-label="${t('add')}">+</button></div>`;
     const { body } = openSheet({
       title: t('goes_with', { name: p.name }),
@@ -352,9 +363,12 @@ export function render(ctx, { id }, root) {
     });
     body.querySelectorAll('[data-gw]').forEach(row => {
       row.querySelector('[data-gw-add]').onclick = (e) => {
-        const c = catalog.byId(parseId(row.dataset.gw));
-        store.setItems(id, addItem(items(), c, 1));
+        const c = catalog.byId(parseId(row.dataset.gw)), n = Number(row.dataset.n) || 1;
+        const cur = getQty(items(), c.id);
+        store.setItems(id, cur ? setQty(items(), c.id, cur + n) : addItem(items(), c, n));
         e.currentTarget.outerHTML = '<span class="gw-done">✓</span>';
+        // one pick fills a choice slot: the other option steps back
+        if (row.dataset.gwSlot) body.querySelectorAll(`[data-gw-slot="${CSS.escape(row.dataset.gwSlot)}"] [data-gw-add]`).forEach(b => { b.closest('.gw-row').classList.add('gw-skip'); b.remove(); });
         root.querySelector('[data-done]').innerHTML = `${icons.check}${t('back_to_list', { n: totalQty(items()) })}`;
         const inPage = root.querySelector(`.row[data-pid="${CSS.escape(String(c.id))}"]`);
         if (inPage) { const f = document.createElement('template'); f.innerHTML = productRow(c, { showBrand: !!inPage.querySelector('.brandname') }); const nr = f.content.firstElementChild; inPage.replaceWith(nr); bindRow(nr); }

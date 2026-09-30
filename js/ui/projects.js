@@ -77,7 +77,7 @@ export function render(ctx, _params, root) {
   const rows = projects.map(p => {
     const n = totalQty(p.items);
     const main = cameraChips(p.items, ctx.resolve, ctx.deptOrder())[0];
-    const sub = [p.productionCo, formatDateRange(p.dateFrom, p.dateTo), main?.name].filter(Boolean).map(esc).join(' · ');
+    const sub = [p.productionCo, formatDateRange(p.dateFrom, p.dateTo), main?.name].filter(Boolean).map(s => `<bdi${/^[0-9.–-]+$/.test(s) ? ' dir="ltr"' : ''}>${esc(s)}</bdi>`).join(' · ');
     return `<article class="prow" data-id="${esc(p.id)}">
       <div class="prow-main"><b dir="auto">${esc(p.name || t('untitled'))}</b>${sub ? `<small dir="auto">${sub}</small>` : ''}</div>
       <span class="num prow-n">${n}</span>

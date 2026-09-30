@@ -990,3 +990,10 @@ body.split .view { max-width: none; padding: 12px 16px 0; }
 .ex-opts summary { cursor: pointer; font-weight: var(--w-strong); padding-bottom: 8px; list-style: none; }
 .ex-opts summary span { color: var(--text-3); font-weight: 400; font-size: 13px; margin-inline-start: 6px; }
 .ex-preview .preview { max-height: none; }
+
+/* what the maker packs in the box, under a gimbal's kit */
+.gkit .inbox { margin-top: 8px; font-size: 13px; color: var(--muted); }
+.gkit .inbox summary { cursor: pointer; font-weight: 600; }
+.gkit .inbox ul { margin: 6px 0; padding-inline-start: 18px; }
+.gkit .inbox small { display: block; opacity: .8; }
+.gw-row.gw-skip { opacity: .45; }

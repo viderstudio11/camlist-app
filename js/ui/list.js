@@ -1,6 +1,6 @@
 import { esc, icons, toast, openSheet, confirmDialog } from './dom.js';
 import { groupByDept, setQty, setNote, totalQty, addItem } from '../list.js';
-import { gearKitFor, gearKitStatus } from '../gearkits.js';
+import { gearKitFor, gearKitStatus, inTheBox } from '../gearkits.js';
 import { brandText } from '../brands.js';
 import { displayName, formatDateRange } from '../export-text.js';
 import { DEPT_EMOJI } from '../i18n.js';
@@ -15,6 +15,8 @@ let showKit = false;
 const openKits = new Set(); // items whose must-have checklist is open // set by "Build around": bring the new kit into view on the next draw
 let pickup = false; // prep day: the list turns into a check-off sheet
 
+// Each detail isolated, so a date range beside a Hebrew name never flips (02.10–01.10).
+const bidi = (s) => `<bdi${/^[0-9.–-]+$/.test(s) ? ' dir="ltr"' : ''}>${esc(s)}</bdi>`;
 export const thumbHTML = (p, key) => `<div class="thumb"><span>${DEPT_EMOJI[key] || '📦'}</span>${p.image ? `<img src="${esc(p.image)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</div>`;
 export const parseId = (s) => (/^\d+$/.test(s) ? Number(s) : s);
 
@@ -36,7 +38,7 @@ export function render(ctx, { id }, root) {
   const packed = p.packed || {};
   const packedQty = p.items.reduce((s, i) => s + Math.min(packed[i.productId] || 0, i.qty), 0);
   ctx.setTopbar({
-    title: `${esc(p.name || t('untitled'))}<small>${[p.techManager, formatDateRange(p.dateFrom, p.dateTo)].filter(Boolean).map(esc).join(' · ')}</small>`,
+    title: `${esc(p.name || t('untitled'))}<small>${[p.techManager, formatDateRange(p.dateFrom, p.dateTo)].filter(Boolean).map(bidi).join(' · ')}</small>`,
     back: '#/',
     right: [
       { text: n, label: t('items_count', { n }), onClick: () => {} },
@@ -67,7 +69,14 @@ export function render(ctx, { id }, root) {
         ${x.done ? '' : x.add != null ? `<button class="btn sm" data-kitadd="${esc(product.id)}" data-slot="${esc(x.key)}">${t('add')}</button>` : `<button class="btn sm" data-kitfind="${esc(x.key)}">${t('choose')}</button>`}
       </div>`).join('');
   const inlineKit = (product) => (openKits.has(product.id) && gearKit(product)
-    ? `<div class="gkit"><div class="gkit-head">${t('must_have_for', { name: esc(displayName(product)) })}</div><div class="slots">${slotRows(product)}</div></div>` : '');
+    ? `<div class="gkit"><div class="gkit-head">${t('must_have_for', { name: esc(displayName(product)) })}</div><div class="slots">${slotRows(product)}</div>${boxNote(product)}</div>` : '');
+  // What the maker packs in the box (DJI gimbals), so the case can be checked against it.
+  const boxNote = (product) => {
+    const b = inTheBox(gearKit(product), product);
+    if (!b) return '';
+    const items = [...b.items, ...(/combo/i.test(product.name) ? b.combo || [] : [])];
+    return `<details class="inbox"><summary>${t('in_the_box')} · ${items.length}</summary><ul>${items.map(i => `<li dir="ltr">${esc(i)}</li>`).join('')}</ul><small>${esc(b.src)}</small></details>`;
+  };
   const buildBtn = (product) => {
     if (!compat.isCamera(product) || !compat.profileFor(product)) return '';
     const isActive = p.buildCameraId === product.id;
@@ -129,7 +138,7 @@ export function render(ctx, { id }, root) {
   const headHTML = `<header class="phead">
     <span class="lbl">${t('gear_list')}</span>
     <h1 dir="auto">${esc(p.name || t('untitled'))}</h1>
-    <p>${[p.productionCo, p.techManager, formatDateRange(p.dateFrom, p.dateTo)].filter(Boolean).map(esc).join(' · ')}</p>
+    <p>${[p.productionCo, p.techManager, formatDateRange(p.dateFrom, p.dateTo)].filter(Boolean).map(bidi).join(' · ')}</p>
     <div class="phead-n">${t('items_count', { n })}</div>
     <div class="ticks"></div>
   </header>`;

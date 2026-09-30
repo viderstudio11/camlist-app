@@ -592,6 +592,70 @@
       "brand": null,
       "dept": "video",
       "subcat": "Video Cables"
+    },
+    {
+      "id": "x_arri_lbp3500",
+      "name": "LBP-3500 Li-Ion Battery Pack",
+      "brand": "arri",
+      "dept": "power",
+      "subcat": "Batteries",
+      "src": "ARRI Online Shop, Hand Units: Hi-5 uses Li-Ion Battery Pack LBP-3500 (K2.0036022)"
+    },
+    {
+      "id": "x_arri_lbp_charger",
+      "name": "LBP Battery Charger",
+      "brand": "arri",
+      "dept": "power",
+      "subcat": "Chargers & PSU",
+      "src": "ARRI Online Shop: LBP Battery Charger (K2.0039874)"
+    },
+    {
+      "id": "x_dji_bg30",
+      "name": "Ronin BG30 Battery Grip",
+      "brand": "dji",
+      "dept": "power",
+      "subcat": "Batteries",
+      "src": "DJI Store, RS 4 Pro in the box: BG30 Battery Grip"
+    },
+    {
+      "id": "x_dji_bg33",
+      "name": "RS BG33 Battery Grip",
+      "brand": "dji",
+      "dept": "power",
+      "subcat": "Batteries",
+      "src": "DJI Store, RS 5 in the box: BG33 Battery Grip"
+    },
+    {
+      "id": "x_dji_focus_pro_motor",
+      "name": "Focus Pro Motor",
+      "brand": "dji",
+      "dept": "lenscontrol",
+      "subcat": "Wireless Follow Focus",
+      "src": "DJI Ronin Series Accessories Compatibility List"
+    },
+    {
+      "id": "x_dji_motor_rod_kit",
+      "name": "Focus Pro Motor Rod Mount Kit",
+      "brand": "dji",
+      "dept": "lenscontrol",
+      "subcat": "Follow Focus Accessories",
+      "src": "DJI Ronin Series Accessories Compatibility List"
+    },
+    {
+      "id": "x_dji_gear_strip",
+      "name": "Ronin Focus Gear Strip",
+      "brand": "dji",
+      "dept": "lenscontrol",
+      "subcat": "Follow Focus Accessories",
+      "src": "DJI Ronin Series Accessories Compatibility List"
+    },
+    {
+      "id": "x_gen_usbc_pd65",
+      "name": "USB-C PD Charger 65W",
+      "brand": null,
+      "dept": "power",
+      "subcat": "Chargers & PSU",
+      "src": "DJI RS 5 specs: charging time measured with a 65W PD charger"
     }
   ],
   "departments": [

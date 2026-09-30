@@ -47,6 +47,45 @@ export const POWER_INPUTS = [
   { rx: /pyro s\b/i, plug: 'dc21', src: 'Hollyland Pyro S: DC 2.1 mm in, 6–16 V (also NP-F, USB-C)' },
   { rx: /cosmo c1/i, plug: 'lemo2', src: 'Hollyland Cosmo C1: 2-pin LEMO power input on transmitter and receiver' },
 ];
+// Wireless follow focus. A hand unit sold on its own needs a motor; the kits (Nucleus-M, Focus Pro
+// All-In-One…) ship with one. The hand unit's battery, from the maker.
+const handUnitOnly = (p) => /hand unit|\bhi-5\b|\bwcu-\d|\bctrl\.5\b/i.test(p.name || '');
+const FF_MOTOR = [
+  { rx: /arri/i, add: 13076 },                         // ARRI cforce mini
+  { rx: /dji/i, add: 'x_dji_focus_pro_motor' },
+];
+export const HAND_BATTERIES = [
+  { rx: /\bhi-5\b/i, qty: 2, add: 'x_arri_lbp3500', match: /lbp-?3500/i, he: 'סוללות LBP-3500', en: 'LBP-3500 batteries', src: 'ARRI Online Shop, Hand Units: Hi-5 runs on the Li-Ion Battery Pack LBP-3500, hot-swap' },
+  { rx: /nucleus-?m\b|nucleus m(ii|\b)/i, qty: 2, add: 3467, match: /np-?f\s?[5-9]\d0|l-series/i, he: 'סוללות NP-F550 (L-Series)', en: 'NP-F550 batteries (L-Series)', src: 'Tilta: the Nucleus-M / M II hand units are powered by Sony NP-F550 batteries' },
+  { rx: /\bctrl\.5\b/i, qty: 2, add: 3466, match: /np-?f\s?[79]\d0/i, he: 'סוללות NP-F970', en: 'NP-F970 batteries', src: 'Teradek CTRL.5 Quick Start Guide: attach a Sony NP-F970 battery to the back' },
+];
+const handBattery = (p) => {
+  const b = HAND_BATTERIES.find(x => x.rx.test(p.name || ''));
+  return b ? [{ ...slot('battery', b.he, b.en, b.qty, b.match, b.add), src: b.src }] : [];
+};
+
+// DJI gimbals: the spare grip and charger each model takes, and whether the Focus Pro Motor fits
+// (DJI Ronin Series Accessories Compatibility List). A Combo already ships with the motor.
+const BG30 = { match: /bg30/i, add: 'x_dji_bg30' }, BG33 = { match: /bg33/i, add: 'x_dji_bg33' };
+const GIMBAL = [
+  { rx: /rs ?5/i, grip: BG33, pd: true, motor: true },
+  { rx: /rs ?4 ?mini/i, pd: true },
+  { rx: /rs ?4|rs ?3|rs ?2|ronin s 2/i, grip: BG30, pd: true, motor: true },
+];
+// In the box, from DJI's own pages. Models without an official list yet show none.
+export const GIMBAL_BOX = [
+  { rx: /rs ?5/i, src: 'DJI Store, DJI RS 5 — In the Box',
+    items: ['Gimbal', 'Quick-Open Tripod', 'Lens-Fastening Support', 'Screw Kit', 'RS 5 Upper Quick-Release Plate', 'RS 5 Lower Quick-Release Plate', 'BG33 Battery Grip', 'Multi-Camera Control Cable (USB-C, 30 cm)'] },
+  { rx: /rs ?4 ?pro/i, src: 'DJI Store, DJI RS 4 Pro — In the Box; Combo additions: DJI Beginner’s Guide to RS 4 / RS 4 Pro',
+    items: ['Gimbal', 'BG30 Battery Grip', 'Quick-Release Plate (Arca-Swiss/Manfrotto)', 'Extended Grip/Tripod (Metal)', 'Briefcase Handle', 'Lens-Fastening Support (Extended)', 'Multi-Camera Control Cable (USB-C, 30 cm)', 'USB-C Charging Cable (40 cm)', 'Screw Kit', 'Carrying Case'],
+    combo: ['DJI Focus Pro Motor', 'Motor Rod Mount Kit', 'Focus Gear Strip'] },
+  { rx: /rs ?4 ?mini/i, src: 'DJI Store, DJI RS 4 Mini — In the Box',
+    items: ['Gimbal', 'Quick-Release Plate', 'RS 4 Mini Tripod', 'L-Shaped Multi-Camera Control Cable (USB-C, 30 cm)', 'USB-C Charging Cable (40 cm)', 'Screw Kit'] },
+  { rx: /rs ?3 ?pro/i, src: 'DJI launch announcement, RS 3 Pro and RS 3 Pro Combo (June 2022)',
+    items: ['Gimbal', 'BG30 Grip', 'USB-C Charging Cable', 'Lens-Fastening Support (Extended)', 'Extended Grip/Tripod (Metal)', 'Quick-Release Plates', 'Briefcase Handle', 'Multi-Camera Control Cable', 'Screw Kit', 'Carrying Case'],
+    combo: ['Extended Quick-Release Plate', 'Phone Holder', 'Focus Motor (2022)', 'Focus Motor Rod Kit', 'Focus Gear Strip', 'Ronin Image Transmitter', 'Hook-and-Loop Straps ×2', 'Additional cables'] },
+];
+
 export const powerInputOf = (product) => (product ? POWER_INPUTS.find(x => x.rx.test(product.name)) || null : null);
 
 export const GEAR_KITS = [
@@ -68,10 +107,10 @@ export const GEAR_KITS = [
     id: 'monitor-small', he: 'מוניטור על המצלמה', en: 'On-camera monitor',
     when: (catalog, p) => isMonitor(catalog, p) && onCamera(catalog, p),
     slots: [
-      slot('arm', 'זרוע', 'Monitor arm', 1, /monitor arm|^ut arm$|magic arm/i, 'x_gen_monitor_arm'),
+      slot('arm', 'זרוע — UT Arm / Noga Arm', 'Arm — UT Arm / Noga Arm', 1, /monitor arm|^ut arm$|noga|magic arm/i, [4080, 'x_gen_noga_arm']),
       slot('hood', 'סאן־הוד', 'Sunhood', 1, /sun ?hood/i, 'x_gen_sunhood'),
       slot('dtap', 'כבל D-Tap', 'D-Tap power cable', 1, /d-?tap/i, 'x_gen_dtap'),
-      slot('sdi', 'כבל SDI קצר', 'Short SDI cable', 1, /\bsdi cable|^bnc cable$/i, 5497),
+      slot('sdi', 'כבל BNC קצר', 'Short BNC cable', 1, /\bsdi cable|^bnc cable/i, 'x_gen_bnc_short'),
       slot('hdmi', 'כבל HDMI', 'HDMI cable', 1, /^hdmi cable$/i, 5504),
     ],
   },
@@ -87,12 +126,34 @@ export const GEAR_KITS = [
   },
   {
     id: 'follow-focus', he: 'פולו פוקוס אלחוטי', en: 'Wireless follow focus',
-    when: (catalog, p) => SUB(catalog, p).includes('Wireless Follow Focus'),
-    slots: [
+    when: (catalog, p) => SUB(catalog, p).includes('Wireless Follow Focus') && !/\bmotor\b|\bria-|radio interface/i.test(p.name),
+    slots: (p) => [
+      ...(handUnitOnly(p) ? [slot('motor', 'מנוע פוקוס', 'Focus motor', 1, /\bmotor\b/i, FF_MOTOR.find(m => m.rx.test(p.brandName || p.name))?.add ?? null)] : []),
+      slot('rings', 'טבעות גיר', 'Lens gear rings', 1, /gear rings?|gear strip/i, 'x_gen_gear_rings'),
+      slot('marks', 'טבעות סימון', 'Focus marking rings', 1, /marking rings?/i, 'x_gen_marking_rings'),
+      ...handBattery(p),
+      slot('strap', 'רצועת יד', 'Hand unit wrist strap', 1, /wrist strap/i, 'x_gen_ff_strap'),
       slot('rods', 'מוטות 15 מ״מ', '15mm rods', 1, /15 ?mm rods?/i, 'x_gen_rods15'),
-      slot('rings', 'טבעות גיר', 'Lens gear rings', 1, /gear rings?/i, 'x_gen_gear_rings'),
-      slot('dtap', 'כבל D-Tap', 'D-Tap power cable', 1, /d-?tap/i, 'x_gen_dtap'),
+      slot('dtap', 'כבל D-Tap למנועים', 'D-Tap cable for the motors', 1, /d-?tap/i, 'x_gen_dtap'),
     ],
+  },
+  {
+    id: 'gimbal', he: 'גימבל', en: 'Gimbal',
+    when: (catalog, p) => SUB(catalog, p).includes('Gimbals & Stabilizers') && /ronin|\brs ?\d/i.test(p.name) && !/wheel|grip$|pad|mimic/i.test(p.name),
+    box: (p) => GIMBAL_BOX.find(b => b.rx.test(p.name)) || null,
+    slots: (p) => {
+      const m = GIMBAL.find(g => g.rx.test(p.name)) || {};
+      return [
+        ...(m.grip ? [slot('grip', 'גריפ סוללה רזרבי', 'Spare battery grip', 1, m.grip.match, m.grip.add)] : []),
+        ...(m.pd ? [slot('charger', 'מטען USB-C PD 65W', 'USB-C PD charger 65W', 1, /usb-?c pd|65 ?w/i, 'x_gen_usbc_pd65')] : []),
+        ...(m.motor && !/combo/i.test(p.name) ? [
+          slot('motor', 'מנוע פוקוס Focus Pro', 'Focus Pro Motor', 1, /focus (pro )?motor/i, 'x_dji_focus_pro_motor'),
+          slot('rodkit', 'ערכת מוט למנוע', 'Motor rod mount kit', 1, /rod mount kit|motor rod/i, 'x_dji_motor_rod_kit'),
+          slot('strip', 'רצועת גיר', 'Focus gear strip', 1, /gear strip|gear rings?/i, 'x_dji_gear_strip'),
+        ] : []),
+        slot('hdmi', 'כבל HDMI קצר', 'Short HDMI cable', 1, /hdmi cable/i, 5504),
+      ];
+    },
   },
   {
     id: 'mattebox', he: 'מטבוקס', en: 'Matte box',
@@ -115,6 +176,11 @@ export const GEAR_KITS = [
   },
 ];
 
+// A kit's slots may depend on the model (a follow focus's own battery, a gimbal's grip).
+export const kitSlotsOf = (kit, product) => (typeof kit.slots === 'function' ? kit.slots(product || {}) : kit.slots);
+// What the maker packs in the box, for kits that know it (DJI gimbals).
+export const inTheBox = (kit, product) => (kit?.box && product ? kit.box(product) : null);
+
 export const gearKitFor = (catalog, product) => (product && !product.manual ? GEAR_KITS.find(k => k.when(catalog, product)) || null : null);
 
 // Slot progress for one kit, scaled by how many of the parent item the list holds. With the parent
@@ -122,7 +188,7 @@ export const gearKitFor = (catalog, product) => (product && !product.manual ? GE
 export function gearKitStatus(kit, parentQty, items, resolve, parent = null) {
   const products = items.map(it => ({ it, p: resolve(it.productId) })).filter(x => x.p);
   const input = powerInputOf(parent);
-  return kit.slots.map(s0 => {
+  return kitSlotsOf(kit, parent).map(s0 => {
     const plug = s0.key === 'dtap' && input ? PLUGS[input.plug] : null;
     const s = plug ? { ...s0, he: `כבל D-Tap ל־${plug.he}`, en: `D-Tap to ${plug.en} cable`, add: plug.add, match: plug.match, src: input.src } : s0;
     const need = s.qty * Math.max(1, parentQty);
