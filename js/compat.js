@@ -212,6 +212,11 @@ export function createCompat(data, catalog) {
       const mine = alloc ? Math.min(alloc[slot.slot] || 0, have) : have;
       const out = { ...slot, deptId, subId, have: mine, done: mine >= slot.qty };
       if (slot.kind === 'reader') { out.wanted = chosen.length ? chosen : (prof.media || []); out.missing = out.wanted.filter(f => !readersFor(f).length); }
+      // the cage row: a camera with a cage made for it gets that cage in one tap (the shelf stays one "choose" away)
+      if (slot.slot === 'rig' && prof?.product) {
+        const cage = (data.cages || []).find(g => new RegExp(g.rx, 'i').test(prof.product.name));
+        if (cage) out.add = cage.add;
+      }
       return out;
     });
   }

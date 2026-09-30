@@ -24,6 +24,7 @@ let strict = false;     // entered from a kit slot: show ONLY items that fit the
 let lf = { type: null, mount: null, format: null };  // lens quick filters
 let tf = { kind: null, bowl: null };                  // tripod quick filters: what it is, and its bowl
 let ff = null;                                         // power / media shelves: battery or card family
+let ffMore = false;                                    // …and whether the rarer families are shown too
 let af = { kind: null, type: null, size: null };      // accessory quick filters: shelf, then filter type and size
 let kind = null;        // kit slot kind (card / reader / battery / charger) — restricts the list to that kind
 let kitSlot = null;     // { cam, slot } while choosing for one camera's kit slot: what is added counts for that camera
@@ -283,7 +284,9 @@ export function render(ctx, { id }, root) {
       const shelfItems = catalog.bySubcat(st.subcat);
       const fams = famOf ? [...new Set(shelfItems.flatMap(famOf))].map(v => ({ val: v, n: shelfItems.filter(p => famOf(p).includes(v)).length })).filter(o => o.n).sort((a, b) => b.n - a.n) : [];
       if (ff && !fams.some(o => o.val === ff)) ff = null;
-      const famBar = fams.length > 1 ? `<div class="filterbar"><div class="chips fchips"><span class="frow-label">${t('f_' + d.slug + '_fam')}</span><button class="${ff ? '' : 'active'}" data-ff="">${t('all')}</button>${fams.map(o => `<button class="${ff === o.val ? 'active' : ''}" data-ff="${esc(o.val)}">${esc(o.val)} <i>${o.n}</i></button>`).join('')}</div></div>` : '';
+      // the six most common first; the rest behind "more" (always shown when one of them is picked)
+      const TOP = 6, showAll = ffMore || fams.length <= TOP + 1 || fams.slice(TOP).some(o => o.val === ff);
+      const famBar = fams.length > 1 ? `<div class="filterbar"><div class="chips fchips"><span class="frow-label">${t('f_' + d.slug + '_fam')}</span><button class="${ff ? '' : 'active'}" data-ff="">${t('all')}</button>${(showAll ? fams : fams.slice(0, TOP)).map(o => `<button class="${ff === o.val ? 'active' : ''}" data-ff="${esc(o.val)}">${esc(o.val)} <i>${o.n}</i></button>`).join('')}${showAll ? '' : `<button data-ff-more>${t('more_n', { n: fams.length - TOP })}</button>`}</div></div>` : '';
       content = famBar + groupedByBrand(shown(ff ? shelfItems.filter(p => famOf(p).includes(ff)) : shelfItems)) + manualCTA;
     }
   }
@@ -330,6 +333,7 @@ export function render(ctx, { id }, root) {
   root.querySelectorAll('[data-tf]').forEach(b => { b.onclick = () => { const v = b.dataset.val; tf[b.dataset.tf === 'tkind' ? 'kind' : 'bowl'] = v ? (/^\d+$/.test(v) ? Number(v) : v) : null; rerender(); }; });
   root.querySelector('[data-tf-clear]')?.addEventListener('click', () => { tf = { kind: null, bowl: null }; rerender(); });
   root.querySelectorAll('[data-ff]').forEach(b => { b.onclick = () => { ff = b.dataset.ff || null; rerender(); }; });
+  root.querySelector('[data-ff-more]')?.addEventListener('click', () => { ffMore = true; rerender(); });
   root.querySelectorAll('[data-tab]').forEach(b => { b.onclick = () => { st.view = b.dataset.tab; st.dept = null; st.subcat = null; st.brand = null; st.sub = null; rerender(); }; });
   root.querySelectorAll('[data-dept]').forEach(c => { c.onclick = () => { st.dept = Number(c.dataset.dept); st.brand = null; st.subcat = null; st.sub = null; lf = { type: null, mount: null, format: null }; af = { kind: null, type: null, size: null }; tf = { kind: null, bowl: null }; ff = null; rerender(); }; });
   root.querySelector('[data-exp-set]')?.addEventListener('click', () => {

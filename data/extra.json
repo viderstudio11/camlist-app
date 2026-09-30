@@ -1081,7 +1081,9 @@
       "name": "Top Handle",
       "brand": null,
       "dept": "grip",
-      "subcat": "Cages & Handles"
+      "subcat": "Cages & Handles",
+      "image": "https://www.adorama.com/images/product/SR3766.jpg",
+      "imageSrc": "Adorama: SmallRig 3766 NATO Top Handle — https://www.adorama.com/smallrig-3766-nato-top-handle-camera-cage/p/sr3766"
     },
     {
       "id": "x_gen_shoe_mount",
@@ -1110,6 +1112,86 @@
       "brand": null,
       "dept": "accessories",
       "subcat": "General Accessories"
+    },
+    {
+      "id": "x_cage_fx3",
+      "name": "Full Camera Cage for Sony FX3 / FX30 (4183B)",
+      "brand": "smallrig",
+      "dept": "grip",
+      "subcat": "Cages & Handles",
+      "url": "https://www.adorama.com/smallrig-4183b-full-camera-cage-sony-fx30-fx3/p/sr4183b",
+      "image": "https://www.adorama.com/images/product/SR4183B.JPG",
+      "imageSrc": "Adorama: Full Camera Cage for Sony FX3 / FX30 (4183B)"
+    },
+    {
+      "id": "x_cage_fx6",
+      "name": "Full Camera Cage Kit for Sony FX6 (4124)",
+      "brand": "smallrig",
+      "dept": "grip",
+      "subcat": "Cages & Handles",
+      "url": "https://www.adorama.com/smallrig-4124-full-camera-cage-kit-sony-fx6/p/sr4124",
+      "image": "https://www.adorama.com/images/product/SR4124.jpg",
+      "imageSrc": "Adorama: Full Camera Cage Kit for Sony FX6 (4124)"
+    },
+    {
+      "id": "x_cage_fx9",
+      "name": "Camera Cage for Sony FX9 — Basic Kit (ES-T18)",
+      "brand": "tilta",
+      "dept": "grip",
+      "subcat": "Cages & Handles",
+      "url": "https://www.adorama.com/tilta-camera-cage-sony-pxw-fx9-basic-kit-es-t18/p/iaest18b",
+      "image": "https://www.adorama.com/images/product/IAEST18B.jpg",
+      "imageSrc": "Adorama: Camera Cage for Sony FX9 — Basic Kit (ES-T18)"
+    },
+    {
+      "id": "x_cage_a7",
+      "name": "Rhinoceros Full Camera Cage for Sony Alpha 7 IV / 7S III (6029)",
+      "brand": "smallrig",
+      "dept": "grip",
+      "subcat": "Cages & Handles",
+      "url": "https://www.adorama.com/smallrig-rhinoceros-full-camera-cage-sony-alpha-6029/p/sr6029",
+      "image": "https://www.adorama.com/images/product/SR6029.JPG",
+      "imageSrc": "Adorama: Rhinoceros Full Camera Cage for Sony Alpha 7 IV / 7S III (6029)"
+    },
+    {
+      "id": "x_cage_c70",
+      "name": "Handheld Half Camera Cage Kit for Canon EOS C70 (3899)",
+      "brand": "smallrig",
+      "dept": "grip",
+      "subcat": "Cages & Handles",
+      "url": "https://www.adorama.com/smallrig-handheld-half-camera-cage-kit-canon-eos-c70/p/sr3899",
+      "image": "https://www.adorama.com/images/product/SR3899.jpg",
+      "imageSrc": "Adorama: Handheld Half Camera Cage Kit for Canon EOS C70 (3899)"
+    },
+    {
+      "id": "x_cage_c80",
+      "name": "Half-Camera Cage Kit for Canon EOS C80 (5136)",
+      "brand": "smallrig",
+      "dept": "grip",
+      "subcat": "Cages & Handles",
+      "url": "https://www.adorama.com/smallrig-half-camera-cage-kit-canon-eos-c80-5136/p/sr5136",
+      "image": "https://www.adorama.com/images/product/SR5136.JPG",
+      "imageSrc": "Adorama: Half-Camera Cage Kit for Canon EOS C80 (5136)"
+    },
+    {
+      "id": "x_cage_bmpcc",
+      "name": "Full Cage for Blackmagic Pocket Cinema Camera 4K / 6K (2203B)",
+      "brand": "smallrig",
+      "dept": "grip",
+      "subcat": "Cages & Handles",
+      "url": "https://www.adorama.com/smallrig-full-cage-blackmagic-design-pocket-cinema-camera-6k-4k/p/sr2203b",
+      "image": "https://www.adorama.com/images/product/SR2203B.jpg",
+      "imageSrc": "Adorama: Full Cage for Blackmagic Pocket Cinema Camera 4K / 6K (2203B)"
+    },
+    {
+      "id": "x_cage_komodo",
+      "name": "Full Camera Cage for RED KOMODO (TA-T08-FCC)",
+      "brand": "tilta",
+      "dept": "grip",
+      "subcat": "Cages & Handles",
+      "url": "https://www.adorama.com/tilta-full-camera-cage-red-komodo-ta-t08-fcc-tactical-gray/p/iatat08fcc",
+      "image": "https://www.adorama.com/images/product/IATAT08FCC.jpg",
+      "imageSrc": "Adorama: Full Camera Cage for RED KOMODO (TA-T08-FCC)"
     }
   ],
   "departments": [
@@ -1819,5 +1901,30 @@
       "image": "https://cdn.cvp.com/images/products/thumb150/03-04-20181522764015hdx1.4-coverter-front-imagesmall.jpg",
       "src": "CVP: IB/E Optics HDx1.4 Converter — https://cvp.com/product/ibe_optics_hdx1.4_converter"
     }
+  },
+  "rename": {
+    "Digital Cinema": "קולנוע דיגיטלי",
+    "High-Speed 120+ Fps": "היי־ספיד 120+ פריים",
+    "Action": "אקשן",
+    "“Compact 1/3” -1/2": "קומפקטיות 1/3″–1/2″",
+    "PC Cameras": "מצלמות רשת / PC",
+    "PTZ Robotic": "PTZ רובוטיות",
+    "Medium Format": "מדיום פורמט",
+    "Film Cameras": "מצלמות פילם",
+    "Full Frame": "פול פריים",
+    "35mm Prime": "פריים 35 מ״מ",
+    "35mm Zoom": "זום 35 מ״מ",
+    "Anamorphic": "אנמורפיות",
+    "Macro": "מאקרו",
+    "16mm": "16 מ״מ",
+    "Converters": "ממירים",
+    "Mixers & Matrix": "מיקסרים ומטריצות",
+    "Camera Support": "תמיכת מצלמה",
+    "System / Friction Head": "מערכות וראשי חיכוך",
+    "Gear Head": "ראש גלגלים (Gear Head)",
+    "Grip Accessories": "אביזרי גריפ",
+    "Camera Support & Rigs": "ריגים ומגנטים",
+    "Dolly & Sliders": "דולי וסליידרים",
+    "Jib & Crane": "ג׳יב ועגורן"
   }
 }

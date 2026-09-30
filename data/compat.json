@@ -1762,6 +1762,18 @@
         "en": "Fluid head + legs",
         "dept": "tripods",
         "qty": 1
+      },
+      {
+        "slot": "rig",
+        "he": "כלוב / ריג",
+        "en": "Cage / rig",
+        "dept": "grip",
+        "subcat": "Cages & Handles",
+        "fallback": {
+          "dept": "grip",
+          "subcat": "Camera Support & Rigs"
+        },
+        "qty": 1
       }
     ],
     "mirrorless": [
@@ -2050,5 +2062,39 @@
         "qty": 1
       }
     ]
-  }
+  },
+  "cages": [
+    {
+      "rx": "ILME-FX3|ILME-FX30",
+      "add": "x_cage_fx3"
+    },
+    {
+      "rx": "PXW-FX6",
+      "add": "x_cage_fx6"
+    },
+    {
+      "rx": "PXW-FX9",
+      "add": "x_cage_fx9"
+    },
+    {
+      "rx": "A7 IV|A7S MARK III",
+      "add": "x_cage_a7"
+    },
+    {
+      "rx": "C70",
+      "add": "x_cage_c70"
+    },
+    {
+      "rx": "C80",
+      "add": "x_cage_c80"
+    },
+    {
+      "rx": "Pocket Cinema Camera (4K|6K)",
+      "add": "x_cage_bmpcc"
+    },
+    {
+      "rx": "KOMODO",
+      "add": "x_cage_komodo"
+    }
+  ]
 }

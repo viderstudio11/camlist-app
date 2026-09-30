@@ -13,7 +13,9 @@ const HOUSE_BRANDS = new Set(['utopia']);
 const brandOf = (b) => (!b || HOUSE_BRANDS.has(b) ? GENERAL : b);
 export function createCatalog(data, manual = [], extra = null) {
   const departments = (data.departments || []).map(d => ({ ...d })).sort((a, b) => a.order - b.order);
-  const sourceDepts = departments.slice();   // moves name the source's shelves, never the supplement's namesakes
+  const sourceDepts = departments.slice();
+  // Hebrew names for the source's shelves that only carry an English one (mount names and 4K stay as they are)
+  for (const d of departments) d.subcategories = (d.subcategories || []).map(sc => (extra?.rename?.[sc.en] ? { ...sc, he: extra.rename[sc.en] } : sc));   // moves name the source's shelves, never the supplement's namesakes
   // The supplement can add departments of its own (numeric ids, like the source's, so the screens treat
   // them the same) and slot each one in after a named department.
   (extra?.departments || []).forEach((x, i) => {

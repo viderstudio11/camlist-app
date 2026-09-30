@@ -39,3 +39,10 @@ test('in the V-Lock kit a V-Mount battery counts, the plate and dummy count by n
   const nat = Object.fromEntries(compat.kitStatus(cam(/^ILME-FX3$/), [{ productId: 'x_gen_dummy_fz100', qty: 1 }], (id) => catalog.byId(id)).map(s => [s.slot, s.have]));
   assert.equal(nat.battery, 0);
 });
+
+test('the cage row offers the cage made for the camera, and compact cinema cameras have one too', () => {
+  const st = (rx) => compat.kitStatus(cam(rx), [], (id) => catalog.byId(id)).find(s => s.slot === 'rig');
+  assert.equal(catalog.byId(st(/^ILME-FX3$/).add).name, 'Full Camera Cage for Sony FX3 / FX30 (4183B)');
+  assert.equal(catalog.byId(st(/^PXW-FX6$/).add).name, 'Full Camera Cage Kit for Sony FX6 (4124)');
+  assert.equal(st(/^ILME-FX2$/)?.add, undefined, 'no cage listed for it: the row opens the shelf');
+});
