@@ -8,6 +8,7 @@ import { deptIcon } from './icons-dept.js';
 import { toolIcon } from './icons.js';
 import { editProjectSheet } from './projects.js';
 import { presetCatalog } from './catalog.js';
+import { allocFor, ensureAlloc } from '../kitalloc.js';
 
 const collapsed = new Set();
 let showKit = false;
@@ -105,7 +106,7 @@ export function render(ctx, { id }, root) {
   let kitHTML = '';
   // Base kit checklist for the active camera
   if (active && activeProf && !pickup) {
-    const slots = compat.kitStatus(activeProf, p.items, ctx.resolve);
+    const slots = compat.kitStatus(activeProf, p.items, ctx.resolve, allocFor(p, p.buildCameraId));
     const lang = ctx.lang();
     kitHTML = `<section class="kit">
       <div class="kit-head">
@@ -161,7 +162,12 @@ export function render(ctx, { id }, root) {
     try { await navigator.clipboard.writeText(txt); toast(t('copied'), { kind: 'ok' }); } catch { toast(t('export_failed'), { kind: 'err' }); }
   });
   root.querySelectorAll('.group-head').forEach(h => { h.onclick = () => { const k = h.parentElement.dataset.key; collapsed.has(k) ? collapsed.delete(k) : collapsed.add(k); h.parentElement.classList.toggle('collapsed'); }; });
-  root.querySelectorAll('[data-build]').forEach(b => { b.onclick = () => { const pid = parseId(b.dataset.build); const on = p.buildCameraId !== pid; store.setBuildCamera(id, on ? pid : null); showKit = on; ctx.render(); }; });
+  // Building around a different camera opens its own, empty kit; the first camera's progress is kept as its own.
+  root.querySelectorAll('[data-build]').forEach(b => { b.onclick = () => {
+    const pid = parseId(b.dataset.build); const on = p.buildCameraId !== pid;
+    if (on && p.buildCameraId != null && p.buildCameraId !== pid) store.updateProject(id, { kitAlloc: ensureAlloc(p, compat, ctx.resolve) });
+    store.setBuildCamera(id, on ? pid : null); showKit = on; ctx.render();
+  }; });
   root.querySelector('[data-clear-build]')?.addEventListener('click', () => { store.setBuildCamera(id, null); ctx.render(); });
   root.querySelectorAll('[data-kitchip]').forEach(b => { b.onclick = () => { const k = parseId(b.dataset.kitchip); openKits.has(k) ? openKits.delete(k) : openKits.add(k); ctx.render(); }; });
   // A missing slot adds what it lacks; a slot with a choice (V-Mount or Gold plate) asks first.
@@ -181,8 +187,8 @@ export function render(ctx, { id }, root) {
   }; });
   root.querySelectorAll('[data-kitfind]').forEach(b => { b.onclick = () => { presetCatalog({}); ctx.navigate(`#/p/${id}/add`); }; });
   root.querySelectorAll('[data-choose]').forEach(b => { b.onclick = () => {
-    const slot = compat.kitStatus(activeProf, p.items, ctx.resolve).find(s => s.slot === b.dataset.choose);
-    presetCatalog({ dept: slot.deptId, subcat: slot.subId, strict: true, kind: slot.kind || null });
+    const slot = compat.kitStatus(activeProf, p.items, ctx.resolve, allocFor(p, p.buildCameraId)).find(s => s.slot === b.dataset.choose);
+    presetCatalog({ dept: slot.deptId, subcat: slot.subId, strict: true, kind: slot.kind || null, kitCam: p.buildCameraId, slot: slot.slot });
     ctx.navigate(`#/p/${id}/add`);
   }; });
 
@@ -213,7 +219,7 @@ export function render(ctx, { id }, root) {
     const badge = document.querySelector('#topbar [data-r="0"]');
     if (badge) badge.textContent = total;
     groupByDept(items, ctx.resolve, ctx.deptOrder()).forEach(g => { const c = root.querySelector(`.group[data-key="${g.key}"] .count`); if (c) c.textContent = g.entries.reduce((s, e) => s + e.item.qty, 0); });
-    if (activeProf) compat.kitStatus(activeProf, items, ctx.resolve).forEach(s => { const el = root.querySelector(`.slot[data-slot="${s.slot}"]`); if (!el) return; el.classList.toggle('done', s.done); el.querySelector('.slot-have').textContent = `${s.have} / ${s.qty}`; el.querySelector('.slot-check').textContent = s.done ? '✓' : ''; });
+    if (activeProf) compat.kitStatus(activeProf, items, ctx.resolve, allocFor(store.getProject(id), p.buildCameraId)).forEach(s => { const el = root.querySelector(`.slot[data-slot="${s.slot}"]`); if (!el) return; el.classList.toggle('done', s.done); el.querySelector('.slot-have').textContent = `${s.have} / ${s.qty}`; el.querySelector('.slot-check').textContent = s.done ? '✓' : ''; });
   }
 }
 

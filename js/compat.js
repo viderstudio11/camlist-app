@@ -158,7 +158,9 @@ export function createCompat(data, catalog) {
 
   // Kit slot progress against the project's items: how many units of matching products are already in the list.
   // A slot with `kind` (card / reader / battery / charger) only counts items of that kind.
-  function kitStatus(prof, items, resolve) {
+  // With `alloc` (what was added through this camera's own kit, per slot) a second camera starts empty instead
+  // of counting the first camera's cards and batteries; the list still caps it.
+  function kitStatus(prof, items, resolve, alloc = null) {
     const chosen = chosenMedia(prof, items, resolve);
     return (prof?.kit || []).map(slot => {
       // Cards and readers live in Media & Offload; a catalog without that department keeps them in Video.
@@ -172,7 +174,8 @@ export function createCompat(data, catalog) {
         if (slot.kind && p.name && verdict(p, prof, { chosenMedia: chosen }).kind !== slot.kind) return n;
         return n + it.qty;
       }, 0);
-      const out = { ...slot, deptId, subId, have, done: have >= slot.qty };
+      const mine = alloc ? Math.min(alloc[slot.slot] || 0, have) : have;
+      const out = { ...slot, deptId, subId, have: mine, done: mine >= slot.qty };
       if (slot.kind === 'reader') { out.wanted = chosen.length ? chosen : (prof.media || []); out.missing = out.wanted.filter(f => !readersFor(f).length); }
       return out;
     });

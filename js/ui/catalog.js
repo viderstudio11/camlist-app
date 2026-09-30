@@ -5,6 +5,7 @@ import { thumbHTML, parseId, profileChips } from './list.js';
 import { lensTypes, LENS_TYPES } from '../lens.js';
 import { deptIcon } from './icons-dept.js';
 import { companionsFor } from '../companions.js';
+import { ensureAlloc, bump } from '../kitalloc.js';
 import { accessoryKind, filterType, filterSize, ACC_KINDS, FILTER_TYPES, FILTER_SIZES } from '../accessory.js';
 
 // Departments that drill Brand → models (the rest drill Subcategory → models grouped by brand).
@@ -19,13 +20,14 @@ let strict = false;     // entered from a kit slot: show ONLY items that fit the
 let lf = { type: null, mount: null, format: null };  // lens quick filters
 let af = { kind: null, type: null, size: null };      // accessory quick filters: shelf, then filter type and size
 let kind = null;        // kit slot kind (card / reader / battery / charger) — restricts the list to that kind
+let kitSlot = null;     // { cam, slot } while choosing for one camera's kit slot: what is added counts for that camera
 export function presetCatalog(o) { preset = o; }
 const offered = new Set(); // products whose "goes with" window was already shown this session
 
 export function render(ctx, { id }, root) {
   const { store, t, catalog } = ctx;
   if (st.pid !== id) { st = { pid: id, q: '', view: 'depts', dept: null, subcat: null, brand: null, sub: null }; lf = { type: null, mount: null, format: null }; af = { kind: null, type: null, size: null }; }
-  if (preset) { st = { pid: id, q: '', view: 'depts', dept: preset.dept ?? null, subcat: preset.subcat ?? null, brand: null, sub: null }; af = { kind: null, type: null, size: null }; strict = !!preset.strict; kind = preset.kind || null; compatOnly = true; preset = null; }
+  if (preset) { st = { pid: id, q: '', view: 'depts', dept: preset.dept ?? null, subcat: preset.subcat ?? null, brand: null, sub: null }; af = { kind: null, type: null, size: null }; strict = !!preset.strict; kind = preset.kind || null; kitSlot = preset.kitCam != null ? { cam: preset.kitCam, slot: preset.slot } : null; compatOnly = true; preset = null; }
   const lang = ctx.lang();
   const { compat, recency } = ctx;
   const project = store.getProject(id);
@@ -265,7 +267,7 @@ export function render(ctx, { id }, root) {
   root.classList.toggle('has-rail', !!root.querySelector('.rail'));
   root.style.setProperty('--search-h', root.querySelector('.search').offsetHeight + 'px');
   root.querySelector('[data-compat-only]')?.addEventListener('change', (e) => { compatOnly = e.target.checked; rerender(); });
-  root.querySelector('[data-show-all]')?.addEventListener('click', () => { if (strict) { strict = false; kind = null; } else compatOnly = false; rerender(); });
+  root.querySelector('[data-show-all]')?.addEventListener('click', () => { if (strict) { strict = false; kind = null; kitSlot = null; } else compatOnly = false; rerender(); });
   const input = root.querySelector('[data-q]');
   let timer;
   input.oninput = () => {
@@ -322,7 +324,10 @@ export function render(ctx, { id }, root) {
     row.querySelectorAll('[data-d]').forEach(b => { b.onclick = () => {
       const p = catalog.byId(productId);
       const cur = getQty(items(), productId); const next = cur + Number(b.dataset.d);
+      // the camera's allocation is taken before the list changes, so a first seed never counts this unit twice
+      const alloc0 = kitSlot ? ensureAlloc(store.getProject(id), ctx.compat, ctx.resolve) : null;
       store.setItems(id, cur ? setQty(items(), productId, next) : addItem(items(), p, 1));
+      if (kitSlot) store.updateProject(id, { kitAlloc: bump(alloc0, kitSlot.cam, kitSlot.slot, Math.max(next, 0) - cur) });
       const fresh = document.createElement('template'); fresh.innerHTML = productRow(catalog.byId(productId), { showBrand });
       const nr = fresh.content.firstElementChild; row.replaceWith(nr); bindRow(nr);
       root.querySelector('[data-done]').innerHTML = `${icons.check}${t('back_to_list', { n: totalQty(items()) })}`;

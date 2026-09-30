@@ -93,3 +93,18 @@ test('kitStatus counts units already in the list', () => {
   assert.equal(batt.have, 6); assert.equal(batt.done, true);
   assert.equal(lens.have, 1);
 });
+
+test('kitStatus with a camera’s own allocation counts only what was added for that camera', () => {
+  const fx6 = compat.profileFor(catalog.byId(16514));
+  const items = [{ productId: 7, qty: 4 }, { productId: 10, qty: 6 }];
+  // nothing allocated to this camera yet: it starts empty even though the list has cards and batteries
+  const fresh = compat.kitStatus(fx6, items, (id) => catalog.byId(id), {});
+  assert.equal(fresh.find(s => s.slot === 'media').have, 0);
+  assert.equal(fresh.find(s => s.slot === 'battery').have, 0);
+  // two of the four cards were added through this camera's kit
+  const mine = compat.kitStatus(fx6, items, (id) => catalog.byId(id), { media: 2 });
+  assert.equal(mine.find(s => s.slot === 'media').have, 2);
+  // an allocation never exceeds what the list still holds
+  const capped = compat.kitStatus(fx6, items, (id) => catalog.byId(id), { media: 9 });
+  assert.equal(capped.find(s => s.slot === 'media').have, 4);
+});
