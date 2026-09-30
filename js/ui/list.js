@@ -41,7 +41,6 @@ export function render(ctx, { id }, root) {
     title: `${esc(p.name || t('untitled'))}<small>${[p.techManager, formatDateRange(p.dateFrom, p.dateTo)].filter(Boolean).map(bidi).join(' · ')}</small>`,
     back: '#/',
     right: [
-      { text: n, label: t('items_count', { n }), onClick: () => {} },
       { icon: toolIcon('pickup'), label: t('pickup_mode'), onClick: () => { pickup = !pickup; ctx.render(); } },
       { icon: icons.edit, label: t('rename'), onClick: () => editProjectSheet(ctx, id) },
     ],
@@ -93,7 +92,7 @@ export function render(ctx, { id }, root) {
 
   const sections = groups.map(g => `
     <section class="group ${collapsed.has(g.key) ? 'collapsed' : ''}" data-key="${g.key}">
-      <div class="group-head"><span class="dept-ico sm">${deptIcon(g.key)}</span><h2>${t(`dept_${g.key}`)}</h2><span class="count">${g.entries.reduce((s, e) => s + e.item.qty, 0)}</span><span class="chev">${icons.chev}</span></div>
+      <div class="group-head"><span class="dept-ico sm">${deptIcon(g.key)}</span><h2>${t(`dept_${g.key}`)}</h2><span class="chev">${icons.chev}</span></div>
       <div class="group-body">${g.entries.map(({ item, product }) => `
         <div class="row ${p.buildCameraId === product.id ? 'is-build' : ''} ${pickup && Math.min(packed[item.productId] || 0, item.qty) < item.qty ? 'unpacked' : ''}" data-pid="${esc(item.productId)}">
           ${thumbHTML(product, g.key)}
@@ -141,7 +140,6 @@ export function render(ctx, { id }, root) {
     <span class="lbl">${t('gear_list')}</span>
     <h1 dir="auto">${esc(p.name || t('untitled'))}</h1>
     <p>${[p.productionCo, p.techManager, formatDateRange(p.dateFrom, p.dateTo)].filter(Boolean).map(bidi).join(' · ')}</p>
-    <div class="phead-n">${t('items_count', { n })}</div>
     <div class="ticks"></div>
   </header>`;
   const listHTML = groups.length ? ''
@@ -233,10 +231,6 @@ export function render(ctx, { id }, root) {
 
   function syncCounts() {
     const items = store.getProject(id).items;
-    const total = totalQty(items);
-    const badge = document.querySelector('#topbar [data-r="0"]');
-    if (badge) badge.textContent = total;
-    groupByDept(items, ctx.resolve, ctx.deptOrder()).forEach(g => { const c = root.querySelector(`.group[data-key="${g.key}"] .count`); if (c) c.textContent = g.entries.reduce((s, e) => s + e.item.qty, 0); });
     if (activeProf) compat.kitStatus(activeProf, items, ctx.resolve, allocFor(store.getProject(id), p.buildCameraId)).forEach(s => { const el = root.querySelector(`.slot[data-slot="${s.slot}"]`); if (!el) return; el.classList.toggle('done', s.done); el.querySelector('.slot-have').textContent = `${s.have} / ${s.qty}`; el.querySelector('.slot-check').textContent = s.done ? '✓' : ''; });
   }
 }

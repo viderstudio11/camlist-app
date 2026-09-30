@@ -1,5 +1,4 @@
 import { esc, openSheet, confirmDialog, icons } from './dom.js';
-import { totalQty } from '../list.js';
 import { formatDateRange } from '../export-text.js';
 import { activeProject, deptStrip, cameraChips } from '../home.js';
 import { deptIcon, toolIcon } from './icons.js';
@@ -47,11 +46,9 @@ export function render(ctx, _params, root) {
   const locale = lang === 'he' ? 'he-IL' : 'en-GB';
   ctx.setTopbar({ title: `<span class="brandmark">CAM<b>LIST</b></span>`, right: [{ icon: icons.gear, onClick: () => ctx.navigate('#/settings'), label: t('settings') }] });
 
-  const itemsWord = (n) => (n === 1 ? t('item_count_one') : t('items_count', { n }));
   const active = activeProject(projects);
   let hero = '';
   if (active) {
-    const n = totalQty(active.items);
     const range = formatDateRange(active.dateFrom, active.dateTo);
     const cams = cameraChips(active.items, ctx.resolve, ctx.deptOrder());
     const strip = deptStrip(active.items, ctx.resolve, ctx.deptOrder());
@@ -64,9 +61,9 @@ export function render(ctx, _params, root) {
         <h2 class="h-display phero-name" dir="auto">${esc(active.name || t('untitled'))}</h2>
         ${who ? `<p class="phero-sub" dir="auto">${who}</p>` : ''}
         ${cams.length ? `<div class="camchips">${cams.map(c => `<span class="camchip" dir="ltr">${esc(c.name)} <b class="num">×${c.qty}</b></span>`).join('')}</div>` : ''}
-        ${strip.length ? `<div class="dstrip">${strip.map(d => `<div class="ds ${d.qty ? '' : 'nil'}" title="${esc(t(`dept_${d.key}`))}"><span class="ds-ico">${deptIcon(d.key)}</span><i><u style="width:${Math.round(d.share * 100)}%"></u></i><span class="num">${d.qty}</span></div>`).join('')}</div>` : ''}
-        <div class="phero-acts"><button class="btn primary" data-open>${t('open_list')}<span class="fwd">${icons.back}</span></button><button class="btn sq" data-export aria-label="${esc(t('export'))}" ${n ? '' : 'disabled'}>${icons.share}</button></div>
-        <div class="phero-meta"><span>${itemsWord(n)}</span><span>·</span><span>${t('updated')} ${new Date(active.updatedAt).toLocaleDateString(locale)}</span></div>
+        ${strip.length ? `<div class="dstrip">${strip.map(d => `<div class="ds ${d.qty ? '' : 'nil'}" title="${esc(t(`dept_${d.key}`))}"><span class="ds-ico">${deptIcon(d.key)}</span><i><u style="width:${Math.round(d.share * 100)}%"></u></i></div>`).join('')}</div>` : ''}
+        <div class="phero-acts"><button class="btn primary" data-open>${t('open_list')}<span class="fwd">${icons.back}</span></button><button class="btn sq" data-export aria-label="${esc(t('export'))}" ${active.items.length ? '' : 'disabled'}>${icons.share}</button></div>
+        <div class="phero-meta"><span>${t('updated')} ${new Date(active.updatedAt).toLocaleDateString(locale)}</span></div>
       </div>
     </article>`;
   }
@@ -75,12 +72,10 @@ export function render(ctx, _params, root) {
     <div class="toolrow">${HOME_TOOLS.map(k => `<button class="tr-t" data-tool="${k}"><span class="tool-ico">${toolIcon(k)}</span><span class="tr-n">${esc(toolLabel(k, lang))}</span></button>`).join('')}</div>`;
 
   const rows = projects.map(p => {
-    const n = totalQty(p.items);
     const main = cameraChips(p.items, ctx.resolve, ctx.deptOrder())[0];
     const sub = [p.productionCo, formatDateRange(p.dateFrom, p.dateTo), main?.name].filter(Boolean).map(s => `<bdi${/^[0-9.–-]+$/.test(s) ? ' dir="ltr"' : ''}>${esc(s)}</bdi>`).join(' · ');
     return `<article class="prow" data-id="${esc(p.id)}">
       <div class="prow-main"><b dir="auto">${esc(p.name || t('untitled'))}</b>${sub ? `<small dir="auto">${sub}</small>` : ''}</div>
-      <span class="num prow-n">${n}</span>
       <button class="iconbtn more" data-more aria-label="more">${icons.more}</button>
     </article>`;
   }).join('');
