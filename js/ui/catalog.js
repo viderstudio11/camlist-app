@@ -293,7 +293,7 @@ export function render(ctx, { id }, root) {
 
   root.innerHTML = `
     <div class="search"><div class="field"><span class="sico">${icons.search}</span><input type="search" value="${esc(st.q)}" placeholder="${t('search_placeholder')}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" data-q>${st.q ? `<button class="clear" data-clear aria-label="clear">×</button>` : ''}</div><button class="btn sm manual-btn" data-manual>${icons.plus}${t('my_item')}</button>
-      ${prof ? `<div class="cbar"><div class="thumb">${active.image ? `<img src="${esc(active.image)}" alt="">` : `<span class="ci">${deptIcon('cameras')}</span>`}</div><div class="cbar-body"><small>${t('building_around')}</small><b dir="auto">${esc(active.name)}</b><div class="pchips">${profileChips(prof, t)}</div></div><label class="cbar-toggle"><input type="checkbox" data-compat-only ${compatOnly ? 'checked' : ''}><span>${t('compat_only')}</span></label></div>` : ''}
+      ${prof ? `<div class="cbar"><div class="thumb">${active.image ? `<img src="${esc(active.image)}" alt="">` : `<span class="ci">${deptIcon('cameras')}</span>`}</div><div class="cbar-body"><small>${t('building_around')}</small><b dir="auto">${esc(active.name)}</b><div class="pchips">${profileChips(prof, t)}</div></div><label class="cbar-toggle"><input type="checkbox" data-compat-only ${compatOnly ? 'checked' : ''}><span>${esc(t('compat_only_for', { cam: active.name }))}</span></label></div>` : ''}
       ${st.q || st.dept || st.brand ? '' : `<div class="tabs"><button class="${st.view === 'depts' ? 'active' : ''}" data-tab="depts">${t('departments')}</button><button class="${st.view === 'brands' ? 'active' : ''}" data-tab="brands">${t('all_brands')}</button></div>`}
     </div>
     ${crumbs}
@@ -371,6 +371,8 @@ export function render(ctx, { id }, root) {
       if (kitSlot) store.updateProject(id, { kitAlloc: bump(alloc0, kitSlot.cam, kitSlot.slot, Math.max(next, 0) - cur) });
       const fresh = document.createElement('template'); fresh.innerHTML = productRow(catalog.byId(productId), { showBrand });
       const nr = fresh.content.firstElementChild; row.replaceWith(nr); bindRow(nr);
+      // on set, eyes on the camera: a short buzz and a flash confirm the add without reading the screen
+      if (next > cur) { navigator.vibrate?.(12); nr.classList.add('just-added'); }
       root.querySelector('[data-done]').innerHTML = `${icons.check}${t('back_to_list', { n: totalQty(items()) })}`;
       if (!cur) { toast(t('added'), { kind: 'ok', ms: 900 }); openGoesWith(p); }
     }; });
@@ -438,6 +440,7 @@ export function render(ctx, { id }, root) {
           const cur = getQty(items(), c.id);
           store.setItems(id, cur ? setQty(items(), c.id, cur + n) : addItem(items(), c, n, p.id));   // picked for p: listed under it
           taken.add(String(c.id)); if (row.dataset.gwSlot) taken.add(row.dataset.gwSlot);
+          navigator.vibrate?.(12);
           row.querySelector('[data-gw-add]').outerHTML = '<span class="gw-done">✓</span>';
           // one pick fills a choice slot: the other option steps back
           if (row.dataset.gwSlot) list.querySelectorAll(`[data-gw-slot="${CSS.escape(row.dataset.gwSlot)}"] [data-gw-add]`).forEach(o => { o.closest('.gw-row').classList.add('gw-skip'); o.remove(); });

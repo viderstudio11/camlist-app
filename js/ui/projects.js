@@ -57,11 +57,11 @@ export function render(ctx, _params, root) {
     <article class="phero" data-id="${esc(active.id)}">
       <div class="ticks"></div>
       <div class="phero-in">
-        <div class="phero-top"><span class="tag">ACTIVE</span>${range ? `<span class="num phero-dates" dir="ltr">${range}</span>` : ''}</div>
+        <div class="phero-top"><span class="tag">${esc(t('active_tag'))}</span>${range ? `<span class="num phero-dates" dir="ltr">${range}</span>` : ''}</div>
         <h2 class="h-display phero-name" dir="auto">${esc(active.name || t('untitled'))}</h2>
         ${who ? `<p class="phero-sub" dir="auto">${who}</p>` : ''}
         ${cams.length ? `<div class="camchips">${cams.map(c => `<span class="camchip" dir="ltr">${esc(c.name)} <b class="num">×${c.qty}</b></span>`).join('')}</div>` : ''}
-        ${strip.length ? `<div class="dstrip">${strip.map(d => `<div class="ds ${d.qty ? '' : 'nil'}" title="${esc(t(`dept_${d.key}`))}"><span class="ds-ico">${deptIcon(d.key)}</span><i><u style="width:${Math.round(d.share * 100)}%"></u></i></div>`).join('')}</div>` : ''}
+        ${strip.some(d => d.qty) ? `<div class="dstrip named">${strip.filter(d => d.qty).map(d => `<span class="ds"><span class="ds-ico">${deptIcon(d.key)}</span>${esc(t(`dept_${d.key}`))}</span>`).join('')}</div>` : ''}
         <div class="phero-acts"><button class="btn primary" data-open>${t('open_list')}<span class="fwd">${icons.back}</span></button><button class="btn sq" data-export aria-label="${esc(t('export'))}" ${active.items.length ? '' : 'disabled'}>${icons.share}</button></div>
         <div class="phero-meta"><span>${t('updated')} ${new Date(active.updatedAt).toLocaleDateString(locale)}</span></div>
       </div>
