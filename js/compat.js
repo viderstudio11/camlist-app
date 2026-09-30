@@ -182,7 +182,9 @@ export function createCompat(data, catalog) {
       kit: (prof.kit || []).flatMap(s => (s.slot !== 'battery' ? [s] : [
         { ...s, qty: Math.max(2, Math.ceil(s.qty / 2)), he: 'סוללות V-Lock', en: 'V-Lock batteries' },
         { slot: 'vplate', he: 'פלטת V-Lock עם D-Tap', en: 'V-Lock plate with D-Tap', qty: 1, match: 'v-?(mount|lock) (battery )?plate', add: 'x_gen_plate_v' },
-        { slot: 'dummy', he: `כבל D-Tap לסוללת דמה ${fam}`, en: `D-Tap to ${fam} dummy battery`, qty: 1, match: `dummy.*(${d.rx})`, add: d.add },
+        // a camera with a DC input its maker names plugs straight in; the rest take a dummy battery
+        prof.dc ? { slot: 'dummy', he: prof.dc.he, en: prof.dc.en, qty: 1, match: prof.dc.match, add: prof.dc.add, src: prof.dc.src }
+          : { slot: 'dummy', he: `כבל D-Tap לסוללת דמה ${fam}`, en: `D-Tap to ${fam} dummy battery`, qty: 1, match: `dummy.*(${d.rx})`, add: d.add },
       ])) };
   }
 

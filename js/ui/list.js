@@ -51,7 +51,7 @@ export function render(ctx, { id }, root) {
   const qtyOf = (pid) => p.items.find(i => i.productId === pid)?.qty || 1;
   // The camera being built around (else the first camera in the list) — a tripod's plate depends on it.
   const kitCamera = () => (p.buildCameraId != null ? ctx.resolve(p.buildCameraId) : p.items.map(i => ctx.resolve(i.productId)).find(x => x && compat.isCamera(x))) || null;
-  const kitSlots = (product) => gearKitStatus(gearKit(product), qtyOf(product.id), p.items, ctx.resolve, product, { camera: kitCamera() });
+  const kitSlots = (product) => gearKitStatus(gearKit(product), qtyOf(product.id), p.items, ctx.resolve, product, { camera: kitCamera(), route: (p.powerRoute || {})[product.id] });
   // Monitors, wireless video, follow focus, matte boxes, laptops: a chip under the item opens its
   // must-have checklist in place, so several kits can be open side by side.
   const kitChip = (product) => {
@@ -62,7 +62,7 @@ export function render(ctx, { id }, root) {
   const slotRows = (product) => kitSlots(product).map(x => `
       <div class="slot ${x.done ? 'done' : ''}">
         <span class="slot-check">${x.done ? '✓' : ''}</span>
-        <span class="slot-label">${esc(ctx.lang() === 'he' ? x.he : x.en)}</span>
+        <span class="slot-label">${esc(ctx.lang() === 'he' ? x.he : x.en)}${x.power ? `<span class="seg pwr"><button class="${x.power.route === 'vlock' ? '' : 'active'}" data-mpower="${esc(product.id)}" data-route="native">${x.power.fam}</button><button class="${x.power.route === 'vlock' ? 'active' : ''}" data-mpower="${esc(product.id)}" data-route="vlock">V-Lock</button></span>` : ''}</span>
         <span class="slot-have">${x.have} / ${x.need}</span>
         ${x.done ? '' : x.add != null ? `<button class="btn sm" data-kitadd="${esc(product.id)}" data-slot="${esc(x.key)}">${t('add')}</button>` : `<button class="btn sm" data-kitfind="${esc(product.id)}" data-slot="${esc(x.key)}">${t('choose')}</button>`}
       </div>`).join('');
@@ -173,6 +173,11 @@ export function render(ctx, { id }, root) {
     const sub = d?.subcategories.find(x => x.en === slot.find.subcat);
     presetCatalog(d ? { dept: d.id, subcat: sub?.id ?? null } : {});
     ctx.navigate(`#/p/${id}/add`);
+  }; });
+  // a monitor on NP-F: its own batteries, or V-Lock through a D-Tap cable — kept per monitor
+  root.querySelectorAll('[data-mpower]').forEach(b => { b.onclick = () => {
+    store.updateProject(id, { powerRoute: { ...(p.powerRoute || {}), [parseId(b.dataset.mpower)]: b.dataset.route } });
+    ctx.render();
   }; });
   root.querySelectorAll('[data-power]').forEach(b => { b.onclick = () => {
     store.updateProject(id, { powerRoute: { ...(p.powerRoute || {}), [p.buildCameraId]: b.dataset.power } });

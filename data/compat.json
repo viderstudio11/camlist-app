@@ -1096,6 +1096,13 @@
         "h": 20.05,
         "mode": "6K 16:9 · full width",
         "src": "Blackmagic PYXIS 6K tech specs: effective sensor size 35.64 × 23.32 mm (large format); 16:9 height derived from the published width"
+      },
+      "dc": {
+        "he": "כבל D-Tap למחבר ה-DC הנעול",
+        "en": "D-Tap to locking DC cable",
+        "add": "x_gen_dtap_bmdc",
+        "match": "d-?tap.*locking dc",
+        "src": "Blackmagic Design: a locking DC power connector"
       }
     },
     {
@@ -1119,6 +1126,13 @@
         "h": 10,
         "mode": "4K DCI",
         "src": "Blackmagic Pocket Cinema Camera 4K tech specs: effective sensor size 18.96 × 10 mm (Four Thirds)"
+      },
+      "dc": {
+        "he": "כבל D-Tap למחבר ה-DC הנעול",
+        "en": "D-Tap to locking DC cable",
+        "add": "x_gen_dtap_bmdc",
+        "match": "d-?tap.*locking dc",
+        "src": "Blackmagic Design: a locking DC power connector"
       }
     },
     {
@@ -1142,6 +1156,13 @@
         "h": 12.99,
         "mode": "6K 16:9",
         "src": "Blackmagic Pocket Cinema Camera 6K tech specs: effective sensor size 23.10 × 12.99 mm (Super 35)"
+      },
+      "dc": {
+        "he": "כבל D-Tap למחבר ה-DC הנעול",
+        "en": "D-Tap to locking DC cable",
+        "add": "x_gen_dtap_bmdc",
+        "match": "d-?tap.*locking dc",
+        "src": "Blackmagic Design: a locking DC power connector"
       }
     },
     {

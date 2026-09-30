@@ -111,8 +111,11 @@ test('a head: legs sized to its bowl, and the Sony VCT-14 plate when the camera 
   const head = find(/^C20S 100mm Fluid Head$/);
   const st = (camera) => gearKitStatus(gearKitFor(catalog, head), 1, [], (id) => catalog.byId(id), head, { camera });
   const legs = st(null).find(s => s.key === 'legs');
-  assert.equal(legs.add, null, 'no 100 mm tall legs in the catalog: the slot opens the legs shelf');
+  assert.deepEqual(legs.add, ['x_gen_legs100', 862], 'a 100 mm head gets 100 mm legs only');
   assert.deepEqual(legs.find, { dept: 'tripods', subcat: 'Tripod Legs' });
+  const v20 = find(/^Video 20 Fluid Head$/);
+  const v20legs = gearKitStatus(gearKitFor(catalog, v20), 1, [], (id) => catalog.byId(id), v20).find(s => s.key === 'legs');
+  assert.ok(![v20legs.add].flat().some(id => /150/.test(catalog.byId(id).name)), 'Sachtler Video 20 is 100 mm: no 150 mm legs');
   assert.equal(catalog.byId(st(null).find(s => s.key === 'hihat').add).name, 'High Hat with 100mm Bowl');
   assert.deepEqual(st(find(/PXW-X400/)).find(s => s.key === 'plate').add, 'x_sony_vct14');
   assert.equal([st(find(/ILME-FX3/)).find(s => s.key === 'plate').add].flat().length, 3);
@@ -122,4 +125,11 @@ test('a Ninja asks for AtomX SSDmini media and NP-F batteries, per Atomos', () =
   const ninja = find(/^Ninja 5\.2″/);
   const keys = gearKitStatus(gearKitFor(catalog, ninja), 1, [], (id) => catalog.byId(id), ninja).map(s => s.key);
   assert.ok(keys.includes('media') && keys.includes('battery'));
+});
+
+test('a monitor on NP-F: batteries by default, a D-Tap cable once switched to V-Lock', () => {
+  const ninja = find(/^Ninja 5.2″/);
+  const keys = (route) => gearKitStatus(gearKitFor(catalog, ninja), 1, [], (id) => catalog.byId(id), ninja, { route }).map(s => s.key);
+  assert.ok(keys().includes('battery') && !keys().includes('dtap'));
+  assert.ok(keys('vlock').includes('dtap') && !keys('vlock').includes('battery'));
 });

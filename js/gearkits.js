@@ -87,20 +87,52 @@ export const GIMBAL_BOX = [
     combo: ['Extended Quick-Release Plate', 'Phone Holder', 'Focus Motor (2022)', 'Focus Motor Rod Kit', 'Focus Gear Strip', 'Ronin Image Transmitter', 'Hook-and-Loop Straps ×2', 'Additional cables'] },
 ];
 
-// Monitor-recorders: the media and batteries the maker names. Models not listed get the monitor kit only.
+// Monitor-recorders: the media the maker names. Models not listed get the monitor kit only.
 const RECORDERS = [
-  { rx: /\bninja\b/i, src: 'Atomos, Ninja: records to AtomX SSDmini (or Master Caddy drives); powered by NP-F batteries on the rear L-series plate',
-    media: { add: 'x_atomos_ssdmini', qty: 2, match: /ssdmini|master caddy/i, he: 'מדיה AtomX SSDmini', en: 'AtomX SSDmini media' },
-    battery: { add: 3467, qty: 2, match: /np-?f\s?[5-9]\d0|l-series/i, he: 'סוללות NP-F', en: 'NP-F batteries' } },
+  { rx: /\bninja\b/i, src: 'Atomos, Ninja: records to AtomX SSDmini (or Master Caddy drives)',
+    media: { add: 'x_atomos_ssdmini', qty: 2, match: /ssdmini|master caddy/i, he: 'מדיה AtomX SSDmini', en: 'AtomX SSDmini media' } },
 ];
 const recorderExtras = (p) => {
   const r = RECORDERS.find(x => x.rx.test(p.name || ''));
-  if (!r) return [];
-  return [r.media, r.battery].filter(Boolean).map((m, i) => ({ ...slot(i ? 'battery' : 'media', m.he, m.en, m.qty, m.match, m.add), src: r.src }));
+  return r ? [{ ...slot('media', r.media.he, r.media.en, r.media.qty, r.media.match, r.media.add), src: r.src }] : [];
+};
+// Monitors that run on NP-F (L-Series) batteries, per the maker. Their kit carries a power choice:
+// NP-F batteries on the monitor, or V-Lock through a D-Tap cable (from the camera's battery or a plate).
+export const NPF_MONITORS = [
+  { rx: /\bninja\b/i, src: 'Atomos, Ninja: a rear L-series battery plate powers it with NP-F batteries' },
+  { rx: /shogun connect/i, src: 'Atomos support: SHOGUN CONNECT runs on the DC supply or NP-F / L-Series batteries' },
+  { rx: /video assist/i, src: 'Blackmagic Design, Video Assist: L-Series batteries' },
+  { rx: /fw279s?\b/i, src: 'Feelworld: F970 (NP-F) battery plate for the FW279 / FW279S' },
+];
+export const npfMonitor = (p) => NPF_MONITORS.find(x => x.rx.test(p?.name || '')) || null;
+const NPF = /np-?f\s?[5-9]\d0|l-series/i;
+// The D-Tap slot names the plug each model takes (see gearKitStatus).
+const DTAP = () => slot('dtap', 'כבל D-Tap', 'D-Tap power cable', 1, /d-?tap/i, 'x_gen_dtap');
+const monitorPower = (p, ctx) => {
+  const m = npfMonitor(p);
+  if (!m) return [DTAP()];
+  const route = ctx?.route === 'vlock' ? 'vlock' : 'native';
+  const power = { fam: 'NP-F', route };
+  return route === 'vlock'
+    ? [{ ...DTAP(), power }]
+    : [{ ...slot('battery', 'סוללות NP-F', 'NP-F batteries', 2, NPF, 3467), src: m.src, power }];
 };
 
-// Tripods. A head's bowl from its name (100 / 150 mm, Mitchell); unnamed bowls offer both sizes.
-const bowlOf = (name) => (/150/.test(name) ? 150 : /100/.test(name) ? 100 : /mitchell|flat/i.test(name) ? 150 : null);
+// Tripods. A head's bowl, from the maker where we have it, else from its name; unknown bowls open the legs shelf.
+export const BOWLS = [
+  { rx: /video (18|20)\b/i, bowl: 100, src: 'Sachtler Video 18 S2 / Video 20 S1 manual: tie-down with the 100 mm ball base' },
+  { rx: /video 25/i, bowl: 150, src: 'Sachtler Video 25 Plus manual: 150 mm half ball' },
+  { rx: /focus 22/i, bowl: 'both', src: 'Cartoni: Focus 22 comes as a 100 mm and a 150 mm model' },
+  { rx: /focus (10|12|18)\b|c20s/i, bowl: 100, src: 'Cartoni EFP 100 tripod (100 mm bowl): compatible with Focus 10, 12, 18, 22, C20S' },
+  { rx: /master|maxima|lambda 25/i, bowl: 'mitchell', src: 'Cartoni: Mitchell flat base (150 mm bowl adapter optional)' },
+  { rx: /2065/i, bowl: 150, src: "O'Connor Ultimate 2065 package: 150 mm ball base" },
+  { rx: /atlas 40/i, bowl: 150, src: 'Ronford-Baker Atlas 40: head bases 150 mm or Mitchell (adaptor)' },
+  { rx: /509hd/i, bowl: 100, src: 'Manfrotto 509HD: incorporated 100 mm half ball' },
+];
+const bowlOf = (name) => BOWLS.find(b => b.rx.test(name))?.bowl
+  ?? (/150/.test(name) ? 150 : /100/.test(name) ? 100 : /mitchell|flat base/i.test(name) ? 'mitchell' : null);
+const LEGS_FOR = { 100: ['x_gen_legs100', 862], 150: [3562, 3569, 3571], mitchell: [3565, 3577], both: ['x_gen_legs100', 862, 3562, 3569, 3571] };
+const HIHAT_FOR = { 100: 3723, 150: 3720, mitchell: 18529, both: [3723, 3720] };
 const isHead = (catalog, p) => {
   const subs = SUB(catalog, p);
   if (subs.includes('Fluid Heads') || subs.includes('Gear Head')) return true;
@@ -108,7 +140,6 @@ const isHead = (catalog, p) => {
 };
 const SAND = /sand ?bag|shot ?bag/i;
 const LEGS = /tripod legs|baby (legs|tripod)|tall tripod/i;
-const LEGS_150 = [3562, 3569, 3571];                       // Ronford-Baker tall, heavy-duty, baby — 150 mm
 const TRIPOD_LEGS = { dept: 'tripods', subcat: 'Tripod Legs' };
 const FLUID_HEADS = { dept: 'tripods', subcat: 'Fluid Heads' };
 const FIELD_MONITORS = { dept: 'monitors', subcat: 'Field Monitors' };
@@ -139,11 +170,11 @@ export const GEAR_KITS = [
   {
     id: 'monitor-small', he: 'מוניטור על המצלמה', en: 'On-camera monitor',
     when: (catalog, p) => isMonitor(catalog, p) && onCamera(catalog, p),
-    slots: (p) => [
+    slots: (p, ctx) => [
       slot('arm', 'זרוע — UT Arm / Noga Arm', 'Arm — UT Arm / Noga Arm', 1, /monitor arm|^ut arm$|noga|magic arm/i, [4080, 'x_gen_noga_arm']),
       ...recorderExtras(p),
       slot('hood', 'סאן־הוד', 'Sunhood', 1, /sun ?hood/i, 'x_gen_sunhood'),
-      slot('dtap', 'כבל D-Tap', 'D-Tap power cable', 1, /d-?tap/i, 'x_gen_dtap'),
+      ...monitorPower(p, ctx),
       slot('sdi', 'כבל BNC קצר', 'Short BNC cable', 1, /\bsdi cable|^bnc cable/i, 'x_gen_bnc_short'),
       slot('hdmi', 'כבל HDMI', 'HDMI cable', 1, /^hdmi cable$/i, 5504),
     ],
@@ -197,8 +228,9 @@ export const GEAR_KITS = [
       return [
         plateSlot(ctx),
         slot('panbar', 'פאן־בר שני', 'Second pan bar', 1, /pan ?bar/i, 'x_gen_pan_bar'),
-        slot('legs', 'רגליים בקוטר הקערה של הראש', 'Legs for the head’s bowl', 1, LEGS, bowl === 100 ? null : LEGS_150, TRIPOD_LEGS),
-        slot('hihat', 'היי־האט', 'Hi-hat', 1, /hi-?hat|high hat/i, bowl === 100 ? 3723 : bowl === 150 ? 3720 : [3720, 3723]),
+        { ...slot('legs', bowl ? `רגליים ${bowl === 'mitchell' ? 'מיטשל' : bowl === 'both' ? '100 / 150 מ״מ' : bowl + ' מ״מ'}` : 'רגליים בקוטר הקערה של הראש',
+          bowl ? `Legs — ${bowl === 'mitchell' ? 'Mitchell' : bowl === 'both' ? '100 / 150 mm' : bowl + ' mm'}` : 'Legs for the head’s bowl', 1, LEGS, LEGS_FOR[bowl] ?? null, TRIPOD_LEGS), src: BOWLS.find(b => b.rx.test(p.name))?.src },
+        slot('hihat', 'היי־האט', 'Hi-hat', 1, /hi-?hat|high hat/i, HIHAT_FOR[bowl] ?? [3720, 3723]),
         slot('spreader', 'ספרדר', 'Spreader', 1, /spreader/i, 'x_gen_spreader'),
         slot('sand', 'שק חול', 'Sandbag', 1, SAND, 3896),
       ];
@@ -220,6 +252,7 @@ export const GEAR_KITS = [
     slots: (p) => [
       slot('head', 'ראש בקוטר הקערה', 'A head for the bowl', 1, /fluid head|\bhead\b/i, null, FLUID_HEADS),
       ...(/hi-?hat|high hat/i.test(p.name) ? [] : [slot('spreader', 'ספרדר', 'Spreader', 1, /spreader/i, 'x_gen_spreader')]),
+      ...(/tall/i.test(p.name) ? [slot('dolly', 'עגלת גלגלים לחצובה', 'Tripod dolly (wheels)', 1, /tripod dolly/i, 'x_gen_tripod_dolly')] : []),
       slot('sand', 'שק חול', 'Sandbag', 1, SAND, 3896),
     ],
   },

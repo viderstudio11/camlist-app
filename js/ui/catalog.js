@@ -348,7 +348,7 @@ export function render(ctx, { id }, root) {
     const kit = gearKitFor(catalog, p);
     if (!kit) return null;
     const qty = items().find(i => i.productId === p.id)?.qty || 1;
-    return gearKitStatus(kit, qty, items(), ctx.resolve, p, { camera: kitCamera() }).filter(s => !s.done && (s.add != null || s.find))
+    return gearKitStatus(kit, qty, items(), ctx.resolve, p, { camera: kitCamera(), route: (store.getProject(id).powerRoute || {})[p.id] }).filter(s => !s.done && (s.add != null || s.find))
       .flatMap(s => (s.add != null
         ? [s.add].flat().map(pid => ({ c: catalog.byId(pid), n: s.need - s.have, slot: s.key, label: lang === 'he' ? s.he : s.en }))
         : [{ find: s.find, label: lang === 'he' ? s.he : s.en }]))

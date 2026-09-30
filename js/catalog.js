@@ -73,7 +73,7 @@ export function createCatalog(data, manual = [], extra = null) {
   const decorate = (p, isManual) => ({
     id: p.id, name: p.name, brand: brandOf(p.brand),
     brandName: brandOf(p.brand) === GENERAL ? 'General' : p.brandName || brandNames.get(p.brand) || p.brand,
-    dept: p.dept, subcats: p.subcats || [], image: p.image || null, url: p.url || null, manual: !!isManual, extra: !!p.extra,
+    dept: p.dept, subcats: p.subcats || [], image: p.image || extra?.images?.[p.id]?.image || null, url: p.url || null, manual: !!isManual, extra: !!p.extra,
     _n: '', _b: '', _all: '',
   });
   const indexOf = (p) => {
