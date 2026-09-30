@@ -18,18 +18,15 @@ export async function exportXlsx(project, groups, { lang, includeNotes = true, i
   if (includeNotes) head.push(t('notes'));
   if (includeLinks) head.push(t('link'));
   rows.push(head);
-  let total = 0;
   for (const g of groups) {
     rows.push([t(`dept_${g.key}`)]);
     for (const { item, product } of g.entries) {
-      total += item.qty;
       const r = [t(`dept_${g.key}`), product.brandName || '', displayName(product), item.qty];
       if (includeNotes) r.push(item.note || '');
       if (includeLinks) r.push(product.url || '');
       rows.push(r);
     }
   }
-  rows.push([], [t('total'), '', '', total]);
   const ws = X.utils.aoa_to_sheet(rows);
   ws['!cols'] = [{ wch: 14 }, { wch: 16 }, { wch: 48 }, { wch: 6 }, { wch: 28 }, { wch: 40 }];
   if (lang === 'he') ws['!views'] = [{ RTL: true }];

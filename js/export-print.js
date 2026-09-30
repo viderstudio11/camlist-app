@@ -12,12 +12,10 @@ export function renderPrint(ctx, project, groups, root, { includeNotes = true, i
   ctx.setTopbar({ title: esc(ctx.t('pdf')), back: `#/p/${project.id}/export` });
   // "Save as PDF" names the file after the page title.
   document.title = `${project.name || t('untitled')} – ${t('gear_list')}`;
-  const total = groups.reduce((n, g) => n + g.entries.reduce((m, e) => m + e.item.qty, 0), 0);
 
   const sections = groups.map(g => {
-    const qty = g.entries.reduce((m, e) => m + e.item.qty, 0);
     return `<section class="pdept">
-      <h2><span>${esc(t(`dept_${g.key}`))}</span><span class="n">${qty}</span></h2>
+      <h2><span>${esc(t(`dept_${g.key}`))}</span></h2>
       ${g.entries.map(({ item, product }) => `<div class="pline">
         <span class="q">${item.qty}×</span>
         ${includeImages ? `<span class="im">${product.image ? `<img src="${esc(product.image)}" alt="" onerror="this.remove()">` : ''}</span>` : ''}
@@ -40,7 +38,7 @@ export function renderPrint(ctx, project, groups, root, { includeNotes = true, i
       ${project.notes ? `<p class="dim" dir="auto">${esc(project.notes)}</p>` : ''}
     </header>
     ${sections}
-    <footer class="pfoot">${esc(t('items_count', { n: total }))} · <bdi dir="ltr">${esc(fmtDate(todayStr()))}</bdi></footer>
+    <footer class="pfoot">CamList · <bdi dir="ltr">${esc(fmtDate(todayStr()))}</bdi></footer>
   </div>`;
 
   const go = () => window.print();

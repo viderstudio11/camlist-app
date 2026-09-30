@@ -43,3 +43,9 @@ test('every filter in the catalog gets a type and a size', () => {
   assert.deepEqual(untyped, []);
   assert.ok(unsized.length <= 6, unsized.join(' | '));
 });
+
+test('nothing a camera assistant would look for is left on the Other shelf', () => {
+  assert.equal(accessoryKind({ name: 'ND Filter', brandName: 'GoPro' }, []), 'action');
+  assert.equal(accessoryKind({ name: 'ICEMAN External Cooler System for Select Cameras' }, ['General Accessories']), 'camera');
+  assert.equal(accessoryKind({ name: 'XLR-K3M Dual-Channel Digital XLR Audio Adapter Kit' }, ['General Accessories']), 'camera');
+});

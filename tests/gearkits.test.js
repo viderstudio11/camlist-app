@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { createCatalog } from '../js/catalog.js';
-import { gearKitFor, gearKitStatus, GEAR_KITS } from '../js/gearkits.js';
+import { gearKitFor, gearKitStatus, kitSlotsOf, inTheBox } from '../js/gearkits.js';
 
 const read = (f) => JSON.parse(readFileSync(new URL(`../data/${f}`, import.meta.url), 'utf8'));
 const catalog = createCatalog(read('catalog.json'), [], read('extra.json'));
@@ -19,13 +19,39 @@ test('each kind of gear finds its kit', () => {
 });
 
 test('every slot that adds something points at a real catalog item', () => {
-  for (const kit of GEAR_KITS) for (const s of kit.slots) {
+  // slots can depend on the model, so every product with a kit is checked with its own slots
+  for (const prod of catalog.products) { const kit = gearKitFor(catalog, prod); if (!kit) continue; for (const s of kitSlotsOf(kit, prod)) {
     for (const id of [s.add].flat().filter(x => x != null)) {
       const p = catalog.byId(id);
       assert.ok(p, `${kit.id}/${s.key}: ${id}`);
       assert.ok(s.match.test(p.name), `${kit.id}/${s.key}: "${p.name}" must satisfy its own slot`);
     }
-  }
+  } }
+});
+
+const keysOf = (rx) => { const p = find(rx); return kitSlotsOf(gearKitFor(catalog, p), p).map(s => s.key); };
+
+test('a wireless follow focus: a motor only for a hand unit sold alone, and the battery its maker names', () => {
+  assert.deepEqual(keysOf(/^Hi-5 Hand Unit$/), ['motor', 'rings', 'marks', 'battery', 'strap', 'rods', 'dtap']);
+  assert.deepEqual(keysOf(/^Nucleus-M$/), ['rings', 'marks', 'battery', 'strap', 'rods', 'dtap']);
+  assert.deepEqual(keysOf(/^Nucleus-Nano$/), ['rings', 'marks', 'strap', 'rods', 'dtap'], 'no battery to add: it is built in');
+  const hi5 = find(/^Hi-5 Hand Unit$/);
+  const bat = gearKitStatus(gearKitFor(catalog, hi5), 1, [], (id) => catalog.byId(id), hi5).find(s => s.key === 'battery');
+  assert.equal(catalog.byId(bat.add).name, 'LBP-3500 Li-Ion Battery Pack');
+  assert.equal(bat.need, 2);
+  assert.equal(gearKitFor(catalog, find(/^Cforce Mini Motor$/)), null, 'a motor carries no kit of its own');
+});
+
+test('a DJI gimbal: its own spare grip, the motor unless the Combo has it, and what DJI packs in the box', () => {
+  assert.equal(gearKitFor(catalog, find(/RONIN RS 5/)).id, 'gimbal');
+  assert.deepEqual(keysOf(/RONIN RS 5/), ['grip', 'charger', 'motor', 'rodkit', 'strip', 'hdmi']);
+  assert.deepEqual(keysOf(/RS3 PRO COMBO/), ['grip', 'charger', 'hdmi']);
+  assert.deepEqual(keysOf(/RS4 Mini/), ['charger', 'hdmi']);
+  const rs5 = find(/RONIN RS 5/);
+  const grip = gearKitStatus(gearKitFor(catalog, rs5), 1, [], (id) => catalog.byId(id), rs5).find(s => s.key === 'grip');
+  assert.equal(catalog.byId(grip.add).name, 'RS BG33 Battery Grip');
+  assert.ok(inTheBox(gearKitFor(catalog, rs5), rs5).items.includes('BG33 Battery Grip'));
+  assert.equal(gearKitFor(catalog, find(/Gimbal Control Wheels for DJI RS/)), null);
 });
 
 test('slots count what is in the list and scale with the parent quantity', () => {
@@ -42,7 +68,7 @@ test('slots count what is in the list and scale with the parent quantity', () =>
 
 test('a field monitor asks for a D-Tap power cable as well', () => {
   const kit = gearKitFor(catalog, find(/LMD-A180/));
-  assert.ok(kit.slots.some(s => s.key === 'dtap'));
+  assert.ok(kitSlotsOf(kit).some(s => s.key === 'dtap'));
 });
 
 test('only real monitors and wireless links get a kit — not their accessories, switchers or viewfinders', () => {
@@ -67,4 +93,43 @@ test('the D-Tap cable in a kit ends in the connector that model takes', () => {
   const p = find(/LMD-A180/);
   const st = gearKitStatus(gearKitFor(catalog, p), 1, [{ productId: 'x_gen_dtap_xlr4', qty: 1 }], (id) => catalog.byId(id), p);
   assert.equal(st.find(s => s.key === 'dtap').done, true);
+});
+
+test('big gear gets its kit: head, legs, dolly, slider, Dana Dolly, jib, car mount', () => {
+  const kitOf = (rx) => gearKitFor(catalog, find(rx))?.id;
+  assert.equal(kitOf(/^Video 18 Fluid Head$/), 'head');
+  assert.equal(kitOf(/^Tall Tripod Legs 150mm$/), 'legs');
+  assert.equal(kitOf(/^Classic Dolly$/), 'dolly');
+  assert.equal(kitOf(/^Slider 60cm 150mm Bowl$/), 'slider');
+  assert.equal(kitOf(/^Dana Dolly$/), 'dana');
+  assert.equal(kitOf(/^GF-Tele Jib$/), 'jib');
+  assert.equal(kitOf(/^Hydra Alien Car Mounting System$/), 'car');
+  for (const rx of [/^VCT-14 Tripod Adaptor$/, /^Tripod Spreader/, /^Dolly Wedges Set$/, /^Jib Counterweights Set$/]) assert.equal(kitOf(rx), undefined, String(rx));
+});
+
+test('a head: legs sized to its bowl, and the Sony VCT-14 plate when the camera is a Sony shoulder camcorder', () => {
+  const head = find(/^C20S 100mm Fluid Head$/);
+  const st = (camera) => gearKitStatus(gearKitFor(catalog, head), 1, [], (id) => catalog.byId(id), head, { camera });
+  const legs = st(null).find(s => s.key === 'legs');
+  assert.deepEqual(legs.add, ['x_gen_legs100', 862], 'a 100 mm head gets 100 mm legs only');
+  assert.deepEqual(legs.find, { dept: 'tripods', subcat: 'Tripod Legs' });
+  const v20 = find(/^Video 20 Fluid Head$/);
+  const v20legs = gearKitStatus(gearKitFor(catalog, v20), 1, [], (id) => catalog.byId(id), v20).find(s => s.key === 'legs');
+  assert.ok(![v20legs.add].flat().some(id => /150/.test(catalog.byId(id).name)), 'Sachtler Video 20 is 100 mm: no 150 mm legs');
+  assert.equal(catalog.byId(st(null).find(s => s.key === 'hihat').add).name, 'High Hat with 100mm Bowl');
+  assert.deepEqual(st(find(/PXW-X400/)).find(s => s.key === 'plate').add, 'x_sony_vct14');
+  assert.equal([st(find(/ILME-FX3/)).find(s => s.key === 'plate').add].flat().length, 3);
+});
+
+test('a Ninja asks for AtomX SSDmini media and NP-F batteries, per Atomos', () => {
+  const ninja = find(/^Ninja 5\.2″/);
+  const keys = gearKitStatus(gearKitFor(catalog, ninja), 1, [], (id) => catalog.byId(id), ninja).map(s => s.key);
+  assert.ok(keys.includes('media') && keys.includes('battery'));
+});
+
+test('a monitor on NP-F: batteries by default, a D-Tap cable once switched to V-Lock', () => {
+  const ninja = find(/^Ninja 5.2″/);
+  const keys = (route) => gearKitStatus(gearKitFor(catalog, ninja), 1, [], (id) => catalog.byId(id), ninja, { route }).map(s => s.key);
+  assert.ok(keys().includes('battery') && !keys().includes('dtap'));
+  assert.ok(keys('vlock').includes('dtap') && !keys('vlock').includes('battery'));
 });

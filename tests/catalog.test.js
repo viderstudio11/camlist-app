@@ -159,6 +159,28 @@ test('a supplement can add a department and move products into it by name', () =
   assert.equal(cat.bySubcat(sub('Computers')).length, 2);
 });
 
+test('a move reads the source shelf even when a new department reuses its name, or takes shelf-less items by department', () => {
+  const cat = createCatalog({
+    departments: [{ id: 9, slug: 'accessories', he: 'אביזרים', en: 'Accessories', order: 4, subcategories: [{ id: 246, parent: null, he: 'פולו אלחוטי', en: 'Wireless Follow Focus' }] }],
+    brands: [],
+    products: [
+      { id: 1, name: 'Nucleus-M', brand: 'tilta', dept: 9, subcats: [246] },
+      { id: 2, name: 'BNC Cable', brand: 'utopia', dept: 9, subcats: [] },
+    ],
+  }, [], {
+    departments: [{ slug: 'lenscontrol', he: 'שליטה בעדשה', en: 'Lens Control & Support', after: 'accessories', subcategories: [{ he: 'פולו אלחוטי', en: 'Wireless Follow Focus' }, { he: 'כבלים', en: 'Cables' }] }],
+    moves: [
+      { from: 'Wireless Follow Focus', match: '.', to: 'lenscontrol', subcat: 'Wireless Follow Focus' },
+      { fromDept: 'accessories', match: '^bnc cable$', to: 'lenscontrol', subcat: 'Cables' },
+    ],
+    brands: [], products: [],
+  });
+  const lc = cat.departments.find(d => d.slug === 'lenscontrol');
+  assert.equal(cat.byId(1).dept, lc.id);
+  assert.deepEqual(cat.byId(1).subcats, [lc.subcategories[0].id]);
+  assert.deepEqual(cat.byId(2).subcats, [lc.subcategories[1].id]);
+});
+
 test('expendables: its own department and a basic set that points at real items', async () => {
   const { readFileSync } = await import('node:fs');
   const read = (f) => JSON.parse(readFileSync(new URL(`../data/${f}`, import.meta.url), 'utf8'));

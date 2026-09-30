@@ -1,61 +1,90 @@
 import { esc, icons, toast } from './dom.js';
-import { groupByDept, totalQty } from '../list.js';
-import { buildShareText } from '../export-text.js';
+import { groupByDept } from '../list.js';
+import { buildShareText, displayName, formatDateRange } from '../export-text.js';
 import { exportXlsx } from '../export-xlsx.js';
 import { exportDocx } from '../export-docx.js';
 import { renderPrint } from '../export-print.js';
 
 const opts = { includeNotes: true, includeLinks: false, includeImages: false };
-let docLang = null; // null = follow the UI language
-// Each line gets dir=auto so mixed Hebrew/English lines render the way WhatsApp/mail clients show them.
-const previewHTML = (txt) => txt.split('\n').map(l => `<div dir="auto">${esc(l) || '&nbsp;'}</div>`).join('');
+let docLang = null;   // null = follow the UI language
+let format = 'text';  // text · pdf · xlsx · docx
+const FORMATS = [['text', null], ['pdf', 'PDF'], ['xlsx', 'Excel'], ['docx', 'Word']];
 
+// The share text as WhatsApp shows it: *bold* headings, one line per item, notes indented under it.
+const textPreview = (txt) => txt.split('\n').map(l => {
+  const bold = /^\*(.+)\*$/.exec(l);
+  const cls = bold ? 'tx-h' : l.startsWith('   ') ? 'tx-note' : '';
+  return `<div dir="auto" class="${cls}">${bold ? `<b>${esc(bold[1])}</b>` : esc(l) || '&nbsp;'}</div>`;
+}).join('');
+
+// PDF, Word and Excel share one picture of the document: departments with their counts, quantity first.
+function docPreview(p, groups, t, sheet) {
+  // each detail isolated, the dates left to right, so a Hebrew name beside them never flips them
+  const range = formatDateRange(p.dateFrom, p.dateTo);
+  const meta = [p.productionCo && `<bdi>${esc(p.productionCo)}</bdi>`, p.techManager && `${esc(t('tech_manager'))}: <bdi>${esc(p.techManager)}</bdi>`, range && `<bdi dir="ltr">${esc(range)}</bdi>`].filter(Boolean);
+  const rows = groups.map(g => {
+    const items = g.entries.map(({ item, product }) => `
+      <div class="dp-row"><b>${item.qty}×</b><span dir="auto">${esc(displayName(product))}${opts.includeNotes && item.note ? `<small dir="auto">${esc(item.note)}</small>` : ''}</span></div>`).join('');
+    return `<div class="dp-dept"><span>${esc(t(`dept_${g.key}`))}</span></div>${items}`;
+  }).join('');
+  return `<div class="docprev ${sheet ? 'sheet' : ''}">
+    ${sheet ? '' : '<div class="dp-stripe"></div>'}
+    <div class="dp-title" dir="auto">${esc(p.name || t('untitled'))}</div>
+    ${meta.length ? `<div class="dp-meta">${meta.join('  ·  ')}</div>` : ''}
+    ${rows}
+    <div class="dp-foot">CamList</div>
+  </div>`;
+}
+
+// Pick a format, see that format, one action. The options sit folded underneath.
 export function render(ctx, { id, print }, root) {
-  const { store, t } = ctx;
+  const { store } = ctx;
   const p = store.getProject(id);
   const groups = groupByDept(p.items, ctx.resolve, ctx.deptOrder());
   if (print) return renderPrint(ctx, p, groups, root, { ...opts, lang: docLang || ctx.lang() });
-  ctx.setTopbar({ title: esc(t('export')), back: `#/p/${id}` });
+  const T = ctx.t;                                  // the controls speak the screen's language
+  ctx.setTopbar({ title: esc(T('export')), back: `#/p/${id}` });
   const lang = () => docLang || ctx.lang();
+  const t = (k, prm) => ctx.t(k, prm, lang());      // the preview speaks the document's
   const text = () => buildShareText(p, groups, { lang: lang(), ...opts });
+  const ACTION = { text: T('share'), pdf: T('save_pdf'), xlsx: T('download_xlsx'), docx: T('download_docx') };
+  const HINT = { text: T('fmt_text_hint'), pdf: T('fmt_pdf_hint'), xlsx: T('fmt_xlsx_hint'), docx: T('fmt_docx_hint') };
+  const optLine = [lang() === 'he' ? 'עברית' : 'English', opts.includeNotes && T('include_notes'), opts.includeLinks && T('include_links'), opts.includeImages && T('include_images')].filter(Boolean).join(' · ');
+
   root.innerHTML = `
-    <div class="section-title">${t('preview')} <span class="count">${totalQty(p.items)}</span></div>
-    <div class="preview" data-preview>${previewHTML(text())}</div>
-    <div class="card" style="margin-top:12px;padding:12px 16px 4px">
-      <div class="doclang"><span>${t('doc_lang')}</span><div class="seg">
+    <div class="card sh-sec ex-formats">
+      <div class="chips">${FORMATS.map(([k, l]) => `<button class="chip pick ${format === k ? 'on' : ''}" data-fmt="${k}">${esc(l || T('fmt_text'))}</button>`).join('')}</div>
+      <p class="tnote">${esc(HINT[format])}</p>
+    </div>
+    <div class="ex-preview" dir="${lang() === 'he' ? 'rtl' : 'ltr'}">${format === 'text' ? `<div class="preview tx">${textPreview(text())}</div>` : docPreview(p, groups, t, format === 'xlsx')}</div>
+    <button class="btn primary block ex-go" data-go>${format === 'text' ? icons.share : icons.check}${esc(ACTION[format])}</button>
+    <details class="card ex-opts">
+      <summary>${esc(T('ex_options'))} <span>${esc(optLine)}</span></summary>
+      <div class="doclang"><span>${T('doc_lang')}</span><div class="seg">
         <button class="${lang() === 'he' ? 'active' : ''}" data-doclang="he">עברית</button>
         <button class="${lang() === 'en' ? 'active' : ''}" data-doclang="en">English</button>
       </div></div>
-      <label class="switch"><span>${t('include_notes')}</span><input type="checkbox" data-opt="includeNotes" ${opts.includeNotes ? 'checked' : ''}></label>
-      <label class="switch"><span>${t('include_links')}</span><input type="checkbox" data-opt="includeLinks" ${opts.includeLinks ? 'checked' : ''}></label>
-      <label class="switch" style="border:0"><span>${t('include_images')}</span><input type="checkbox" data-opt="includeImages" ${opts.includeImages ? 'checked' : ''}></label>
-    </div>
-    <div class="export-grid">
-      <button class="btn primary" data-share>${icons.share}${t('share')}<small>WhatsApp · Mail</small></button>
-      <button class="btn" data-xlsx>📊 ${t('excel')}<small>.xlsx</small></button>
-      <button class="btn" data-docx>📝 ${t('word')}<small>.docx</small></button>
-      <button class="btn" data-pdf>🖨️ ${t('pdf')}<small>${t('pdf_hint')}</small></button>
-    </div>`;
-  root.querySelectorAll('[data-opt]').forEach(c => { c.onchange = () => { opts[c.dataset.opt] = c.checked; root.querySelector('[data-preview]').innerHTML = previewHTML(text()); }; });
-  root.querySelectorAll('[data-doclang]').forEach(b => { b.onclick = () => { docLang = b.dataset.doclang; render(ctx, { id }, root); }; });
-  const copy = async (txt) => { await navigator.clipboard.writeText(txt); toast(t('copied'), { kind: 'ok' }); };
-  root.querySelector('[data-share]').onclick = async () => {
+      <label class="switch"><span>${T('include_notes')}</span><input type="checkbox" data-opt="includeNotes" ${opts.includeNotes ? 'checked' : ''}></label>
+      <label class="switch"><span>${T('include_links')}</span><input type="checkbox" data-opt="includeLinks" ${opts.includeLinks ? 'checked' : ''}></label>
+      <label class="switch" style="border:0"><span>${T('include_images')}</span><input type="checkbox" data-opt="includeImages" ${opts.includeImages ? 'checked' : ''}></label>
+    </details>`;
+
+  const again = (keepOpen) => { render(ctx, { id }, root); if (keepOpen) root.querySelector('.ex-opts').open = true; };
+  root.querySelectorAll('[data-fmt]').forEach(b => { b.onclick = () => { format = b.dataset.fmt; again(); }; });
+  root.querySelectorAll('[data-opt]').forEach(c => { c.onchange = () => { opts[c.dataset.opt] = c.checked; again(true); }; });
+  root.querySelectorAll('[data-doclang]').forEach(b => { b.onclick = () => { docLang = b.dataset.doclang; again(true); }; });
+  const copy = async (txt) => { await navigator.clipboard.writeText(txt); toast(T('copied'), { kind: 'ok' }); };
+  const share = async () => {
     const txt = text();
-    try {
-      if (navigator.share) await navigator.share({ title: p.name, text: txt });
-      else await copy(txt);
-    } catch (e) {
-      if (e?.name === 'AbortError') return;
-      try { await copy(txt); } catch { toast(t('export_failed'), { kind: 'err' }); }
-    }
+    try { if (navigator.share) await navigator.share({ title: p.name, text: txt }); else await copy(txt); }
+    catch (err) { if (err?.name === 'AbortError') return; try { await copy(txt); } catch { toast(T('export_failed'), { kind: 'err' }); } }
   };
-  const run = (fn) => async (e) => {
-    const btn = e.currentTarget; btn.disabled = true;
-    try { await fn(p, groups, { lang: lang(), ...opts, t: (k, prm) => t(k, prm, lang()) }); }
-    catch (err) { console.error(err); toast(t('export_failed'), { kind: 'err' }); }
+  const file = (fn) => async (btn) => {
+    btn.disabled = true;
+    try { await fn(p, groups, { lang: lang(), ...opts, t }); }
+    catch (err) { console.error(err); toast(T('export_failed'), { kind: 'err' }); }
     finally { btn.disabled = false; }
   };
-  root.querySelector('[data-xlsx]').onclick = run(exportXlsx);
-  root.querySelector('[data-docx]').onclick = run(exportDocx);
-  root.querySelector('[data-pdf]').onclick = () => ctx.navigate(`#/p/${id}/print`);
+  const go = { text: share, pdf: () => ctx.navigate(`#/p/${id}/print`), xlsx: file(exportXlsx), docx: file(exportDocx) };
+  root.querySelector('[data-go]').onclick = (e) => go[format](e.currentTarget);
 }

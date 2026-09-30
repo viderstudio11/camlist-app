@@ -18,9 +18,10 @@ export function companionsFor(product, catalog, { items = [], resolve = () => nu
   const cable = (rx) => add(byName(catalog, rx));
   const bnc = /^bnc cable$/i, hdmi = /^hdmi cable$/i, usbc = /^usb-c to usb-c cable$/i;
 
-  if (dept === 'video' && (subs.includes('Wireless Video') || /bolt|cosmo|mars|pyro|wireless/i.test(name))) {
+  const isVideo = dept === 'video' || dept === 'monitors';   // Monitors split off Video; older catalogs keep them there
+  if (isVideo && (subs.includes('Wireless Video') || /bolt|cosmo|mars|pyro|wireless/i.test(name))) {
     cable(bnc); cable(hdmi);
-  } else if (dept === 'video' && !subs.includes('Recorders & Media') && /monitor|lcd|oled|\blmd\b|\bpvm\b|\bbvm\b|smallhd|cine \d|ultra \d|indie|vision/i.test(name)) {
+  } else if (isVideo && !subs.some(x => ['Recorders & Media', 'Viewfinders & EVF', 'Monitor Accessories'].includes(x)) && /monitor|lcd|oled|\blmd\b|\bpvm\b|\bbvm\b|smallhd|cine \d|ultra \d|indie|vision/i.test(name)) {
     const size = inches(name);
     if (size == null || size >= 13) add(byName(catalog, /^monitor stand$/i));
     else add(byName(catalog, /^ut arm$/i));

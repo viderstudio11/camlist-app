@@ -13,6 +13,7 @@ const HOUSE_BRANDS = new Set(['utopia']);
 const brandOf = (b) => (!b || HOUSE_BRANDS.has(b) ? GENERAL : b);
 export function createCatalog(data, manual = [], extra = null) {
   const departments = (data.departments || []).map(d => ({ ...d })).sort((a, b) => a.order - b.order);
+  const sourceDepts = departments.slice();   // moves name the source's shelves, never the supplement's namesakes
   // The supplement can add departments of its own (numeric ids, like the source's, so the screens treat
   // them the same) and slot each one in after a named department.
   (extra?.departments || []).forEach((x, i) => {
@@ -45,15 +46,18 @@ export function createCatalog(data, manual = [], extra = null) {
   brandNames.set(GENERAL, 'General');
   for (const b of extra?.brands || []) brandNames.set(b.id, b.name); // supplement's display names win
   // Moves re-file source products by name — e.g. cards and readers out of Video into Media & Offload.
-  const subByName = (en) => departments.flatMap(d => d.subcategories.map(sc => ({ ...sc, dept: d.id }))).find(sc => sc.en === en || sc.he === en);
+  const subByName = (en) => sourceDepts.flatMap(d => d.subcategories.map(sc => ({ ...sc, dept: d.id }))).find(sc => sc.en === en || sc.he === en);
+  // A move names the shelf it takes from, or (fromDept) a department whose items sit on no shelf at all.
   const moves = (extra?.moves || []).map(m => {
-    const from = subByName(m.from);
+    const from = m.from ? subByName(m.from) : null;
+    const fromDept = m.fromDept ? sourceDepts.find(d => d.slug === m.fromDept) : null;
     const dept = departments.find(d => d.slug === m.to);
     const to = dept?.subcategories.find(sc => sc.en === m.subcat);
-    return from && dept ? { from: from.id, rx: new RegExp(m.match, 'i'), dept: dept.id, subcats: to ? [to.id] : [] } : null;
+    return (from || fromDept) && dept ? { from: from?.id ?? null, fromDept: fromDept?.id ?? null, rx: new RegExp(m.match, 'i'), dept: dept.id, subcats: to ? [to.id] : [] } : null;
   }).filter(Boolean);
+  const takes = (x, p) => (x.from != null ? (p.subcats || []).includes(x.from) : p.dept === x.fromDept && !(p.subcats || []).length);
   const moved = (p) => {
-    const m = moves.find(x => (p.subcats || []).includes(x.from) && x.rx.test(p.name));
+    const m = moves.find(x => takes(x, p) && x.rx.test(p.name));
     return m ? { ...p, dept: m.dept, subcats: m.subcats } : p;
   };
   const extraProducts = (extra?.products || []).map(x => {
@@ -69,7 +73,7 @@ export function createCatalog(data, manual = [], extra = null) {
   const decorate = (p, isManual) => ({
     id: p.id, name: p.name, brand: brandOf(p.brand),
     brandName: brandOf(p.brand) === GENERAL ? 'General' : p.brandName || brandNames.get(p.brand) || p.brand,
-    dept: p.dept, subcats: p.subcats || [], image: p.image || null, url: p.url || null, manual: !!isManual, extra: !!p.extra,
+    dept: p.dept, subcats: p.subcats || [], image: p.image || extra?.images?.[p.id]?.image || null, url: p.url || null, manual: !!isManual, extra: !!p.extra,
     _n: '', _b: '', _all: '',
   });
   const indexOf = (p) => {
@@ -124,7 +128,8 @@ export function createCatalog(data, manual = [], extra = null) {
     byDept: (deptId) => all().filter(p => p.dept === deptId),
     bySubcat: (id) => { const ids = withDescendants(id); return all().filter(p => p.subcats.some(x => ids.has(x))); },
     byBrand: (slug) => all().filter(p => p.brand === slug),
-    subcatsOf: (deptId) => (deptMap.get(deptId)?.subcategories || []).filter(s => s.parent === null),
+    // a shelf whose items all moved elsewhere (Monitors, Follow Focus…) is not shown
+    subcatsOf: (deptId) => (deptMap.get(deptId)?.subcategories || []).filter(s => s.parent === null && (() => { const ids = withDescendants(s.id); return all().some(p => p.subcats.some(x => ids.has(x))); })()),
     deptById: (id) => deptMap.get(id),
     deptKey: (id) => deptMap.get(id)?.slug || 'other',
     brandName: (slug) => brandNames.get(slug) || slug,

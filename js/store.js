@@ -47,7 +47,6 @@ export function createStore(storage = localStorageAdapter()) {
     },
     setItems(id, items) { const p = project(id); if (!p) return; p.items = items; touch(p); emit(); },
     setBuildCamera(id, productId) { const p = project(id); if (!p) return; p.buildCameraId = productId ?? null; touch(p); emit(); },
-    setPacked(id, productId, qty) { const p = project(id); if (!p) return; p.packed = p.packed || {}; if (qty > 0) p.packed[productId] = qty; else delete p.packed[productId]; touch(p); emit(); },
     setShoot(id, patch) { const p = project(id); if (!p) return; Object.assign(p, patch); touch(p); emit(); },
 
     // Versions are snapshots of the list, kept so a change can be undone days later.
