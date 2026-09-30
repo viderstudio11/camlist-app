@@ -8,7 +8,7 @@
 :root {
   --bg: #F4F3EF; --surface: #FFFFFF; --surface-2: #ECEAE4; --surface-3: #E1DED6;
   --line: #DAD7CF; --line-2: #C9C5BB;
-  --text: #16171A; --text-2: #55575D; --text-3: #85878D;
+  --text: #16171A; --text-2: #55575D; --text-3: #64666C;
   --accent: #E88A00; --accent-ink: #9A4E00; --on-accent: #16171A; --accent-soft: #FFF1D9;
   --ok: #1F9D55; --warn: #D9A300; --no: #D6332A; --unk: #A3A5AB;
   --ok-ink: #12703F; --warn-ink: #8A5A00; --no-ink: #B3261E;
@@ -39,7 +39,7 @@
 :root[data-theme="dark"] {
   --bg: #0F1012; --surface: #17181B; --surface-2: #1F2024; --surface-3: #292B30;
   --line: #2A2C31; --line-2: #383A40;
-  --text: #EDEDEE; --text-2: #A6A8AE; --text-3: #6E7077;
+  --text: #EDEDEE; --text-2: #A6A8AE; --text-3: #8A8C93;
   --accent: #FFB020; --accent-ink: #FFC45C; --on-accent: #111111; --accent-soft: #2A2112;
   --ok: #3DDC97; --warn: #FBBF24; --no: #FF6B5E;
   --ok-ink: #3DDC97; --warn-ink: #FBBF24; --no-ink: #FF8A7F;
@@ -97,10 +97,10 @@ img { display: block; }
 /* Topbar */
 .topbar { position: sticky; top: calc(var(--sat) + 8px); z-index: 20; margin: calc(var(--sat) + 8px) auto 0; width: calc(100% - 20px); max-width: 760px; padding: 8px 10px; background: var(--glass); backdrop-filter: blur(20px) saturate(150%); -webkit-backdrop-filter: blur(20px) saturate(150%); border: var(--stroke) solid var(--border-2); border-radius: 20px; box-shadow: var(--shadow); display: flex; align-items: center; gap: 8px; min-height: 58px; }
 .topbar .title { font-weight: 800; font-size: 17px; flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; letter-spacing: -.01em; }
-.topbar .title small { display: block; font-weight: 500; font-size: 12px; color: var(--muted); }
+.topbar .title small { display: block; font-weight: 500; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .brandmark { font-weight: 900; letter-spacing: .06em; font-size: 16px; }
 .brandmark b { color: var(--accent); }
-.iconbtn { width: 42px; height: 42px; border-radius: 13px; display: grid; place-items: center; color: var(--text); background: var(--tint); border: var(--stroke) solid var(--hair); font-weight: 800; font-size: 13px; flex: 0 0 auto; transition: transform .5s var(--spring), background .3s; }
+.iconbtn { width: 44px; height: 44px; border-radius: 13px; display: grid; place-items: center; color: var(--text); background: var(--tint); border: var(--stroke) solid var(--hair); font-weight: 800; font-size: 13px; flex: 0 0 auto; transition: transform .5s var(--spring), background .3s; }
 .iconbtn:hover { background: var(--tint-2); }
 .iconbtn:active { transform: scale(.94); }
 .iconbtn svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
@@ -1010,3 +1010,9 @@ body.split .view { max-width: none; padding: 12px 16px 0; }
 .assign-row select { max-width: 100%; }
 .preview.tx .tx-note { padding-inline-start: 16px; }
 .preview.tx .tx-note.deep { padding-inline-start: 32px; }
+
+/* ---------- Accessibility (WCAG 2.1 AA audit, v2.5.1) ----------
+   A visible focus ring for keyboard and switch access; small controls keep their look but get a 44px hit area. */
+:focus-visible { outline: 2px solid var(--accent-ink); outline-offset: 2px; border-radius: 6px; }
+.langpill, .crumbs button, .linkbtn { position: relative; }
+.langpill::after, .crumbs button::after, .linkbtn::after { content: ''; position: absolute; inset: 50% auto auto 50%; width: max(100%, 44px); height: 44px; transform: translate(-50%, -50%); }

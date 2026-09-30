@@ -35,7 +35,7 @@ export function render(ctx, { id }, root) {
   const { store, t, compat } = ctx;
   const p = store.getProject(id);
   ctx.setTopbar({
-    title: `${esc(p.name || t('untitled'))}<small>${[p.techManager, formatDateRange(p.dateFrom, p.dateTo)].filter(Boolean).map(bidi).join(' · ')}</small>`,
+    title: `${esc(p.name || t('untitled'))}<small>${[formatDateRange(p.dateFrom, p.dateTo)].filter(Boolean).map(bidi).join(' · ')}</small>`,
     back: '#/',
     right: [
       { icon: icons.edit, label: t('rename'), onClick: () => editProjectSheet(ctx, id) },
@@ -138,7 +138,7 @@ export function render(ctx, { id }, root) {
   if (kitHTML) sections.splice(camAt + 1, 0, kitHTML);
   // Accessories added before the list remembered their item: offer to place them under it.
   const proposals = proposeParents(p, ctx.catalog, ctx.resolve, { dismissed: p.accDismissed || [] });
-  const assignHTML = proposals.length ? `<section class="card assign-card"><div><b>${esc(t('assign_title', { n: proposals.length }))}</b><p>${esc(t('assign_hint'))}</p></div>
+  const assignHTML = proposals.length ? `<section class="card assign-card"><div><b>${esc(proposals.length === 1 ? t('assign_title_one') : t('assign_title', { n: proposals.length }))}</b><p>${esc(t('assign_hint'))}</p></div>
     <div class="assign-acts"><button class="btn sm primary" data-assign>${t('assign_review')}</button><button class="btn sm ghost" data-assign-later>${t('assign_later')}</button></div></section>` : '';
   root.innerHTML = headHTML + assignHTML + (groups.length ? sections.join('') : listHTML);
   if (showKit) { showKit = false; root.querySelector('.kit')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }

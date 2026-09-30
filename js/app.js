@@ -47,7 +47,7 @@ const ctx = {
   resolve: (id) => catalog.byId(id),
   setTopbar({ title = '', back = null, right = [] }) {
     const bar = document.getElementById('topbar');
-    bar.innerHTML = `${back ? `<button class="iconbtn mirror" data-back aria-label="back">${icons.back}</button>` : ''}<div class="title" dir="auto">${title}</div>${right.map((r, i) => `<button class="iconbtn" data-r="${i}" aria-label="${esc(r.label || '')}">${r.icon || esc(r.text ?? '')}</button>`).join('')}<button class="iconbtn" data-theme-btn aria-label="${esc(t('theme'))}" title="${esc(t('theme'))}">${{ light: icons.sun, sun: icons.sunFill, dark: icons.moon }[ctx.theme()] || icons.sun}</button><button class="langpill" data-lang aria-label="language">${t('lang_switch')}</button>`;
+    bar.innerHTML = `${back ? `<button class="iconbtn mirror" data-back aria-label="${esc(t('back'))}">${icons.back}</button>` : ''}<div class="title" dir="auto">${title}</div>${right.map((r, i) => `<button class="iconbtn" data-r="${i}" aria-label="${esc(r.label || '')}">${r.icon || esc(r.text ?? '')}</button>`).join('')}<button class="iconbtn" data-theme-btn aria-label="${esc(t('theme'))}" title="${esc(t('theme'))}">${{ light: icons.sun, sun: icons.sunFill, dark: icons.moon }[ctx.theme()] || icons.sun}</button><button class="langpill" data-lang aria-label="${esc(t('language'))}">${t('lang_switch')}</button>`;
     bar.querySelector('[data-lang]').onclick = () => ctx.setLang(getLang() === 'he' ? 'en' : 'he');
     bar.querySelector('[data-theme-btn]').onclick = () => ctx.toggleTheme();
     if (back) bar.querySelector('[data-back]').onclick = () => (typeof back === 'string' ? ctx.navigate(back) : back());
@@ -232,6 +232,15 @@ window.addEventListener('hashchange', render);
 // An app, not a web page: a long press opens no browser menu ("copy", "search with Google", Google Lens
 // on a product photo). Android Chrome ignores -webkit-touch-callout, so the menu is stopped here —
 // except in fields and the export preview, where copying is the point.
+// Cards that open something (departments, shelves, brands, accessory shelves) are <div>s: give them the
+// button role and a tab stop after every render, and let Enter / Space press them.
+const CLICKABLE = 'div[data-dept], div[data-sub], div[data-brand], div[data-af], div[data-tool], article[data-id]';
+new MutationObserver(() => {
+  for (const el of document.querySelectorAll(CLICKABLE)) if (!el.hasAttribute('role')) { el.setAttribute('role', 'button'); el.tabIndex = 0; }
+}).observe(document.body, { childList: true, subtree: true });
+document.addEventListener('keydown', (e) => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.matches?.('[role="button"][tabindex="0"]')) { e.preventDefault(); e.target.click(); }
+});
 document.addEventListener('contextmenu', (e) => {
   if (!e.target.closest?.('input, textarea, [contenteditable], .preview, .print')) e.preventDefault();
 });
