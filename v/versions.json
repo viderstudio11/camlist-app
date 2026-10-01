@@ -1,5 +1,10 @@
 [
  {
+  "version": "v2.7.0",
+  "date": "2026-10-01",
+  "label": "Lens choice: full-screen live viewfinder with a focal strip; simpler page"
+ },
+ {
   "version": "v2.6.0",
   "date": "2026-09-30",
   "label": "UX: three-to-a-row departments, named home strip, compatible-only switch, haptic add"
