@@ -7,6 +7,7 @@ import { sunDay, sunStatus, zoneOf, localTime, todayIn } from '../tools/solar.js
 import { offload, transfer, READERS, DRIVES, PORTS, UNIT_GROUPS, convert, cToF, fToC, mahToWh, whToMah, hoursReport, ndFrom, flightCheck } from '../tools/convert.js';
 import { num, hm } from '../format.js';
 import { activeProject } from '../home.js';
+import { feel } from '../feel.js';
 import { openViewfinder, closeViewfinder, rulerStops } from './viewfinder.js';
 
 // Tool labels live here rather than in the global dictionary: they are only ever used on this screen,
@@ -103,6 +104,13 @@ const L = {
   viewfinder: { he: 'ויופיינדר חי', en: 'Live viewfinder' },
   vf_start: { he: 'פתח את מצלמת הטלפון', en: 'Open the phone camera' },
   vf_ruler: { he: 'בחירת מוקד', en: 'Focal length' },
+  sensor_format: { he: 'פורמט חיישן', en: 'Sensor format' },
+  fmt_all: { he: 'הכל', en: 'All' },
+  fmt_FF: { he: 'פול־פריים', en: 'Full frame' },
+  fmt_S35: { he: 'Super 35', en: 'Super 35' },
+  fmt_MFT: { he: 'MFT', en: 'MFT' },
+  frame_at: { he: '{mm} מ״מ מ־{d} {u}: פריים {w} × {h} {u}', en: '{mm} mm from {d} {u}: frame {w} × {h} {u}' },
+  vf_at: { he: 'מ־{d} {u}: {w} × {h} {u}', en: 'At {d} {u}: {w} × {h} {u}' },
   lens_now: { he: 'עדשה', en: 'Lens' },
   lens_wider: { he: 'עדשה רחבה יותר', en: 'Wider lens' },
   lens_longer: { he: 'עדשה ארוכה יותר', en: 'Longer lens' },
@@ -243,7 +251,7 @@ export const setPlaces = (data) => { placeData = data || placeData; };
 // Everything the user typed, kept while the app is open so switching tools does not reset the work.
 const S = {
   media: { brand: 'Sony', cam: 'fx6', fmt: '', fps: 25, mtype: '', card: 0, cardPicked: false, customCard: false, backup: false, hours: 10, customHours: false },
-  fov: { distance: 4, unit: 'm', shot: 'waist', focal: 0, cam: '', camBrand: '', picking: false, fromProject: false, calcOpen: false },
+  fov: { distance: 4, unit: 'm', shot: 'waist', focal: 0, cam: '', camBrand: '', fmt: '', picking: false, fromProject: false, calcOpen: false },
   shutter: { fps: 25, mode: 'speed', speed: 50, angle: 180, mains: 50, projectFps: 25, customFps: false },
   offload: { gb: 1000, reader: 'CFexpress A', drive: 'ssd10', copies: 2, verify: true, customGb: false, fromMedia: false, readOther: false, readMBs: 800, writeOther: false, writeMBs: 1000, readers: 1, port: 'tb', cardGb: 0 },
   sun: { country: 'IL', city: 0, date: new Date().toISOString().slice(0, 10), dateMode: 'today', lat: null, lon: null },
@@ -255,7 +263,7 @@ const S = {
 // The lens tool remembers its camera and last lens on this phone, so opening it again picks up where
 // the user left off. Kept in this browser only; losing it just means starting from the project's camera.
 const FOV_KEY = 'camlist.fov';
-const FOV_KEEP = ['cam', 'camBrand', 'focal', 'distance', 'unit', 'shot'];
+const FOV_KEEP = ['cam', 'camBrand', 'fmt', 'focal', 'distance', 'unit', 'shot'];
 try {
   const kept = JSON.parse(localStorage.getItem(FOV_KEY) || '{}');
   for (const k of FOV_KEEP) if (kept[k] != null) S.fov[k] = kept[k];
@@ -456,9 +464,13 @@ function fovTool(T, lang, ctx) {
     .map(p => { const product = ctx.catalog.byId(p.id); return { prof: product ? ctx.compat.profileFor(product) : null, product }; })
     .filter(x => x.product && x.prof)
     .sort((a, b) => (a.product.brandName || '').localeCompare(b.product.brandName || '') || a.product.name.localeCompare(b.product.name));
-  const brands = [...new Map(cams.map(c => [c.product.brand, c.product.brandName || c.product.brand])).entries()];
+  const FORMATS = ['FF', 'S35', 'MFT'].filter(k => cams.some(c => c.prof.format === k));
+  if (s.fmt && !FORMATS.includes(s.fmt)) s.fmt = '';
+  const inFmt = s.fmt ? cams.filter(c => c.prof.format === s.fmt) : cams;
+  const brands = [...new Map(inFmt.map(c => [c.product.brand, c.product.brandName || c.product.brand])).entries()];
+  if (s.camBrand && !brands.some(([b]) => b === s.camBrand) && s.picking) s.camBrand = '';
   if (!s.camBrand && brands.length === 1) s.camBrand = brands[0][0];
-  const models = cams.filter(c => c.product.brand === s.camBrand);
+  const models = inFmt.filter(c => c.product.brand === s.camBrand);
   if (!s.cam && !s.picking) {
     const p = activeProject(ctx.store.state.projects || []);
     const pc = p && cams.find(c => String(c.product.id) === String(p.buildCameraId));
@@ -476,10 +488,12 @@ function fovTool(T, lang, ctx) {
         <button class="btn sm" data-cchange>${esc(T('change'))}</button></div>
       </div>`
     : `<div class="card sh-sec" data-part="cam">
-        <div class="tsub">1 · ${esc(T('maker'))}</div>
+        <div class="tsub">1 · ${esc(T('sensor_format'))}</div>
+        <div class="chips">${chip('data-cfmt', '', esc(T('fmt_all')), !s.fmt)}${FORMATS.map(k => chip('data-cfmt', k, `${esc(T('fmt_' + k))} <i class="n">${cams.filter(c => c.prof.format === k).length}</i>`, s.fmt === k)).join('')}</div>
+        <div class="tsub" style="margin-top:12px">2 · ${esc(T('maker'))}</div>
         <div class="chips">${brands.map(([slug, n]) => chip('data-cbrand', slug, esc(n), slug === s.camBrand)).join('')}</div>
         <div class="fov-models-box">
-          <div class="tsub">2 · ${esc(s.camBrand ? Tp('model_of', { brand: (brands.find(([b]) => b === s.camBrand) || [])[1] || '' }) : T('pick_maker_first'))}</div>
+          <div class="tsub">3 · ${esc(s.camBrand ? Tp('model_of', { brand: (brands.find(([b]) => b === s.camBrand) || [])[1] || '' }) : T('pick_maker_first'))}</div>
           ${models.length ? `<div class="model-list">${models.map(c => `<button class="model-row ${cam && c.prof.id === cam.prof.id ? 'on' : ''}" data-cmodel="${esc(c.prof.id)}"><b>${esc(c.product.name)}</b><small>${esc(`${c.prof.sensor.w}×${c.prof.sensor.h} mm`)}</small></button>`).join('')}</div>` : ''}
         </div>
         <p class="tnote">${esc(T('verified_only'))}</p>
@@ -610,13 +624,20 @@ function fovTool(T, lang, ctx) {
     <p class="tnote">${esc(Tp('vf_hint', { cam: cam.product.name }))}</p>
   </div>
 `;
+  const frameAtLine = (mm) => { const z = frameAt(sn, mm, s.distance); return Tp('frame_at', { mm, d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); };
+  const distRow = `<div class="card fov-distrow" data-part="distrow">
+    <label class="fov-distin"><span class="tsub">${esc(T('distance_step'))}</span>
+      <input type="number" data-fdist2 value="${esc(dist(s.distance))}" min="0.2" max="600" step="0.1" inputmode="decimal" aria-label="${esc(T('distance_step'))}"></label>
+    <div class="seg sh-mode"><button class="${unit === 'm' ? 'active' : ''}" data-unit="m">${esc(T('meters'))}</button><button class="${unit === 'ft' ? 'active' : ''}" data-unit="ft">${esc(T('feet'))}</button></div>
+    <p class="fov-frameline">${esc(frameAtLine(shown))}</p>
+  </div>`;
   const cta = `<div class="fov-cta-space"></div><div class="bottombar fabbar"><button class="btn fab fov-cta" data-vf-start>${toolIcon('fov')}${esc(T('vf_start'))}</button></div>`;
 
-  fovView = { cam: { name: cam.product.name, w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown };
+  fovView = { cam: { name: cam.product.name, w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown, frameLine: (mm) => { const z = frameAt(sn, mm, s.distance); return Tp('vf_at', { d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); } };
   keepFov();
 
   // The page is the camera and the viewfinder; the calculation from a distance waits folded.
-  return `${pickCard}${viewfinder}<details class="card fov-calc" ${s.calcOpen ? 'open' : ''} data-calc><summary>${esc(T('calc_by_distance'))}</summary>${distCard}${answer}</details>${cta}`;
+  return `${pickCard}${viewfinder}${distRow}<details class="card fov-calc" ${s.calcOpen ? 'open' : ''} data-calc><summary>${esc(T('calc_by_distance'))}</summary>${distCard}${answer}</details>${cta}`;
 }
 
 // ---------- shutter ----------
@@ -1129,9 +1150,13 @@ function wire(root, ctx, id, T, lang) {
   root.querySelectorAll('[data-fstep]').forEach(b => { b.onclick = () => {
     const stops = fovView?.stops; if (!stops) return;
     const i = stops.findIndex(x => x.mm === fovView.focal) + Number(b.dataset.fstep);
-    if (i < 0 || i >= stops.length) return;
-    S.fov.focal = stops[i].mm; navigator.vibrate?.(8); ctx.render();
+    if (i < 0 || i >= stops.length) { feel.end(); return; }
+    S.fov.focal = stops[i].mm; feel.detent(); ctx.render();
   }; });
+  root.querySelectorAll('[data-cfmt]').forEach(b => { b.onclick = () => { S.fov.fmt = b.dataset.cfmt; S.fov.picking = true; ctx.render(); }; });
+  // the page's distance changes the frame, not the lens
+  const fd2 = root.querySelector('[data-fdist2]');
+  if (fd2) fd2.onchange = () => { const v = Number(fd2.value); if (v > 0) S.fov.distance = fromUnit(v, S.fov.unit); ctx.render(); };
   root.querySelector('[data-cchange]')?.addEventListener('click', () => { S.fov.picking = true; ctx.render(); });
 
   root.querySelectorAll('[data-scity]').forEach(b => { b.onclick = () => { Object.assign(S.sun, { city: Number(b.dataset.scity), lat: null, lon: null }); redraw(); }; });

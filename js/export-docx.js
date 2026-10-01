@@ -78,19 +78,38 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
   const rowBorders = { top: none, left: none, right: none, bottom: hair };
   const headBorders = { top: none, left: none, right: none, bottom: { style: D.BorderStyle.SINGLE, size: 8, color: '111111' } };
 
-  const children = [
-    P(project.name || t('untitled'), { size: 40, bold: true }),
-    ...(project.productionCo ? [P(project.productionCo, { size: 24, color: '444444' })] : []),
-  ];
   // Dates, phone and mail are left-to-right islands (LRM on each side, and around the dash of a range):
   // without them a date range inside a Hebrew line came out reversed, 05.10–01.10.
   const ltr = (s) => (s ? `‎${String(s).replace(/–/g, '‎–‎')}‎` : '');
-  const meta = [project.techManager ? `${t('tech_manager')}: ${project.techManager}` : '', ltr(formatDateRange(project.dateFrom, project.dateTo))].filter(Boolean).join('   ·   ');
-  if (meta) children.push(P(meta, { color: '555555' }));
   const contact = [project.phone, project.email].filter(Boolean).map(ltr).join('   ·   ');
-  if (contact) children.push(P(contact, { color: '777777', size: 20 }));
-  if (project.notes) children.push(P(project.notes, { color: '555555' }));
-  children.push(P('', { spacing: { after: 120 } }));
+
+  // The slate: a row of black and white clapper sticks, then the board — the production's name across,
+  // and the boxes a clapperboard carries, two to a row.
+  const ink = { style: D.BorderStyle.SINGLE, size: 12, color: '111111' };
+  const box = { top: ink, bottom: ink, left: ink, right: ink };
+  const STICKS = 12, stickW = Math.floor(USABLE / STICKS), half = Math.floor(USABLE / 2);
+  const label = (s) => P(String(s).toUpperCase(), { size: 15, color: '777777', spacing: { after: 20 } });
+  const slateBoxes = [
+    [t('production_co'), project.productionCo],
+    [t('dates'), ltr(formatDateRange(project.dateFrom, project.dateTo))],
+    [t('tech_manager'), project.techManager],
+    [t('contact'), contact],
+  ].filter(([, v]) => v);
+  const slateRows = [
+    new D.TableRow({ height: { value: 260, rule: D.HeightRule.EXACT }, children: Array.from({ length: STICKS }, (_, i) =>
+      cell([P('', { size: 2, spacing: { after: 0 } })], { w: stickW, shade: i % 2 ? 'FFFFFF' : '111111', borders: box })) }),
+    new D.TableRow({ children: [cell([label(t('project_name')), P(project.name || t('untitled'), { size: 40, bold: true, spacing: { after: 40 } })], { w: stickW * STICKS, span: STICKS, borders: box })] }),
+  ];
+  for (let i = 0; i < slateBoxes.length; i += 2) {
+    const pair = slateBoxes.slice(i, i + 2);
+    slateRows.push(new D.TableRow({ cantSplit: true, children: pair.map(([k, v], j) => cell([label(k), P(v, { size: 22, bold: true, spacing: { after: 20 } })],
+      { w: pair.length === 1 ? stickW * STICKS : (j ? stickW * STICKS - half : half), span: pair.length === 1 ? STICKS : STICKS / 2, borders: box })) }));
+  }
+  const children = [
+    new D.Table({ width: { size: stickW * STICKS, type: D.WidthType.DXA }, columnWidths: Array(STICKS).fill(stickW), layout: D.TableLayoutType.FIXED, visuallyRightToLeft: rtl, rows: slateRows }),
+  ];
+  if (project.notes) children.push(P(project.notes, { color: '555555', spacing: { before: 120 } }));
+  children.push(P('', { spacing: { after: 160 } }));
 
   const rows = [];
   for (const g of groups) {

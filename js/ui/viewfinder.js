@@ -2,6 +2,7 @@
 // lens would take in from where you stand. A focal ruler along the bottom scrolls like a zoom ring,
 // and the frame follows it live.
 import { esc } from './dom.js';
+import { feel } from '../feel.js';
 
 // The phone's main camera, as the 35 mm-equivalent focal length makers quote (diagonal-based).
 // Browsers open the main (1×) camera for the rear-facing request on nearly every phone.
@@ -42,6 +43,7 @@ export async function openViewfinder(o) {
     </div>
     <div class="vfx-bottom">
       <div class="vfx-read"><b class="vfx-big"></b><span class="vfx-deg"></span><button class="vfx-vs" hidden aria-label="${esc(T('vf_cmp_clear'))}"></button></div>
+      <div class="vfx-at"></div>
       <div class="vfx-ruler" dir="ltr" role="listbox" aria-label="${esc(T('vf_ruler'))}">
         ${stops.map((s, i) => `<button class="vfx-stop ${s.have ? 'have' : ''}" role="option" data-i="${i}"><b>${s.mm}</b></button>`).join('')}
       </div>
@@ -100,6 +102,7 @@ export async function openViewfinder(o) {
     el.querySelector('.vfx-big').innerHTML = `${mm}<small>mm</small>`;
     el.querySelector('.vfx-deg').textContent = `${Math.round((2 * Math.atan(cam.w / (2 * mm)) * 180) / Math.PI)}°`;
     el.querySelector('.vfx-mm').textContent = `${mm}mm`;
+    el.querySelector('.vfx-at').textContent = o.frameLine ? o.frameLine(mm) : '';
     ruler.querySelectorAll('.vfx-stop').forEach((b, i) => { b.classList.toggle('on', i === idx); b.classList.toggle('cmp', i === cmp); b.setAttribute('aria-selected', i === idx); });
     vs.hidden = cmp == null;
     if (cmp != null) vs.textContent = `vs ${stops[cmp].mm}mm ✕`;
@@ -125,7 +128,13 @@ export async function openViewfinder(o) {
     const b = ruler.children[i];
     ruler.scrollTo({ left: b.offsetLeft - (ruler.clientWidth - b.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' });
   };
-  const tick = () => navigator.vibrate?.(8);
+  const tick = () => feel.detent();
+  // stepping past either end of the ring knocks against the stop instead of moving
+  const step = (dir) => {
+    const n = idx + dir;
+    if (n < 0 || n >= stops.length) { feel.end(); return; }
+    idx = n; tick(); draw(); centreOn(idx, true);
+  };
   const curve = () => {
     const mid = ruler.scrollLeft + ruler.clientWidth / 2;
     const half = ruler.clientWidth / 2 || 1;
@@ -157,7 +166,7 @@ export async function openViewfinder(o) {
       held = true;
       const i = Number(b.dataset.i);
       cmp = cmp === i ? null : i;
-      navigator.vibrate?.([12, 40, 12]);
+      feel.pin();
       draw();
     }, 450);
   });
@@ -180,8 +189,7 @@ export async function openViewfinder(o) {
     if (sx == null) return;
     const dx = e.clientX - sx; sx = null;
     if (Math.abs(dx) < 40) return;
-    idx = Math.min(stops.length - 1, Math.max(0, idx + (dx < 0 ? 1 : -1)));
-    tick(); draw(); centreOn(idx, true);
+    step(dx < 0 ? 1 : -1);
   });
 
   const onResize = () => { draw(); centreOn(idx, false); curve(); };
@@ -203,10 +211,7 @@ export async function openViewfinder(o) {
   };
   const onKey = (e) => {
     if (e.key === 'Escape') close();
-    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-      idx = Math.min(stops.length - 1, Math.max(0, idx + (e.key === 'ArrowRight' ? 1 : -1)));
-      draw(); centreOn(idx, true);
-    }
+    if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') step(e.key === 'ArrowRight' ? 1 : -1);
   };
   el.querySelector('.vfx-close').onclick = close;
   el.querySelector('.vfx-turn').onclick = () => turn(orient === 'landscape' ? 'portrait' : 'landscape');

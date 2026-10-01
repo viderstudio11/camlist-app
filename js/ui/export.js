@@ -2,6 +2,7 @@ import { esc, icons, toast } from './dom.js';
 import { groupByDept } from '../list.js';
 import { buildShareText, displayName, formatDateRange } from '../export-text.js';
 import { exportXlsx } from '../export-xlsx.js';
+import { feel } from '../feel.js';
 import { exportDocx } from '../export-docx.js';
 import { renderPrint } from '../export-print.js';
 
@@ -82,10 +83,10 @@ export function render(ctx, { id, print }, root) {
   };
   const file = (fn) => async (btn) => {
     btn.disabled = true;
-    try { await fn(p, groups, { lang: lang(), ...opts, t }); }
+    try { await fn(p, groups, { lang: lang(), ...opts, t }); feel.clap(); }
     catch (err) { console.error(err); toast(T('export_failed'), { kind: 'err' }); }
     finally { btn.disabled = false; }
   };
-  const go = { text: share, pdf: () => ctx.navigate(`#/p/${id}/print`), xlsx: file(exportXlsx), docx: file(exportDocx) };
+  const go = { text: share, pdf: () => { feel.clap(); ctx.navigate(`#/p/${id}/print`); }, xlsx: file(exportXlsx), docx: file(exportDocx) };
   root.querySelector('[data-go]').onclick = (e) => go[format](e.currentTarget);
 }

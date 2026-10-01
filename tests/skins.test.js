@@ -19,8 +19,9 @@ test('saved v1 skins that were dropped land on a valid look', () => {
   assert.deepEqual(migrateSettings({ skin: 'sony', theme: 'weird' }), { skin: 'sony', theme: 'light' });
 });
 
-test('the bank is the default plus the seven camera skins', () => {
-  assert.deepEqual(SKINS.map(s => s.id), ['clean', 'arri', 'sony', 'blackmagic', 'red', 'panasonic', 'canon', 'broadcast']);
+test('the bank is the default, the seven camera skins and the three camera-world themes', () => {
+  assert.deepEqual(SKINS.map(s => s.id), ['clean', 'arri', 'sony', 'blackmagic', 'red', 'panasonic', 'canon', 'broadcast', 'monitor', 'slate', 'barrel']);
+  assert.deepEqual(SKINS.filter(s => s.group === 'world').map(s => s.id), ['monitor', 'slate', 'barrel']);
   assert.equal(skin('clean').he, 'ברירת מחדל');
   assert.equal(skin('clean').en, 'Default');
 });

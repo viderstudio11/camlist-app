@@ -1,3 +1,4 @@
+import { feel, setSound } from './feel.js';
 import { createStore } from './store.js';
 import { createCatalog, loadCatalog } from './catalog.js';
 import { createCompat, loadCompat } from './compat.js';
@@ -85,6 +86,7 @@ function applyTheme() {
   render();
 }
 
+let lastRoute = null;
 function route() {
   const h = location.hash || '#/';
   let m;
@@ -114,6 +116,8 @@ function render() {
   document.body.classList.toggle('split', ctx.split);
   if (ctx.split) renderSplit(root, splitProjectId(location.hash));
   else screen.render(ctx, params, root);
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches && lastRoute !== location.hash.split('?')[0]) root.animate?.([{ filter: 'blur(5px)', opacity: 0.55 }, { filter: 'blur(0)', opacity: 1 }], { duration: 260, easing: 'cubic-bezier(.2,.8,.2,1)' });
+  lastRoute = location.hash.split('?')[0];
   if (catalogError && !document.getElementById('catalog-error')) {
     root.insertAdjacentHTML('afterbegin', `<div class="card" id="catalog-error" style="border-color:var(--accent);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:12px"><b>${t('catalog_error')}</b><button class="btn sm" data-retry>${t('retry')}</button></div>`);
     root.querySelector('[data-retry]').onclick = boot;
@@ -165,7 +169,8 @@ function renderSettings(ctx, _p, root) {
       <label>${t('default_tech_manager')}<input name="techManager" value="${esc(s.techManager)}" autocomplete="off"></label>
     </div>
     <div class="section-title">${t('appearance')}</div>
-    <div class="card"><button class="kv linkrow" data-open-skins><span>${t('design')}</span><b>${esc(getLang() === 'he' ? skin(ctx.skin()).he : skin(ctx.skin()).en)} \u203A</b></button></div>
+    <div class="card"><button class="kv linkrow" data-open-skins><span>${t('design')}</span><b>${esc(getLang() === 'he' ? skin(ctx.skin()).he : skin(ctx.skin()).en)} \u203A</b></button>
+      <label class="kv cbar-toggle set-toggle"><span>${t('sounds')}<small>${t('sounds_hint')}</small></span><input type="checkbox" data-sounds ${s.sounds ? 'checked' : ''}></label></div>
     <div class="section-title">${t('backup')}</div>
     <div class="card" style="display:grid;gap:10px">
       <button class="btn" data-export>${t('export_backup')}</button>
@@ -184,6 +189,7 @@ function renderSettings(ctx, _p, root) {
     </div>`;
   root.querySelector('[name=techManager]').onchange = (e) => store.setSettings({ techManager: e.target.value.trim() });
   root.querySelector('[data-open-skins]').onclick = () => ctx.navigate('#/skins');
+  root.querySelector('[data-sounds]').onchange = (e) => { store.setSettings({ sounds: e.target.checked }); setSound(e.target.checked); if (e.target.checked) feel.detent(); };
   root.querySelector('[data-export]').onclick = () => download(`camlist-backup-${new Date().toISOString().slice(0, 10)}.json`, new Blob([JSON.stringify(store.exportBackup(), null, 1)], { type: 'application/json' }));
   const file = root.querySelector('[data-file]');
   root.querySelector('[data-import]').onclick = () => file.click();
@@ -249,6 +255,7 @@ document.addEventListener('contextmenu', (e) => {
 });
 applyDir();
 document.documentElement.dataset.theme = store.state.settings.theme || 'light';
+setSound(store.state.settings.sounds);
 document.documentElement.dataset.skin = isSkin(store.state.settings.skin) ? store.state.settings.skin : DEFAULT_SKIN;
 loadSkinFonts(document.documentElement.dataset.skin);
 render();

@@ -77,8 +77,38 @@ export const SKINS = [
   },
 ];
 
+// The camera-world themes are not one maker's menus but the objects around a camera: the field
+// monitor, the slate, the lens barrel.
+SKINS.push(
+  {
+    id: 'monitor', group: 'world',
+    he: 'מוניטור שטח', en: 'Field monitor',
+    descHe: 'כהה וירוק כמו מסך שטח: נורת REC, פינות קווי מסגרת ומספרים במונוספייס',
+    descEn: 'Dark and green like a field monitor: REC light, frame-line corners, monospaced numerals',
+    swatch: ['#0D0F12', '#E8EAED', '#34C759'],
+    fonts: ['IBM+Plex+Mono:wght@400;500;600;700', 'Heebo:wght@400;500;700;800;900'],
+  },
+  {
+    id: 'slate', group: 'world',
+    he: 'סלייט', en: 'Slate',
+    descHe: 'פסי קלאפר בשחור־לבן, כותרות בסגנון לוח וקווים ישרים',
+    descEn: 'Black-and-white clapper stripes, board-style headings, straight lines',
+    swatch: ['#F2F1EC', '#141414', '#141414'],
+    fonts: ['Frank+Ruhl+Libre:wght@500;700;900', 'Heebo:wght@400;500;700;800;900'],
+  },
+  {
+    id: 'barrel', group: 'world',
+    he: 'גוף עדשה', en: 'Lens barrel',
+    descHe: 'שחור אנודייז, מספרים חרוטים בצהוב, חריצי אחיזה ונקודת mount אדומה',
+    descEn: 'Anodised black, yellow engraved numerals, knurled grip and a red mount dot',
+    swatch: ['#141414', '#F4F4F4', '#F2C230'],
+    fonts: ['Barlow+Condensed:wght@400;500;600;700', 'Heebo:wght@400;500;700;800;900'],
+  },
+);
+
 export const GROUPS = [
   { id: 'plain', he: 'ברירת מחדל', en: 'Default' },
+  { id: 'world', he: 'עולם המצלמה', en: 'Camera world' },
   { id: 'camera', he: 'מצלמות', en: 'Cameras' },
 ];
 

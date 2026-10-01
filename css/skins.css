@@ -309,3 +309,84 @@
 .skin-main b { display: block; font-size: 14.5px; font-weight: 800; }
 .skin-main small { color: var(--muted); font-size: 12px; line-height: 1.45; }
 .skin-check { flex: 0 0 auto; color: var(--accent); font-weight: 900; font-size: 17px; }
+
+/* ============================================================ CAMERA WORLD ======
+   Not a maker's menus but the things around a camera: the field monitor, the slate, the lens barrel. */
+
+/* ---------- FIELD MONITOR: dark glass, monitor green, frame-line corners, mono numerals ---------- */
+[data-skin="monitor"] { --mono: "IBM Plex Mono", "Heebo", ui-monospace, monospace; --radius: 6px; --radius-s: 4px; --shadow: none; --shadow-s: none; }
+[data-skin="monitor"]:not([data-theme="dark"]) {
+  --bg: #E9ECEF; --bg-2: #E2E6EA; --surface: #F8F9FA; --surface-2: #EEF1F4; --surface-3: #DDE2E7;
+  --border: rgba(0,0,0,.14); --border-2: rgba(0,0,0,.28); --hair: rgba(0,0,0,.1);
+  --text: #0D0F12; --muted: #3E444B; --dim: #5F666E;
+  --accent: #1E7D3A; --accent-2: #166030; --accent-soft: rgba(30,125,58,.14); --accent-ink: #1E7D3A;
+  --amber: #1E7D3A; --amber-soft: rgba(30,125,58,.14); --amber-ink: #FFFFFF; --chart: rgba(0,0,0,.08);
+}
+[data-skin="monitor"][data-theme="dark"] {
+  --bg: #0D0F12; --bg-2: #101317; --surface: #15181D; --surface-2: #1C2026; --surface-3: #2A2F36;
+  --border: rgba(255,255,255,.12); --border-2: rgba(255,255,255,.24); --hair: rgba(255,255,255,.08);
+  --text: #E8EAED; --muted: #B4BAC1; --dim: #8A9199;
+  --accent: #34C759; --accent-2: #5BD97A; --accent-soft: rgba(52,199,89,.18); --accent-ink: #34C759;
+  --amber: #34C759; --amber-soft: rgba(52,199,89,.18); --amber-ink: #06210F;
+  --tint: rgba(255,255,255,.04); --tint-2: rgba(255,255,255,.08); --glass: rgba(13,15,18,.94); --chart: rgba(255,255,255,.07);
+}
+/* frame-line corners on every card, like the guides on a monitor */
+[data-skin="monitor"] .card, [data-skin="monitor"] .phero {
+  background-image:
+    linear-gradient(var(--accent), var(--accent)), linear-gradient(var(--accent), var(--accent)),
+    linear-gradient(var(--accent), var(--accent)), linear-gradient(var(--accent), var(--accent));
+  background-size: 12px 2px, 2px 12px, 12px 2px, 2px 12px;
+  background-position: top left, top left, bottom right, bottom right;
+  background-repeat: no-repeat;
+}
+[data-skin="monitor"] .num, [data-skin="monitor"] .sh-big, [data-skin="monitor"] .tsub { font-family: var(--mono); }
+[data-skin="monitor"] .tsub { text-transform: uppercase; letter-spacing: .1em; }
+
+/* ---------- SLATE: clapper stripes, board-style serif headings, straight lines ---------- */
+[data-skin="slate"] { --font-head: "Frank Ruhl Libre", "Heebo", serif; --radius: 4px; --radius-s: 3px; --shadow: none; --shadow-s: none;
+  --stripes: repeating-linear-gradient(-45deg, var(--text) 0 12px, var(--surface) 12px 24px); }
+[data-skin="slate"]:not([data-theme="dark"]) {
+  --bg: #F2F1EC; --bg-2: #EAE8E1; --surface: #FFFFFF; --surface-2: #F4F3EE; --surface-3: #E4E2DA;
+  --border: rgba(0,0,0,.2); --border-2: rgba(0,0,0,.55); --hair: rgba(0,0,0,.14);
+  --text: #141414; --muted: #3F3F3C; --dim: #66655F;
+  --accent: #141414; --accent-2: #333333; --accent-soft: rgba(20,20,20,.08); --accent-ink: #141414;
+  --amber: #141414; --amber-soft: rgba(20,20,20,.08); --amber-ink: #FFFFFF; --chart: rgba(0,0,0,.07);
+}
+[data-skin="slate"][data-theme="dark"] {
+  --bg: #111111; --bg-2: #161616; --surface: #1C1C1C; --surface-2: #242424; --surface-3: #333333;
+  --border: rgba(255,255,255,.2); --border-2: rgba(255,255,255,.5); --hair: rgba(255,255,255,.12);
+  --text: #F2F1EC; --muted: #CFCDC6; --dim: #9C9A93;
+  --accent: #F2F1EC; --accent-2: #FFFFFF; --accent-soft: rgba(242,241,236,.12); --accent-ink: #F2F1EC;
+  --amber: #F2F1EC; --amber-soft: rgba(242,241,236,.12); --amber-ink: #111111;
+  --tint: rgba(255,255,255,.04); --tint-2: rgba(255,255,255,.08); --glass: rgba(17,17,17,.95); --chart: rgba(255,255,255,.07);
+}
+[data-skin="slate"] .topbar { padding-top: 15px; overflow: hidden; }
+[data-skin="slate"] .topbar::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 7px; background: var(--stripes); }
+[data-skin="slate"] .phero { border: 2px solid var(--text); }
+[data-skin="slate"] .phero::before { content: ""; display: block; height: 12px; background: var(--stripes); border-bottom: 2px solid var(--text); }
+[data-skin="slate"] .group-head { border-block-end: 2px solid var(--text); }
+[data-skin="slate"] .group-head h2, [data-skin="slate"] .phero h2, [data-skin="slate"] .sh-big { font-family: var(--font-head); }
+[data-skin="slate"] .tsub { text-transform: uppercase; letter-spacing: .14em; }
+
+/* ---------- LENS BARREL: anodised black, engraved yellow numerals, knurled grip, red mount dot ---------- */
+[data-skin="barrel"] { --mono: "Barlow Condensed", "Heebo", sans-serif; --radius: 12px; --radius-s: 8px;
+  --knurl: repeating-linear-gradient(90deg, rgba(255,255,255,.07) 0 2px, transparent 2px 5px); }
+[data-skin="barrel"]:not([data-theme="dark"]) {
+  --bg: #E6E6E3; --bg-2: #DCDCD8; --surface: #F5F5F3; --surface-2: #EBEBE8; --surface-3: #D6D6D2;
+  --border: rgba(0,0,0,.14); --border-2: rgba(0,0,0,.3); --hair: rgba(0,0,0,.1);
+  --text: #141414; --muted: #444444; --dim: #666666;
+  --accent: #8A6A00; --accent-2: #6E5400; --accent-soft: rgba(138,106,0,.14); --accent-ink: #8A6A00;
+  --amber: #8A6A00; --amber-soft: rgba(138,106,0,.14); --amber-ink: #FFFFFF; --chart: rgba(0,0,0,.07);
+  --knurl: repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 5px);
+}
+[data-skin="barrel"][data-theme="dark"] {
+  --bg: #0F0F0F; --bg-2: #141414; --surface: #1A1A1A; --surface-2: #222222; --surface-3: #2E2E2E;
+  --border: rgba(255,255,255,.1); --border-2: rgba(255,255,255,.22); --hair: rgba(255,255,255,.07);
+  --text: #F4F4F4; --muted: #BDBDBD; --dim: #8E8E8E;
+  --accent: #F2C230; --accent-2: #FFD65C; --accent-soft: rgba(242,194,48,.16); --accent-ink: #F2C230;
+  --amber: #F2C230; --amber-soft: rgba(242,194,48,.16); --amber-ink: #141414;
+  --tint: rgba(255,255,255,.04); --tint-2: rgba(255,255,255,.08); --glass: rgba(15,15,15,.94); --chart: rgba(255,255,255,.06);
+}
+[data-skin="barrel"] .topbar, [data-skin="barrel"] .bottombar:not(.fabbar) { background-image: var(--knurl); }
+[data-skin="barrel"] .num, [data-skin="barrel"] .sh-big, [data-skin="barrel"] .arc-mm { font-family: var(--mono); color: var(--accent); fill: var(--accent); }
+[data-skin="barrel"] .tag.rec .rec-dot { background: #E53935; }

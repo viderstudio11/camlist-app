@@ -57,7 +57,7 @@ export function render(ctx, _params, root) {
     <article class="phero" data-id="${esc(active.id)}">
       <div class="ticks"></div>
       <div class="phero-in">
-        <div class="phero-top"><span class="tag">${esc(t('active_tag'))}</span>${range ? `<span class="num phero-dates" dir="ltr">${range}</span>` : ''}</div>
+        <div class="phero-top"><span class="tag rec" aria-label="${esc(t('rec_active'))}"><i class="rec-dot" aria-hidden="true"></i>${esc(t('active_tag'))}</span>${range ? `<span class="num phero-dates" dir="ltr">${range}</span>` : ''}</div>
         <h2 class="h-display phero-name" dir="auto">${esc(active.name || t('untitled'))}</h2>
         ${who ? `<p class="phero-sub" dir="auto">${who}</p>` : ''}
         ${cams.length ? `<div class="camchips">${cams.map(c => `<span class="camchip" dir="ltr">${esc(c.name)} <b class="num">×${c.qty}</b></span>`).join('')}</div>` : ''}

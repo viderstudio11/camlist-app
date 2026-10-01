@@ -28,14 +28,22 @@ export function renderPrint(ctx, project, groups, root, { includeNotes = true, i
   // Each detail is isolated, so a Hebrew name next to an English label (or a date range) never reorders.
   const meta = [project.productionCo && `<bdi>${esc(project.productionCo)}</bdi>`, project.techManager && `${esc(t('tech_manager'))}: <bdi>${esc(project.techManager)}</bdi>`, dates && `<bdi dir="ltr">${esc(dates)}</bdi>`].filter(Boolean);
   const contact = [project.phone, project.email].filter(Boolean).join(' · ');
+  // The slate's boxes, as on a clapperboard: production company, shoot days, 1st AC, contact.
+  const slateCells = [
+    [t('production_co'), project.productionCo && `<bdi>${esc(project.productionCo)}</bdi>`],
+    [t('dates'), dates && `<bdi dir="ltr">${esc(dates)}</bdi>`],
+    [t('tech_manager'), project.techManager && `<bdi>${esc(project.techManager)}</bdi>`],
+    [t('contact'), contact && `<bdi dir="ltr">${esc(contact)}</bdi>`],
+  ].filter(([, v]) => v);
   root.innerHTML = `<div class="print" dir="${dir}" lang="${lang}">
     <div class="screen-only card"><b>${ctx.t('pdf_hint')}</b><button class="btn sm primary" data-print>${ctx.t('pdf')}</button></div>
-    <div class="pstripe"><span class="mark">CAM<b>LIST</b></span></div>
-    <header class="phead-print">
-      <h1><bdi>${esc(project.name || t('untitled'))}</bdi></h1>
-      ${meta.length ? `<p>${meta.join('  ·  ')}</p>` : ''}
-      ${contact ? `<p class="dim"><bdi dir="ltr">${esc(contact)}</bdi></p>` : ''}
-      ${project.notes ? `<p class="dim"><bdi>${esc(project.notes)}</bdi></p>` : ''}
+    <header class="pslate">
+      <div class="pslate-sticks"><span class="mark">CAM<b>LIST</b></span></div>
+      <div class="pslate-board">
+        <div class="pslate-cell wide"><small>${esc(t('project_name'))}</small><h1><bdi>${esc(project.name || t('untitled'))}</bdi></h1></div>
+        ${slateCells.map(([k, v]) => `<div class="pslate-cell"><small>${esc(k)}</small><b>${v}</b></div>`).join('')}
+      </div>
+      ${project.notes ? `<p class="pslate-notes"><bdi>${esc(project.notes)}</bdi></p>` : ''}
     </header>
     ${sections}
     <footer class="pfoot">CamList · <bdi dir="ltr">${esc(fmtDate(todayStr()))}</bdi></footer>
