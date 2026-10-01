@@ -64,7 +64,24 @@
         "h": 20,
         "mode": "UHD 16:9 · ≤60p",
         "src": "Sony FX6 manual (Help Guide PDF, p.12): in FF, cropping only at UHD 100/120 fps S&Q or RAW UHD — regular UHD uses the full width. p.161: 35 mm full-frame, 10.2M effective (16:9). Sony does not publish the width in mm; 35.6 mm is the official FX3 figure for the same 12.9M sensor.",
-        "pending": "width derived from the FX3 official spec — Sony publishes no mm figure for the FX6"
+        "pending": "width derived from the FX3 official spec — Sony publishes no mm figure for the FX6",
+        "modes": [
+          {
+            "id": "ff",
+            "label": "FF · UHD / HD ≤60p",
+            "w": 35.6,
+            "h": 20,
+            "src": "Sony FX6 manual p.12: in FF, regular UHD uses the full width (see the sensor entry)"
+          },
+          {
+            "id": "s35-hd",
+            "label": "S35 · HD only",
+            "w": 23.73,
+            "h": 13.33,
+            "src": "Sony FX6 manual (Imager Scan Mode, p.97): S35 = Super 35mm size, restricts recording to 1920×1080; Sony S35 scan = 1.5 crop → 35.6 / 1.5",
+            "pending": "Sony publishes no mm figure for the FX6 S35 area"
+          }
+        ]
       }
     },
     {
@@ -87,7 +104,39 @@
         "w": 33.4,
         "h": 18.8,
         "mode": "FF 6K → UHD",
-        "src": "Sony: FF 6K scan 35.7×18.8 mm (17:9); UHD 16:9 crops the sides at full height"
+        "src": "Sony: FF 6K scan 35.7×18.8 mm (17:9); UHD 16:9 crops the sides at full height",
+        "modes": [
+          {
+            "id": "ff6k-uhd",
+            "label": "FF 6K · UHD / HD",
+            "w": 33.47,
+            "h": 18.8,
+            "src": "Sony Cine \"FX9 Firmware V2 – Scan Modes\" (sony-cinematography.com) and pro.sony FX9 page: FF 6K scan 35.7 × 18.8 mm (17:9); UHD 3840 of 4096 → 33.47 mm wide at full height"
+          },
+          {
+            "id": "ff6k-dci",
+            "label": "FF 6K · DCI 4K",
+            "w": 35.7,
+            "h": 18.8,
+            "src": "Sony Cine \"FX9 Firmware V2 – Scan Modes\" (sony-cinematography.com) and pro.sony FX9 page: sensor 35.7 × 18.8 mm, DCI 4K uses the full 17:9 width"
+          },
+          {
+            "id": "ff5k",
+            "label": "FF crop 5K · UHD ≤60p",
+            "w": 27.78,
+            "h": 15.6,
+            "src": "pro.sony FX9: \"Scanning area is cropped around 83% of full-frame\" (diagonal) → 33.47 × 0.83",
+            "pending": "Sony gives the 5K area as ~83% of FF, not in mm"
+          },
+          {
+            "id": "s35-4k",
+            "label": "S35 4K · UHD / HD",
+            "w": 22.31,
+            "h": 12.53,
+            "src": "Sony Cine \"FX9 Firmware V2 – Scan Modes\" (sony-cinematography.com) and pro.sony FX9 page: S35 scan has a crop factor of 1.5 against FF 6K → 33.47 / 1.5",
+            "pending": "Sony gives S35 as a 1.5 crop factor, not in mm"
+          }
+        ]
       }
     },
     {
@@ -877,7 +926,31 @@
         "w": 24.6,
         "h": 13.8,
         "mode": "UHD 3840×2160 · Super 35",
-        "src": "Canon Europe EOS C70 specifications, Effective Sensor Screen Size: 24.6 × 13.8 mm when 3840 × 2160 is selected (26.2 × 13.8 mm at 4096 × 2160)"
+        "src": "Canon Europe EOS C70 specifications, Effective Sensor Screen Size: 24.6 × 13.8 mm when 3840 × 2160 is selected (26.2 × 13.8 mm at 4096 × 2160)",
+        "modes": [
+          {
+            "id": "s35-uhd",
+            "label": "Super 35 · UHD",
+            "w": 24.6,
+            "h": 13.8,
+            "src": "Canon USA EOS C70 support specs: \"UHD: 4K: 24.6 x 13.8 (28.2 mm diagonal)\""
+          },
+          {
+            "id": "s35-dci",
+            "label": "Super 35 · DCI 4K",
+            "w": 26.2,
+            "h": 13.8,
+            "src": "Canon USA EOS C70 support specs: \"4K: 26.2 x 13.8 (29.6 mm diagonal)\""
+          },
+          {
+            "id": "s16",
+            "label": "Super 16 crop · 2K / HD",
+            "w": 13.1,
+            "h": 6.9,
+            "src": "Canon USA EOS C70 support specs: Sensor Modes \"Super 16mm (cropped)\"; a 2K window of the 4K sensor → half of 26.2 × 13.8",
+            "pending": "Canon publishes no mm figure for the Super 16 crop"
+          }
+        ]
       }
     },
     {
@@ -943,7 +1016,58 @@
         "w": 27.03,
         "h": 14.25,
         "mode": "6K 17:9",
-        "src": "RED KOMODO 6K specifications: 27.03 × 14.25 mm, 6144 × 3240"
+        "src": "RED KOMODO 6K specifications: 27.03 × 14.25 mm, 6144 × 3240",
+        "modes": [
+          {
+            "id": "6k-17x9",
+            "label": "6K 17:9",
+            "w": 27.03,
+            "h": 14.26,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 6144 × 3240, 27.03 × 14.26 mm"
+          },
+          {
+            "id": "6k-16x9",
+            "label": "6K 16:9",
+            "w": 25.34,
+            "h": 14.26,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 5760 × 3240, 25.34 × 14.26 mm"
+          },
+          {
+            "id": "6k-2.4",
+            "label": "6K 2.4:1",
+            "w": 27.03,
+            "h": 11.32,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 6144 × 2574, 27.03 × 11.32 mm"
+          },
+          {
+            "id": "5k-17x9",
+            "label": "5K 17:9",
+            "w": 22.53,
+            "h": 11.88,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 5120 × 2700, 22.53 × 11.88 mm"
+          },
+          {
+            "id": "4k-17x9",
+            "label": "4K 17:9",
+            "w": 18.02,
+            "h": 9.5,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 4096 × 2160, 18.02 × 9.50 mm"
+          },
+          {
+            "id": "4k-16x9",
+            "label": "4K 16:9",
+            "w": 16.9,
+            "h": 9.5,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 3840 × 2160, 16.90 × 9.50 mm"
+          },
+          {
+            "id": "2k-17x9",
+            "label": "2K 17:9",
+            "w": 9.01,
+            "h": 4.75,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 2048 × 1080, 9.01 × 4.75 mm"
+          }
+        ]
       }
     },
     {
@@ -965,7 +1089,58 @@
         "w": 27.03,
         "h": 14.25,
         "mode": "6K 17:9",
-        "src": "RED KOMODO 6K Monochrome: same sensor, 27.03 × 14.25 mm"
+        "src": "RED KOMODO 6K Monochrome: same sensor, 27.03 × 14.25 mm",
+        "modes": [
+          {
+            "id": "6k-17x9",
+            "label": "6K 17:9",
+            "w": 27.03,
+            "h": 14.26,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 6144 × 3240, 27.03 × 14.26 mm"
+          },
+          {
+            "id": "6k-16x9",
+            "label": "6K 16:9",
+            "w": 25.34,
+            "h": 14.26,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 5760 × 3240, 25.34 × 14.26 mm"
+          },
+          {
+            "id": "6k-2.4",
+            "label": "6K 2.4:1",
+            "w": 27.03,
+            "h": 11.32,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 6144 × 2574, 27.03 × 11.32 mm"
+          },
+          {
+            "id": "5k-17x9",
+            "label": "5K 17:9",
+            "w": 22.53,
+            "h": 11.88,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 5120 × 2700, 22.53 × 11.88 mm"
+          },
+          {
+            "id": "4k-17x9",
+            "label": "4K 17:9",
+            "w": 18.02,
+            "h": 9.5,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 4096 × 2160, 18.02 × 9.50 mm"
+          },
+          {
+            "id": "4k-16x9",
+            "label": "4K 16:9",
+            "w": 16.9,
+            "h": 9.5,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 3840 × 2160, 16.90 × 9.50 mm"
+          },
+          {
+            "id": "2k-17x9",
+            "label": "2K 17:9",
+            "w": 9.01,
+            "h": 4.75,
+            "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 2048 × 1080, 9.01 × 4.75 mm"
+          }
+        ]
       }
     },
     {

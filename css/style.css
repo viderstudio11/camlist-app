@@ -1164,3 +1164,5 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 @media print {
   .print .pslate-sticks { -webkit-print-color-adjust: exact; print-color-adjust: exact; height: 4mm; background: repeating-linear-gradient(-45deg, #000 0 3mm, #fff 3mm 6mm); }
 }
+.fov-modes { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--hair, rgba(0,0,0,.08)); }
+.fov-modes .chips { margin-top: 6px; }

@@ -170,7 +170,8 @@ function renderSettings(ctx, _p, root) {
     </div>
     <div class="section-title">${t('appearance')}</div>
     <div class="card"><button class="kv linkrow" data-open-skins><span>${t('design')}</span><b>${esc(getLang() === 'he' ? skin(ctx.skin()).he : skin(ctx.skin()).en)} \u203A</b></button>
-      <label class="kv cbar-toggle set-toggle"><span>${t('sounds')}<small>${t('sounds_hint')}</small></span><input type="checkbox" data-sounds ${s.sounds ? 'checked' : ''}></label></div>
+      <label class="kv cbar-toggle set-toggle"><span>${t('sounds')}<small>${t('sounds_hint')}</small></span><input type="checkbox" data-sounds ${s.sounds ? 'checked' : ''}></label>
+      <div class="kv set-toggle"><span>${t('vib_test')}<small>${t('vib_test_hint')}</small></span><button class="btn sm" data-vibtest>${t('vib_test_btn')}</button></div></div>
     <div class="section-title">${t('backup')}</div>
     <div class="card" style="display:grid;gap:10px">
       <button class="btn" data-export>${t('export_backup')}</button>
@@ -189,6 +190,14 @@ function renderSettings(ctx, _p, root) {
     </div>`;
   root.querySelector('[name=techManager]').onchange = (e) => store.setSettings({ techManager: e.target.value.trim() });
   root.querySelector('[data-open-skins]').onclick = () => ctx.navigate('#/skins');
+  // What this phone allows: the browser may have no Vibration API (iPhone) or refuse the call.
+  root.querySelector('[data-vibtest]').onclick = () => {
+    const api = typeof navigator.vibrate === 'function';
+    let ok = false;
+    try { ok = api && navigator.vibrate([200, 100, 200]); } catch { ok = false; }
+    if (!api) feel.end();
+    toast(t(!api ? 'vib_none' : ok ? 'vib_sent' : 'vib_refused'), { kind: ok ? 'ok' : 'err', ms: 7000 });
+  };
   root.querySelector('[data-sounds]').onchange = (e) => { store.setSettings({ sounds: e.target.checked }); setSound(e.target.checked); if (e.target.checked) feel.detent(); };
   root.querySelector('[data-export]').onclick = () => download(`camlist-backup-${new Date().toISOString().slice(0, 10)}.json`, new Blob([JSON.stringify(store.exportBackup(), null, 1)], { type: 'application/json' }));
   const file = root.querySelector('[data-file]');
