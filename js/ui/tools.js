@@ -103,6 +103,10 @@ const L = {
   viewfinder: { he: 'ויופיינדר חי', en: 'Live viewfinder' },
   vf_start: { he: 'פתח את מצלמת הטלפון', en: 'Open the phone camera' },
   vf_ruler: { he: 'בחירת מוקד', en: 'Focal length' },
+  vf_turn: { he: 'החלפה בין רוחב לאורך', en: 'Switch between landscape and portrait' },
+  maker: { he: 'יצרן', en: 'Maker' },
+  model_of: { he: 'דגם · {brand}', en: 'Model · {brand}' },
+  pick_maker_first: { he: 'בחר יצרן כדי לראות את הדגמים', en: 'Pick a maker to see its models' },
   vf_rotate: { he: 'העדשה הזו רחבה מהטלפון כשהוא עומד — סובב את הטלפון לרוחב ותראה את כל הפריים.', en: 'This lens is wider than the phone held upright — turn the phone sideways to see the whole frame.' },
   calc_by_distance: { he: 'חישוב לפי מרחק וגודל שוט', en: 'Work it out from distance and shot size' },
   in_catalog: { he: 'במאגר', en: 'In the catalog' },
@@ -457,9 +461,12 @@ function fovTool(T, lang, ctx) {
         <button class="btn sm" data-cchange>${esc(T('change'))}</button></div>
       </div>`
     : `<div class="card sh-sec" data-part="cam">
-        <div class="tsub">${esc(T('camera_step'))}</div>
+        <div class="tsub">1 · ${esc(T('maker'))}</div>
         <div class="chips">${brands.map(([slug, n]) => chip('data-cbrand', slug, esc(n), slug === s.camBrand)).join('')}</div>
-        ${models.length ? `<div class="chips fov-models">${models.map(c => chip('data-cmodel', c.prof.id, esc(c.product.name), cam && c.prof.id === cam.prof.id)).join('')}</div>` : ''}
+        <div class="fov-models-box">
+          <div class="tsub">2 · ${esc(s.camBrand ? Tp('model_of', { brand: (brands.find(([b]) => b === s.camBrand) || [])[1] || '' }) : T('pick_maker_first'))}</div>
+          ${models.length ? `<div class="model-list">${models.map(c => `<button class="model-row ${cam && c.prof.id === cam.prof.id ? 'on' : ''}" data-cmodel="${esc(c.prof.id)}"><b>${esc(c.product.name)}</b><small>${esc(`${c.prof.sensor.w}×${c.prof.sensor.h} mm`)}</small></button>`).join('')}</div>` : ''}
+        </div>
         <p class="tnote">${esc(T('verified_only'))}</p>
       </div>`;
 

@@ -23,16 +23,6 @@ let open = null;
  */
 export async function openViewfinder(o) {
   if (open) return;
-  let stream;
-  try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
-      audio: false,
-    });
-  } catch {
-    return false;
-  }
-
   const { cam, stops, T } = o;
   let idx = Math.max(0, stops.findIndex(s => s.mm >= o.focal));
   if (stops[idx]?.mm !== o.focal && idx > 0 && Math.abs(stops[idx - 1].mm - o.focal) < Math.abs(stops[idx].mm - o.focal)) idx -= 1;
@@ -48,7 +38,7 @@ export async function openViewfinder(o) {
     <div class="vfx-wide" hidden></div>
     <div class="vfx-top">
       <div class="vfx-cam"><b>${esc(cam.name)}</b><small>${esc(`${cam.w}×${cam.h} mm${cam.mode ? ` · ${cam.mode}` : ''}`)}</small></div>
-      <button class="vfx-close" aria-label="${esc(T('vf_stop'))}">✕</button>
+      <div class="vfx-btns"><button class="vfx-turn" aria-label="${esc(T('vf_turn'))}" title="${esc(T('vf_turn'))}">⟳</button><button class="vfx-close" aria-label="${esc(T('vf_stop'))}">✕</button></div>
     </div>
     <div class="vfx-bottom">
       <div class="vfx-read"><b class="vfx-big"></b><span class="vfx-lens"></span><span class="vfx-deg"></span></div>
@@ -59,6 +49,30 @@ export async function openViewfinder(o) {
     </div>`;
   document.body.appendChild(el);
   document.documentElement.classList.add('vfx-on');
+
+  // The app itself stays upright; the viewfinder opens sideways, the way a cine frame is seen.
+  // Full screen first (it must come straight from the tap), then the screen is turned.
+  let orient = 'landscape';
+  const turn = (to) => {
+    orient = to;
+    el.classList.toggle('vfx-portrait', to === 'portrait');
+    screen.orientation?.lock?.(to).catch(() => {});
+  };
+  const goFull = el.requestFullscreen?.({ navigationUI: 'hide' }) || el.webkitRequestFullscreen?.();
+  Promise.resolve(goFull).then(() => turn('landscape')).catch(() => {});
+
+  let stream;
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: false,
+    });
+  } catch {
+    leaveFullscreen();
+    document.documentElement.classList.remove('vfx-on');
+    el.remove();
+    return false;
+  }
 
   const video = el.querySelector('video');
   const frame = el.querySelector('.vfx-frame');
@@ -137,6 +151,7 @@ export async function openViewfinder(o) {
     window.removeEventListener('hashchange', close);
     document.removeEventListener('keydown', onKey);
     document.documentElement.classList.remove('vfx-on');
+    leaveFullscreen();
     el.remove();
     o.onClose(stops[idx].mm);
   };
@@ -148,8 +163,11 @@ export async function openViewfinder(o) {
     }
   };
   el.querySelector('.vfx-close').onclick = close;
+  el.querySelector('.vfx-turn').onclick = () => turn(orient === 'landscape' ? 'portrait' : 'landscape');
   window.addEventListener('hashchange', close);
   document.addEventListener('keydown', onKey);
+  const onFs = () => { if (!document.fullscreenElement && !document.webkitFullscreenElement && open && el.dataset.fs) close(); };
+  document.addEventListener('fullscreenchange', () => { if (document.fullscreenElement === el) el.dataset.fs = '1'; onFs(); });
   open = { close };
 
   draw();
@@ -159,6 +177,11 @@ export async function openViewfinder(o) {
 }
 
 export const closeViewfinder = () => open?.close();
+
+function leaveFullscreen() {
+  try { screen.orientation?.unlock?.(); } catch { /* not supported */ }
+  if (document.fullscreenElement || document.webkitFullscreenElement) (document.exitFullscreen || document.webkitExitFullscreen)?.call(document)?.catch?.(() => {});
+}
 
 // The ruler's stops: the usual cine primes, plus every focal length a catalog lens for this camera
 // offers (primes, and both ends of each zoom). A stop is marked when a catalog lens covers it.

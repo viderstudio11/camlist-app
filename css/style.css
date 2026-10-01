@@ -1086,3 +1086,14 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
   .vfx-ruler { padding-top: 4px; padding-bottom: 4px; }
   .vfx-stop { height: 40px; flex-basis: 50px; }
 }
+/* maker and model: two clearly separate steps — makers as chips, the maker's models as a list below */
+.fov-models-box { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line, rgba(0,0,0,.08)); }
+.model-list { display: grid; gap: 6px; margin-top: 8px; }
+.model-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; min-height: 48px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line, rgba(0,0,0,.1)); background: var(--surface-2); color: var(--text); text-align: start; cursor: pointer; font: inherit; }
+.model-row b { font-size: 14px; }
+.model-row small { font-size: 12px; color: var(--text-3); white-space: nowrap; }
+.model-row.on { border-color: var(--accent); background: var(--accent); color: #111; }
+.model-row.on small { color: #111; opacity: .75; }
+/* viewfinder buttons */
+.vfx-btns { display: flex; gap: 8px; }
+.vfx-turn { width: 44px; height: 44px; border-radius: 50%; border: 0; background: rgba(255,255,255,.18); color: #fff; font-size: 20px; cursor: pointer; }
