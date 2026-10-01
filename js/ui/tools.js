@@ -1,5 +1,5 @@
 import { esc, icons, toast } from './dom.js';
-import { toolIcon } from './icons.js';
+import { toolIcon, deptIcon } from './icons.js';
 import { createMedia } from '../tools/media.js';
 import { timeFromAngle, angleFromTime, asFraction, flicker, slowMotion, FRAME_RATES, shutterChoices } from '../tools/shutter.js';
 import { PRIME_SET, SHOTS, lensFor, frameAt, pickLens, toUnit, fromUnit } from '../tools/fov.js';
@@ -103,6 +103,11 @@ const L = {
   viewfinder: { he: 'ויופיינדר חי', en: 'Live viewfinder' },
   vf_start: { he: 'פתח את מצלמת הטלפון', en: 'Open the phone camera' },
   vf_ruler: { he: 'בחירת מוקד', en: 'Focal length' },
+  lens_now: { he: 'עדשה', en: 'Lens' },
+  lens_wider: { he: 'עדשה רחבה יותר', en: 'Wider lens' },
+  lens_longer: { he: 'עדשה ארוכה יותר', en: 'Longer lens' },
+  vf_hold: { he: 'גוללים את החוגה או מחליקים על התמונה. החזקה ארוכה על עדשה משווה אותה לנוכחית.', en: 'Turn the dial or swipe the picture. Hold a lens to compare it with the current one.' },
+  vf_cmp_clear: { he: 'בטל השוואה', en: 'Clear comparison' },
   vf_turn: { he: 'החלפה בין רוחב לאורך', en: 'Switch between landscape and portrait' },
   maker: { he: 'יצרן', en: 'Maker' },
   model_of: { he: 'דגם · {brand}', en: 'Model · {brand}' },
@@ -246,6 +251,16 @@ const S = {
   luts: { brand: '', model: '' },
   hours: { call: '07:00', wrap: '19:30', breaks: 60, customBreaks: false, base: 10, tier1h: 2, tier1pct: 125, tier2pct: 150, turnaround: 11, dayRate: 0 },
 };
+
+// The lens tool remembers its camera and last lens on this phone, so opening it again picks up where
+// the user left off. Kept in this browser only; losing it just means starting from the project's camera.
+const FOV_KEY = 'camlist.fov';
+const FOV_KEEP = ['cam', 'camBrand', 'focal', 'distance', 'unit', 'shot'];
+try {
+  const kept = JSON.parse(localStorage.getItem(FOV_KEY) || '{}');
+  for (const k of FOV_KEEP) if (kept[k] != null) S.fov[k] = kept[k];
+} catch { /* private window or blocked storage */ }
+const keepFov = () => { try { localStorage.setItem(FOV_KEY, JSON.stringify(Object.fromEntries(FOV_KEEP.map(k => [k, S.fov[k]])))); } catch { /* ignore */ } };
 
 // Short labels for places outside the tools screen (the home screen's tool row).
 export const toolLabel = (k, lang) => L[k]?.[lang] ?? L[k]?.he ?? k;
@@ -457,7 +472,7 @@ function fovTool(T, lang, ctx) {
   const sensorNote = cam ? Tp('sensor_line', { w: cam.prof.sensor.w, h: cam.prof.sensor.h, mode: cam.prof.sensor.mode }) : '';
   const pickCard = cam && !s.picking
     ? `<div class="card sh-sec fov-cam" data-part="cam">
-        <div class="fov-cam-row"><div><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(cam.product.name)}</b><p class="tnote">${esc(sensorNote)}</p></div>
+        <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(cam.product.name)}</b><p class="tnote">${esc(sensorNote)}</p></div>
         <button class="btn sm" data-cchange>${esc(T('change'))}</button></div>
       </div>`
     : `<div class="card sh-sec" data-part="cam">
@@ -573,15 +588,35 @@ function fovTool(T, lang, ctx) {
     <details class="fov-more"><summary>${esc(Tp('frame_line', { w: num(toUnit(fr.widthM, unit), 2), h: num(toUnit(fr.heightM, unit), 2), u: uLabel, a: num(fr.hFov, 0) }))}</summary>${measured}</details>
   </div>`;
 
-  const viewfinder = `<div class="card vf-hero" data-part="vf">
-    <div class="vf-hero-txt"><b>${esc(T('viewfinder'))}</b><p class="tnote">${esc(Tp('vf_hint', { cam: cam.product.name }))}</p></div>
-    <button class="btn primary" data-vf-start>${esc(T('vf_start'))}</button>
-  </div>`;
+  const stops = rulerStops([], PRIME_SET);
+  const at = stops.reduce((b, x, i) => (Math.abs(x.mm - focal) < Math.abs(stops[b].mm - focal) ? i : b), 0);
+  const shown = stops[at].mm;
+  // An arc from 180° to 0°: the lit part runs up to this lens's place among the stops.
+  const R = 70, CX = 80, CY = 76;
+  const pt = (t) => [CX - R * Math.cos(Math.PI * t), CY - R * Math.sin(Math.PI * t)];
+  const tEnd = stops.length > 1 ? at / (stops.length - 1) : 0;
+  const [x0, y0] = pt(0), [x1, y1] = pt(Math.max(tEnd, 0.001));
+  const viewfinder = `<div class="card fov-dialcard" data-part="vf">
+    <div class="tsub">${esc(T('lens_now'))}</div>
+    <div class="fov-dial">
+      <button class="fov-step" data-fstep="-1" aria-label="${esc(T('lens_wider'))}" ${at === 0 ? 'aria-disabled="true"' : ''}>‹</button>
+      <svg viewBox="0 0 160 84" class="fov-arc" role="img" aria-label="${shown} mm">
+        <path d="M${x0} ${y0} A${R} ${R} 0 0 1 ${CX + R} ${CY}" class="arc-bg"/>
+        <path d="M${x0} ${y0} A${R} ${R} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}" class="arc-on"/>
+        <text x="80" y="70" text-anchor="middle" class="arc-mm">${shown}<tspan class="arc-u" dx="2">mm</tspan></text>
+      </svg>
+      <button class="fov-step" data-fstep="1" aria-label="${esc(T('lens_longer'))}" ${at === stops.length - 1 ? 'aria-disabled="true"' : ''}>›</button>
+    </div>
+    <p class="tnote">${esc(Tp('vf_hint', { cam: cam.product.name }))}</p>
+  </div>
+`;
+  const cta = `<div class="fov-cta-space"></div><div class="bottombar fabbar"><button class="btn fab fov-cta" data-vf-start>${toolIcon('fov')}${esc(T('vf_start'))}</button></div>`;
 
-  fovView = { cam: { name: cam.product.name, w: sn.w, h: sn.h, mode: sn.mode }, stops: rulerStops([], PRIME_SET), focal, lensLabel: () => '' };
+  fovView = { cam: { name: cam.product.name, w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown };
+  keepFov();
 
   // The page is the camera and the viewfinder; the calculation from a distance waits folded.
-  return `${pickCard}${viewfinder}<details class="card fov-calc" ${s.calcOpen ? 'open' : ''} data-calc><summary>${esc(T('calc_by_distance'))}</summary>${distCard}${answer}</details>`;
+  return `${pickCard}${viewfinder}<details class="card fov-calc" ${s.calcOpen ? 'open' : ''} data-calc><summary>${esc(T('calc_by_distance'))}</summary>${distCard}${answer}</details>${cta}`;
 }
 
 // ---------- shutter ----------
@@ -1091,6 +1126,12 @@ function wire(root, ctx, id, T, lang) {
     if (ok === false) toast(T('vf_denied'), { kind: 'err', ms: 4000 });
   });
   root.querySelector('[data-calc]')?.addEventListener('toggle', (e) => { S.fov.calcOpen = e.currentTarget.open; });
+  root.querySelectorAll('[data-fstep]').forEach(b => { b.onclick = () => {
+    const stops = fovView?.stops; if (!stops) return;
+    const i = stops.findIndex(x => x.mm === fovView.focal) + Number(b.dataset.fstep);
+    if (i < 0 || i >= stops.length) return;
+    S.fov.focal = stops[i].mm; navigator.vibrate?.(8); ctx.render();
+  }; });
   root.querySelector('[data-cchange]')?.addEventListener('click', () => { S.fov.picking = true; ctx.render(); });
 
   root.querySelectorAll('[data-scity]').forEach(b => { b.onclick = () => { Object.assign(S.sun, { city: Number(b.dataset.scity), lat: null, lon: null }); redraw(); }; });

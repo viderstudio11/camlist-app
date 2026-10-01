@@ -17,7 +17,6 @@ let open = null;
  * @param {{name:string, w:number, h:number, mode?:string}} o.cam  sensor size in mm (recorded area)
  * @param {{mm:number, have:boolean}[]} o.stops  focal stops for the ruler; `have` = a catalog lens covers it
  * @param {number} o.focal  starting focal length
- * @param {(mm:number)=>string} o.lensLabel  which lens that focal length is on ('' if none)
  * @param {(k:string)=>string} o.T
  * @param {(mm:number)=>void} o.onClose  called with the focal length last shown
  */
@@ -34,6 +33,7 @@ export async function openViewfinder(o) {
   el.setAttribute('aria-label', T('viewfinder'));
   el.innerHTML = `
     <video class="vfx-video" playsinline autoplay muted></video>
+    <div class="vfx-cmp" hidden><span></span></div>
     <div class="vfx-frame"><span class="vfx-mm"></span></div>
     <div class="vfx-wide" hidden></div>
     <div class="vfx-top">
@@ -41,11 +41,11 @@ export async function openViewfinder(o) {
       <div class="vfx-btns"><button class="vfx-turn" aria-label="${esc(T('vf_turn'))}" title="${esc(T('vf_turn'))}">⟳</button><button class="vfx-close" aria-label="${esc(T('vf_stop'))}">✕</button></div>
     </div>
     <div class="vfx-bottom">
-      <div class="vfx-read"><b class="vfx-big"></b><span class="vfx-lens"></span><span class="vfx-deg"></span></div>
+      <div class="vfx-read"><b class="vfx-big"></b><span class="vfx-deg"></span><button class="vfx-vs" hidden aria-label="${esc(T('vf_cmp_clear'))}"></button></div>
       <div class="vfx-ruler" dir="ltr" role="listbox" aria-label="${esc(T('vf_ruler'))}">
         ${stops.map((s, i) => `<button class="vfx-stop ${s.have ? 'have' : ''}" role="option" data-i="${i}"><b>${s.mm}</b></button>`).join('')}
       </div>
-      <p class="vfx-note">${esc(T('vf_approx'))}</p>
+      <p class="vfx-note">${esc(T('vf_hold'))}</p>
     </div>`;
   document.body.appendChild(el);
   document.documentElement.classList.add('vfx-on');
@@ -82,20 +82,33 @@ export async function openViewfinder(o) {
 
   // Where the cine frame falls on screen. The video fills the screen (cover), so the phone's angle
   // per screen pixel comes from the stream's own size and the cover scale.
+  // A lens held for comparison: a second, dashed frame, so two lenses can be weighed from the same spot.
+  let cmp = null;
+  const cmpEl = el.querySelector('.vfx-cmp');
+  const vs = el.querySelector('.vfx-vs');
+  const sizeOf = (mm) => {
+    const vw = video.videoWidth, vh = video.videoHeight;
+    if (!vw || !vh) return null;
+    const tanPerVideoPx = TAN_HALF_LONG / (Math.max(vw, vh) / 2);
+    const scale = Math.max(el.clientWidth / vw, el.clientHeight / vh);
+    return { w: ((cam.w / (2 * mm)) / tanPerVideoPx) * 2 * scale, h: ((cam.h / (2 * mm)) / tanPerVideoPx) * 2 * scale };
+  };
   const draw = () => {
     const mm = stops[idx].mm;
     const vw = video.videoWidth, vh = video.videoHeight;
     const SW = el.clientWidth, SH = el.clientHeight;
     el.querySelector('.vfx-big').innerHTML = `${mm}<small>mm</small>`;
-    el.querySelector('.vfx-lens').textContent = o.lensLabel(mm);
     el.querySelector('.vfx-deg').textContent = `${Math.round((2 * Math.atan(cam.w / (2 * mm)) * 180) / Math.PI)}°`;
     el.querySelector('.vfx-mm').textContent = `${mm}mm`;
-    ruler.querySelectorAll('.vfx-stop').forEach((b, i) => { b.classList.toggle('on', i === idx); b.setAttribute('aria-selected', i === idx); });
-    if (!vw || !vh) return;
-    const tanPerVideoPx = TAN_HALF_LONG / (Math.max(vw, vh) / 2);
-    const scale = Math.max(SW / vw, SH / vh);
-    const fw = ((cam.w / (2 * mm)) / tanPerVideoPx) * 2 * scale;
-    const fh = ((cam.h / (2 * mm)) / tanPerVideoPx) * 2 * scale;
+    ruler.querySelectorAll('.vfx-stop').forEach((b, i) => { b.classList.toggle('on', i === idx); b.classList.toggle('cmp', i === cmp); b.setAttribute('aria-selected', i === idx); });
+    vs.hidden = cmp == null;
+    if (cmp != null) vs.textContent = `vs ${stops[cmp].mm}mm ✕`;
+    const c = cmp != null && sizeOf(stops[cmp].mm);
+    cmpEl.hidden = !c;
+    if (c) { cmpEl.style.width = `${c.w}px`; cmpEl.style.height = `${c.h}px`; cmpEl.querySelector('span').textContent = `${stops[cmp].mm}mm`; }
+    const z = sizeOf(mm);
+    if (!z) return;
+    const fw = z.w, fh = z.h;
     frame.style.width = `${fw}px`;
     frame.style.height = `${fh}px`;
     const tooWide = fw > SW * 1.02 || fh > SH * 1.02;
@@ -112,20 +125,52 @@ export async function openViewfinder(o) {
     const b = ruler.children[i];
     ruler.scrollTo({ left: b.offsetLeft - (ruler.clientWidth - b.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' });
   };
+  const tick = () => navigator.vibrate?.(8);
+  const curve = () => {
+    const mid = ruler.scrollLeft + ruler.clientWidth / 2;
+    const half = ruler.clientWidth / 2 || 1;
+    for (const b of ruler.children) {
+      const d = Math.max(-1.3, Math.min(1.3, (b.offsetLeft + b.offsetWidth / 2 - mid) / half));
+      b.style.transform = `translateY(${(d * d * 22).toFixed(1)}px) rotate(${(d * 16).toFixed(1)}deg)`;
+      b.style.opacity = (1 - Math.abs(d) * 0.5).toFixed(2);
+    }
+  };
   let raf = 0;
   ruler.addEventListener('scroll', () => {
     cancelAnimationFrame(raf);
     raf = requestAnimationFrame(() => {
+      curve();
       const mid = ruler.scrollLeft + ruler.clientWidth / 2;
       let best = idx, d = Infinity;
       [...ruler.children].forEach((b, i) => { const c = Math.abs(b.offsetLeft + b.offsetWidth / 2 - mid); if (c < d) { d = c; best = i; } });
-      if (best !== idx) { idx = best; navigator.vibrate?.(4); draw(); }
+      if (best !== idx) { idx = best; tick(); draw(); }
     });
   }, { passive: true });
-  ruler.addEventListener('click', (e) => {
+  // Holding a lens pins it as the comparison frame; holding it again (or tapping "vs") lets it go.
+  let hold = 0, held = false;
+  ruler.addEventListener('pointerdown', (e) => {
     const b = e.target.closest('.vfx-stop');
     if (!b) return;
-    idx = Number(b.dataset.i); draw(); centreOn(idx, true);
+    held = false;
+    clearTimeout(hold);
+    hold = setTimeout(() => {
+      held = true;
+      const i = Number(b.dataset.i);
+      cmp = cmp === i ? null : i;
+      navigator.vibrate?.([12, 40, 12]);
+      draw();
+    }, 450);
+  });
+  const cancelHold = () => clearTimeout(hold);
+  ruler.addEventListener('pointerup', cancelHold);
+  ruler.addEventListener('pointercancel', cancelHold);
+  ruler.addEventListener('scroll', cancelHold, { passive: true });
+  ruler.addEventListener('contextmenu', (e) => e.preventDefault());
+  vs.onclick = () => { cmp = null; draw(); };
+  ruler.addEventListener('click', (e) => {
+    const b = e.target.closest('.vfx-stop');
+    if (!b || held) { held = false; return; }
+    idx = Number(b.dataset.i); tick(); draw(); centreOn(idx, true);
   });
 
   // A swipe across the picture steps one lens, for a thumb that is not on the ruler.
@@ -136,10 +181,10 @@ export async function openViewfinder(o) {
     const dx = e.clientX - sx; sx = null;
     if (Math.abs(dx) < 40) return;
     idx = Math.min(stops.length - 1, Math.max(0, idx + (dx < 0 ? 1 : -1)));
-    draw(); centreOn(idx, true);
+    tick(); draw(); centreOn(idx, true);
   });
 
-  const onResize = () => { draw(); centreOn(idx, false); };
+  const onResize = () => { draw(); centreOn(idx, false); curve(); };
   video.addEventListener('loadedmetadata', onResize);
   window.addEventListener('resize', onResize);
 
@@ -150,6 +195,7 @@ export async function openViewfinder(o) {
     window.removeEventListener('resize', onResize);
     window.removeEventListener('hashchange', close);
     document.removeEventListener('keydown', onKey);
+    document.removeEventListener('fullscreenchange', onFs);
     document.documentElement.classList.remove('vfx-on');
     leaveFullscreen();
     el.remove();
@@ -166,12 +212,16 @@ export async function openViewfinder(o) {
   el.querySelector('.vfx-turn').onclick = () => turn(orient === 'landscape' ? 'portrait' : 'landscape');
   window.addEventListener('hashchange', close);
   document.addEventListener('keydown', onKey);
-  const onFs = () => { if (!document.fullscreenElement && !document.webkitFullscreenElement && open && el.dataset.fs) close(); };
-  document.addEventListener('fullscreenchange', () => { if (document.fullscreenElement === el) el.dataset.fs = '1'; onFs(); });
+  // Leaving full screen with the phone's back gesture closes the viewfinder too.
+  const onFs = () => {
+    if (document.fullscreenElement === el) { el.dataset.fs = '1'; return; }
+    if (!document.fullscreenElement && !document.webkitFullscreenElement && open && el.dataset.fs) close();
+  };
+  document.addEventListener('fullscreenchange', onFs);
   open = { close };
 
   draw();
-  requestAnimationFrame(() => centreOn(idx, false));
+  requestAnimationFrame(() => { centreOn(idx, false); curve(); });
   el.querySelector('.vfx-close').focus();
   return true;
 }
