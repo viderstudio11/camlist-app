@@ -112,6 +112,7 @@ const L = {
   dl_fw_manual: { he: 'עדכון ומדריך', en: 'Firmware & manual' },
   dl_app: { he: 'אפליקציה', en: 'App' },
   dl_open: { he: 'להורדה', en: 'Download' },
+  dl_new: { he: 'חדש', en: 'New' },
   dl_none: { he: 'לא נמצא — נסה שם אחר', en: 'Nothing found — try another name' },
   dl_search_ph: { he: 'חיפוש: מצלמה, מוניטור, תוכנה…', en: 'Search: camera, monitor, software…' },
   dl_lut_finder: { he: 'מציאת LUT לפי מצלמה ←', en: 'Find a LUT by camera →' },
@@ -284,6 +285,10 @@ let lutData = { logs: [] };
 export const setLuts = (data) => { lutData = data || lutData; };
 let dlData = { departments: [], items: [] };
 export const setDownloads = (data) => { dlData = data || dlData; };
+// the weekly watch: a page whose version numbers changed in the last three weeks is shown as new
+let watchData = { pages: {} };
+export const setWatch = (data) => { watchData = data || watchData; };
+const isNew = (url) => { const d = watchData.pages?.[url]?.changed; return !!d && (Date.now() - new Date(d).getTime()) < 21 * 864e5; };
 // a query carried by the route (#/tools/downloads?q=…), read once by the tool it opens
 let routeQuery = new URLSearchParams('');
 
@@ -1168,7 +1173,7 @@ function downloadsTool(T, lang, ctx) {
   const term = (s.q || '').trim().toLowerCase();
   const hit = (txt) => !term || String(txt).toLowerCase().includes(term);
   const TYPE = { firmware: T('dl_firmware'), software: T('dl_software'), app: T('dl_app'), lut: 'LUT' };
-  const link = (url, label) => `<a class="dl-link" href="${esc(url)}" target="_blank" rel="noopener">${esc(label)} ↗</a>`;
+  const link = (url, label) => `<a class="dl-link ${isNew(url) ? 'is-new' : ''}" href="${esc(url)}" target="_blank" rel="noopener">${isNew(url) ? `<i class="dl-new">${esc(T('dl_new'))}</i>` : ''}${esc(label)} ↗</a>`;
   const camRow = (c) => `<div class="dl-row"><div class="dl-main"><b dir="auto">${esc(c.name)}</b><small>${esc([c.brand, c.log].filter(Boolean).join(' · '))}</small></div><div class="dl-links">${c.firmware ? link(c.firmware, c.firmware.includes('/download/ff/dl/') ? T('dl_firmware') : T('dl_fw_manual')) : ''}${c.lut ? link(c.lut, 'LUT') : ''}</div></div>`;
   const itemRow = (it) => `<div class="dl-row"><div class="dl-main"><b dir="auto">${esc(it.name)}</b><small><i class="dl-type">${esc(TYPE[it.type] || it.type)}</i>${it.note ? ' ' + esc(name(it.note)) : ''}</small></div><div class="dl-links">${link(it.url, T('dl_open'))}</div></div>`;
   const lutRow = (g) => `<div class="dl-row"><div class="dl-main"><b dir="auto">${esc(g.brand)} — ${esc(g.name)}</b><small>${esc(g.source || '')}</small></div><div class="dl-links">${link(g.url, 'LUT')}</div></div>`;
