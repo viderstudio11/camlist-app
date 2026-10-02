@@ -1,5 +1,5 @@
 {
-  "_readme": "Camera profiles for 'build around a camera'. mount = native mount(s); adapters = lens mounts usable via an adapter; format = FF | S35 | MFT | MF | 2/3 | 1in | 16; media / battery = families matched by name patterns in js/compat.js; kit = key into kits. Edit freely — ids are Utopia product ids, match is a fallback regex on the product name. sensor = the sensor area a camera actually uses for UHD 16:9 recording (w × h mm, the mode, and the source it was verified against). Cameras without it are not offered in the lens tool.",
+  "_readme": "Camera profiles for 'build around a camera'. mount = native mount(s); adapters = lens mounts usable via an adapter; format = FF | S35 | MFT | MF | 2/3 | 1in | 16; media / battery = families matched by name patterns in js/compat.js; kit = key into kits. Edit freely — ids are Utopia product ids, match is a fallback regex on the product name. sensor = the sensor area a camera actually uses for UHD 16:9 recording (w × h mm, the mode, and the source it was verified against). Cameras without it are not offered in the lens tool. year = the year the maker announced the camera (lists show the newest first). sensor.modes = recording formats, each its own sensor window (first = default).",
   "adapters": {
     "E": [
       "EF",
@@ -82,7 +82,8 @@
             "pending": "Sony publishes no mm figure for the FX6 S35 area"
           }
         ]
-      }
+      },
+      "year": 2020
     },
     {
       "id": 14868,
@@ -137,7 +138,8 @@
             "pending": "Sony gives S35 as a 1.5 crop factor, not in mm"
           }
         ]
-      }
+      },
+      "year": 2019
     },
     {
       "id": 17205,
@@ -159,7 +161,8 @@
         "h": 20,
         "mode": "UHD 16:9 · ≤60p",
         "src": "Sony FX3 spec: 35.6×23.8 mm, 10.3 MP effective for movies (16:9 full width)"
-      }
+      },
+      "year": 2021
     },
     {
       "id": 28981,
@@ -197,7 +200,8 @@
         "h": 13.1,
         "mode": "UHD ≤60p · full width",
         "src": "Sony FX30 specifications: APS-C 23.3 × 15.5 mm; 4K up to 60p oversampled from the full 6K width; 16:9 height derived from the published width"
-      }
+      },
+      "year": 2022
     },
     {
       "id": 19101,
@@ -219,7 +223,8 @@
         "h": 20.2,
         "mode": "UHD ≤30p · full width",
         "src": "Sony α7 IV specifications: 35.9 × 23.9 mm; 4K 24/30p oversampled from the full 7K width (60p crops to Super 35); 16:9 height derived from the published width"
-      }
+      },
+      "year": 2021
     },
     {
       "id": 16386,
@@ -241,7 +246,8 @@
         "h": 20,
         "mode": "UHD · full width",
         "src": "Sony α7S III specifications: 35.6 × 23.8 mm; 4K recorded from the full sensor width; 16:9 height derived from the published width"
-      }
+      },
+      "year": 2020
     },
     {
       "id": 12017,
@@ -262,7 +268,8 @@
         "h": 20,
         "mode": "UHD 24p · full width",
         "src": "Sony α7 III specifications: 35.6 × 23.8 mm; 4K 24p from the full width (30p crops 1.2×); 16:9 height derived from the published width"
-      }
+      },
+      "year": 2018
     },
     {
       "id": 666,
@@ -283,7 +290,8 @@
         "h": 20,
         "mode": "UHD · full width",
         "src": "Sony α7S II specifications: 35.6 × 23.8 mm; 4K from the full sensor width; 16:9 height derived from the published width"
-      }
+      },
+      "year": 2015
     },
     {
       "id": 662,
@@ -304,7 +312,8 @@
         "h": 20,
         "mode": "UHD (external) · full width",
         "src": "Sony α7S specifications: 35.6 × 23.8 mm; 4K to an external recorder from the full width; 16:9 height derived from the published width"
-      }
+      },
+      "year": 2014
     },
     {
       "id": 12069,
@@ -345,7 +354,8 @@
         "h": 18,
         "mode": "7.6K 16:9 → UHD",
         "src": "Sony pro.sony VENICE 2 specifications: 7.6K 16:9, 7680 × 4320, 32.0 × 18.0 mm, 1–60 fps"
-      }
+      },
+      "year": 2021
     },
     {
       "id": 24920,
@@ -368,7 +378,8 @@
         "h": 20.2,
         "mode": "FF 8.6K 16:9",
         "src": "Sony BURANO specifications: 35.9 × 24.0 mm; FF 8.6K 16:9 imager mode 8632 × 4856 = 35.9 × 20.2 mm"
-      }
+      },
+      "year": 2023
     },
     {
       "id": 654,
@@ -389,7 +400,8 @@
         "h": 13.3,
         "mode": "Super 35 · 4K / UHD",
         "src": "Sony PXW-FS7: Super 35 sensor 23.6 × 13.3 mm"
-      }
+      },
+      "year": 2014
     },
     {
       "id": 9860,
@@ -410,7 +422,8 @@
         "h": 13.3,
         "mode": "Super 35 · 4K / UHD",
         "src": "Sony PXW-FS7 II: same Super 35 sensor as the FS7, 23.6 × 13.3 mm"
-      }
+      },
+      "year": 2016
     },
     {
       "id": 11797,
@@ -463,7 +476,8 @@
         "h": 12.7,
         "mode": "UHD from 4K 17:9",
         "src": "Sony PMW-F5: same Super 35 sensor as the F55, 24.0 × 12.7 mm at 4096 × 2160; UHD = 22.5 mm wide (derived)"
-      }
+      },
+      "year": 2012
     },
     {
       "id": 633,
@@ -486,7 +500,8 @@
         "h": 12.7,
         "mode": "UHD from 4K 17:9",
         "src": "Sony PMW-F55: Super 35 24.0 × 12.7 mm at 4096 × 2160; UHD 3840 wide = 22.5 mm (derived)"
-      }
+      },
+      "year": 2012
     },
     {
       "id": 670,
@@ -650,8 +665,60 @@
         "w": 24.88,
         "h": 14,
         "mode": "4K 16:9 → UHD",
-        "src": "ARRI ALEXA 35 recording format poster: 4K 16:9 24.88×14.00 mm, records UHD"
-      }
+        "src": "ARRI ALEXA 35 recording format poster: 4K 16:9 24.88×14.00 mm, records UHD",
+        "modes": [
+          {
+            "id": "4k-16x9",
+            "label": "4K 16:9 · UHD / HD",
+            "w": 24.9,
+            "h": 14,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 4K 16:9 24.90 × 14.00 mm (UHD and HD are recorded from this area)"
+          },
+          {
+            "id": "4.6k-og",
+            "label": "4.6K 3:2 Open Gate",
+            "w": 28,
+            "h": 19.2,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 4.6K 3:2 Open Gate 28.00 × 19.20 mm"
+          },
+          {
+            "id": "4.6k-16x9",
+            "label": "4.6K 16:9",
+            "w": 28,
+            "h": 15.7,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 4.6K 16:9 28.00 × 15.70 mm"
+          },
+          {
+            "id": "4k-2x1",
+            "label": "4K 2:1",
+            "w": 24.9,
+            "h": 12.4,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 4K 2:1 24.90 × 12.40 mm"
+          },
+          {
+            "id": "3.3k-6x5",
+            "label": "3.3K 6:5 (anamorphic)",
+            "w": 20.22,
+            "h": 16.95,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 3.3K 6:5 20.22 × 16.95 mm"
+          },
+          {
+            "id": "3k-1x1",
+            "label": "3K 1:1 (anamorphic)",
+            "w": 18.7,
+            "h": 18.7,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 3K 1:1 18.70 × 18.70 mm"
+          },
+          {
+            "id": "2.7k-8x9",
+            "label": "2.7K 8:9 (anamorphic)",
+            "w": 16.7,
+            "h": 18.7,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 2.7K 8:9 16.70 × 18.70 mm"
+          }
+        ]
+      },
+      "year": 2022
     },
     {
       "id": 30380,
@@ -672,8 +739,60 @@
         "w": 24.88,
         "h": 14,
         "mode": "4K 16:9 → UHD",
-        "src": "ARRI: ALEXA 35 Xtreme uses the ALEXA 35 ALEV 4 sensor and formats — 4K 16:9 24.88 × 14.00 mm"
-      }
+        "src": "ARRI: ALEXA 35 Xtreme uses the ALEXA 35 ALEV 4 sensor and formats — 4K 16:9 24.88 × 14.00 mm",
+        "modes": [
+          {
+            "id": "4k-16x9",
+            "label": "4K 16:9 · UHD / HD",
+            "w": 24.9,
+            "h": 14,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 4K 16:9 24.90 × 14.00 mm (UHD and HD are recorded from this area)"
+          },
+          {
+            "id": "4.6k-og",
+            "label": "4.6K 3:2 Open Gate",
+            "w": 28,
+            "h": 19.2,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 4.6K 3:2 Open Gate 28.00 × 19.20 mm"
+          },
+          {
+            "id": "4.6k-16x9",
+            "label": "4.6K 16:9",
+            "w": 28,
+            "h": 15.7,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 4.6K 16:9 28.00 × 15.70 mm"
+          },
+          {
+            "id": "4k-2x1",
+            "label": "4K 2:1",
+            "w": 24.9,
+            "h": 12.4,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 4K 2:1 24.90 × 12.40 mm"
+          },
+          {
+            "id": "3.3k-6x5",
+            "label": "3.3K 6:5 (anamorphic)",
+            "w": 20.22,
+            "h": 16.95,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 3.3K 6:5 20.22 × 16.95 mm"
+          },
+          {
+            "id": "3k-1x1",
+            "label": "3K 1:1 (anamorphic)",
+            "w": 18.7,
+            "h": 18.7,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 3K 1:1 18.70 × 18.70 mm"
+          },
+          {
+            "id": "2.7k-8x9",
+            "label": "2.7K 8:9 (anamorphic)",
+            "w": 16.7,
+            "h": 18.7,
+            "src": "ARRI ALEXA 35 brochure, technical data (arri.com, recording formats with active image area): 2.7K 8:9 16.70 × 18.70 mm"
+          }
+        ]
+      },
+      "year": 2025
     },
     {
       "id": 14095,
@@ -695,8 +814,60 @@
         "w": 31.68,
         "h": 17.82,
         "mode": "3.8K LF 16:9 UHD",
-        "src": "ARRI Formats and Resolutions Overview v6.1: 3.8K LF 16:9-UHD 31.68×17.82 mm"
-      }
+        "src": "ARRI Formats and Resolutions Overview v6.1: 3.8K LF 16:9-UHD 31.68×17.82 mm",
+        "modes": [
+          {
+            "id": "lf-uhd",
+            "label": "LF 3.8K 16:9 · UHD",
+            "w": 31.68,
+            "h": 17.82,
+            "src": "ARRI ALEXA Mini LF technical data / recording formats (arri.com): 3.8K LF 16:9 UHD 31.68 × 17.82 mm"
+          },
+          {
+            "id": "lf-og",
+            "label": "LF 4.5K 3:2 Open Gate",
+            "w": 36.7,
+            "h": 25.54,
+            "src": "ARRI ALEXA Mini LF technical data / recording formats (arri.com): 4.5K LF 3:2 Open Gate 36.70 × 25.54 mm"
+          },
+          {
+            "id": "lf-239",
+            "label": "LF 4.5K 2.39:1",
+            "w": 36.7,
+            "h": 15.31,
+            "src": "ARRI ALEXA Mini LF technical data / recording formats (arri.com): 4.5K LF 2.39:1 36.70 × 15.31 mm"
+          },
+          {
+            "id": "s35-3.4k",
+            "label": "S35 3.4K 3:2",
+            "w": 28.25,
+            "h": 18.17,
+            "src": "ARRI ALEXA Mini LF technical data / recording formats (arri.com): 3.4K S35 3:2 28.25 × 18.17 mm"
+          },
+          {
+            "id": "s35-3.2k",
+            "label": "S35 3.2K 16:9",
+            "w": 26.4,
+            "h": 14.85,
+            "src": "ARRI ALEXA Mini LF technical data / recording formats (arri.com): 3.2K S35 16:9 26.40 × 14.85 mm"
+          },
+          {
+            "id": "s35-2.8k-43",
+            "label": "S35 2.8K 4:3",
+            "w": 23.76,
+            "h": 17.82,
+            "src": "ARRI ALEXA Mini LF technical data / recording formats (arri.com): 2.8K S35 4:3 23.76 × 17.82 mm"
+          },
+          {
+            "id": "s35-2.8k",
+            "label": "S35 2.8K 16:9",
+            "w": 23.76,
+            "h": 13.37,
+            "src": "ARRI ALEXA Mini LF technical data / recording formats (arri.com): 2.8K S35 16:9 23.76 × 13.37 mm"
+          }
+        ]
+      },
+      "year": 2019
     },
     {
       "id": 493,
@@ -721,7 +892,8 @@
         "h": 14.85,
         "mode": "4K UHD (3.2K)",
         "src": "ARRI Formats and Resolutions Overview v6.1, ALEXA Mini: 4K UHD 3200 × 1800 photosites, 26.40 × 14.85 mm"
-      }
+      },
+      "year": 2015
     },
     {
       "id": 448,
@@ -747,7 +919,8 @@
         "h": 14.85,
         "mode": "4K UHD (3.2K)",
         "src": "ARRI Formats and Resolutions Overview v6.1, AMIRA: 4K UHD 3200 × 1800 photosites, 26.40 × 14.85 mm"
-      }
+      },
+      "year": 2014
     },
     {
       "id": 66,
@@ -769,7 +942,8 @@
         "h": 13.37,
         "mode": "HD 16:9",
         "src": "ARRI ALEV III 16:9 HD area 23.76 × 13.37 mm (Formats and Resolutions Overview)"
-      }
+      },
+      "year": 2010
     },
     {
       "id": 7387,
@@ -791,7 +965,8 @@
         "h": 13.37,
         "mode": "HD 16:9",
         "src": "ARRI ALEV III 16:9 HD area 23.76 × 13.37 mm (Formats and Resolutions Overview)"
-      }
+      },
+      "year": 2011
     },
     {
       "id": 678,
@@ -812,7 +987,8 @@
         "h": 13.8,
         "mode": "HD · Super 35",
         "src": "Canon EOS C300 specifications: Super 35 effective 24.6 × 13.8 mm"
-      }
+      },
+      "year": 2011
     },
     {
       "id": 700,
@@ -833,7 +1009,8 @@
         "h": 13.8,
         "mode": "HD · Super 35",
         "src": "Canon EOS C300 specifications: Super 35 effective 24.6 × 13.8 mm"
-      }
+      },
+      "year": 2011
     },
     {
       "id": 9029,
@@ -858,7 +1035,8 @@
         "h": 13.8,
         "mode": "UHD 3840×2160 · Super 35",
         "src": "Canon EOS C300 Mark II specifications: Super 35 effective 24.6 × 13.8 mm"
-      }
+      },
+      "year": 2015
     },
     {
       "id": 15177,
@@ -883,7 +1061,8 @@
         "h": 20.1,
         "mode": "UHD 3840×2160 · Full Frame",
         "src": "Canon Europe EOS C500 Mark II specifications, Effective Sensor Screen Size: 35.7 × 20.1 mm at 3840 × 2160 (38.1 × 20.1 mm at 5952 × 3140 / 4096 × 2160); media: CFexpress card x2, SD for proxy"
-      }
+      },
+      "year": 2019
     },
     {
       "id": 28559,
@@ -906,7 +1085,8 @@
         "h": 19,
         "mode": "UHD 3840×2160 · Full Frame",
         "src": "Canon EOS C400 specifications: effective 33.8 × 19.0 mm at 3840 × 2160 (36.0 × 19.0 mm at 6000 × 3164 / 4096 × 2160)"
-      }
+      },
+      "year": 2024
     },
     {
       "id": 19707,
@@ -951,7 +1131,8 @@
             "pending": "Canon publishes no mm figure for the Super 16 crop"
           }
         ]
-      }
+      },
+      "year": 2020
     },
     {
       "id": 30392,
@@ -973,7 +1154,8 @@
         "h": 19,
         "mode": "UHD 3840×2160 · Full Frame",
         "src": "Canon EOS C80 specifications: effective 33.8 × 19.0 mm at 3840 × 2160 (Super 35 crop 24.6 × 13.8 mm)"
-      }
+      },
+      "year": 2024
     },
     {
       "id": 533,
@@ -994,7 +1176,8 @@
         "h": 20.25,
         "mode": "HD 1080 · full width",
         "src": "Canon EOS 5D Mark II specifications: 36 × 24 mm; 1080 video from the full width; 16:9 height derived from the published width"
-      }
+      },
+      "year": 2008
     },
     {
       "id": 16253,
@@ -1068,7 +1251,8 @@
             "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 2048 × 1080, 9.01 × 4.75 mm"
           }
         ]
-      }
+      },
+      "year": 2020
     },
     {
       "id": 22830,
@@ -1141,7 +1325,8 @@
             "src": "RED KOMODO Operation Guide v1.6, Project > Format > All Formats table (docs.red.com): 2048 × 1080, 9.01 × 4.75 mm"
           }
         ]
-      }
+      },
+      "year": 2022
     },
     {
       "id": 607,
@@ -1166,7 +1351,8 @@
         "h": 15.8,
         "mode": "6K 17:9",
         "src": "RED EPIC DRAGON specifications (RED Support): 30.7 × 15.8 mm, 6144 × 3160"
-      }
+      },
+      "year": 2013
     },
     {
       "id": 615,
@@ -1191,7 +1377,8 @@
         "h": 15.77,
         "mode": "8K 17:9",
         "src": "RED EPIC-W HELIUM 8K S35 technical specifications (docs.red.com): 29.90 × 15.77 mm, 8192 × 4320"
-      }
+      },
+      "year": 2016
     },
     {
       "id": 16137,
@@ -1220,7 +1407,8 @@
         "h": 14.25,
         "mode": "12K 17:9",
         "src": "Blackmagic URSA Mini Pro 12K tech specs: effective sensor size 27.03 × 14.25 mm (Super 35)"
-      }
+      },
+      "year": 2020
     },
     {
       "id": 13949,
@@ -1248,7 +1436,8 @@
         "h": 14.25,
         "mode": "4.6K 16:9",
         "src": "Blackmagic URSA Mini Pro 4.6K G2 tech specs: effective sensor size 25.34 × 14.25 mm"
-      }
+      },
+      "year": 2017
     },
     {
       "id": 26769,
@@ -1278,7 +1467,8 @@
         "add": "x_gen_dtap_bmdc",
         "match": "d-?tap.*locking dc",
         "src": "Blackmagic Design: a locking DC power connector"
-      }
+      },
+      "year": 2024
     },
     {
       "id": 12287,
@@ -1308,7 +1498,8 @@
         "add": "x_gen_dtap_bmdc",
         "match": "d-?tap.*locking dc",
         "src": "Blackmagic Design: a locking DC power connector"
-      }
+      },
+      "year": 2018
     },
     {
       "id": 14259,
@@ -1338,7 +1529,8 @@
         "add": "x_gen_dtap_bmdc",
         "match": "d-?tap.*locking dc",
         "src": "Blackmagic Design: a locking DC power connector"
-      }
+      },
+      "year": 2019
     },
     {
       "id": 9036,
@@ -1379,7 +1571,8 @@
         "h": 12.97,
         "mode": "UHD from 5.7K (full height)",
         "src": "Panasonic AU-EVA1: Super 35 24.60 × 12.97 mm (5.7K); UHD at full height = 23.06 mm wide (derived)"
-      }
+      },
+      "year": 2017
     },
     {
       "id": 1344,
@@ -1401,7 +1594,8 @@
         "h": 12.96,
         "mode": "UHD · Super 35",
         "src": "Panasonic VariCam operating guide specifications: UHD active area 23.04 × 12.96 mm (4K 24.576 × 12.96 mm)"
-      }
+      },
+      "year": 2014
     },
     {
       "id": 8473,
@@ -1427,7 +1621,8 @@
         "h": 12.96,
         "mode": "UHD · Super 35",
         "src": "Panasonic VariCam LT operating guide (VQT5M58), specifications: UHD active area 23.04 × 12.96 mm (4K 24.576 × 12.96 mm)"
-      }
+      },
+      "year": 2016
     },
     {
       "id": 14712,
@@ -1448,7 +1643,8 @@
         "h": 20,
         "mode": "UHD ≤30p · full width",
         "src": "Panasonic LUMIX S1H specifications: 35.6 × 23.8 mm; 4K/UHD up to 30p from the full 6K width; 16:9 height derived from the published width"
-      }
+      },
+      "year": 2019
     },
     {
       "id": 20892,
@@ -1469,7 +1665,8 @@
         "h": 20,
         "mode": "UHD ≤30p · full width",
         "src": "Panasonic LUMIX BS1H: same 35.6 × 23.8 mm sensor as the S1H; UHD from the full width; 16:9 height derived from the published width"
-      }
+      },
+      "year": 2020
     },
     {
       "id": 11007,
@@ -1627,7 +1824,8 @@
         "h": 19,
         "mode": "FF 6K 17:9",
         "src": "DJI Ronin 4D specs: Zenmuse X9 full-frame 36 × 24 mm; 6K 17:9 (6008 × 3168) height derived"
-      }
+      },
+      "year": 2021
     },
     {
       "id": 600,
@@ -1701,7 +1899,8 @@
         "h": 20.2,
         "mode": "FF 5K 16:9 → UHD",
         "src": "Sony spec page (35-mm full frame 35.9 × 24.0 mm); Sony Help Guide ILME-FX5 \"Clip Recording/Playback Time\": XAVC 3840×2160 recorded in imager mode FF 5K 16:9 at 23.98–119.88p. Height = 16:9 of the width (derived)."
-      }
+      },
+      "year": 2025
     }
   ],
   "kits": {

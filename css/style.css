@@ -1166,3 +1166,4 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 }
 .fov-modes { margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--hair, rgba(0,0,0,.08)); }
 .fov-modes .chips { margin-top: 6px; }
+.vfx-mode { display: block; margin-top: 3px; border: 1px solid rgba(255,255,255,.45); background: rgba(0,0,0,.35); color: #fff; border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700; min-height: 32px; cursor: pointer; }

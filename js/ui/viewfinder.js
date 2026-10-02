@@ -24,6 +24,10 @@ let open = null;
 export async function openViewfinder(o) {
   if (open) return;
   const { cam, stops, T } = o;
+  // The sensor window in use: the recording format's, switchable here with one tap.
+  const modes = o.modes || [];
+  let mi = Math.max(0, modes.findIndex(m => m.id === o.modeId));
+  let area = modes.length ? { w: modes[mi].w, h: modes[mi].h } : { w: cam.w, h: cam.h };
   let idx = Math.max(0, stops.findIndex(s => s.mm >= o.focal));
   if (stops[idx]?.mm !== o.focal && idx > 0 && Math.abs(stops[idx - 1].mm - o.focal) < Math.abs(stops[idx].mm - o.focal)) idx -= 1;
 
@@ -38,7 +42,7 @@ export async function openViewfinder(o) {
     <div class="vfx-frame"><span class="vfx-mm"></span></div>
     <div class="vfx-wide" hidden></div>
     <div class="vfx-top">
-      <div class="vfx-cam"><b>${esc(cam.name)}</b><small>${esc(`${cam.w}×${cam.h} mm${cam.mode ? ` · ${cam.mode}` : ''}`)}</small></div>
+      <div class="vfx-cam"><b>${esc(cam.name)}</b>${modes.length > 1 ? `<button class="vfx-mode" aria-label="${esc(T('rec_format'))}"></button>` : `<small>${esc(cam.mode || '')}</small>`}</div>
       <div class="vfx-btns"><button class="vfx-turn" aria-label="${esc(T('vf_turn'))}" title="${esc(T('vf_turn'))}">⟳</button><button class="vfx-close" aria-label="${esc(T('vf_stop'))}">✕</button></div>
     </div>
     <div class="vfx-bottom">
@@ -93,16 +97,17 @@ export async function openViewfinder(o) {
     if (!vw || !vh) return null;
     const tanPerVideoPx = TAN_HALF_LONG / (Math.max(vw, vh) / 2);
     const scale = Math.max(el.clientWidth / vw, el.clientHeight / vh);
-    return { w: ((cam.w / (2 * mm)) / tanPerVideoPx) * 2 * scale, h: ((cam.h / (2 * mm)) / tanPerVideoPx) * 2 * scale };
+    return { w: ((area.w / (2 * mm)) / tanPerVideoPx) * 2 * scale, h: ((area.h / (2 * mm)) / tanPerVideoPx) * 2 * scale };
   };
   const draw = () => {
     const mm = stops[idx].mm;
     const vw = video.videoWidth, vh = video.videoHeight;
     const SW = el.clientWidth, SH = el.clientHeight;
     el.querySelector('.vfx-big').innerHTML = `${mm}<small>mm</small>`;
-    el.querySelector('.vfx-deg').textContent = `${Math.round((2 * Math.atan(cam.w / (2 * mm)) * 180) / Math.PI)}°`;
+    el.querySelector('.vfx-deg').textContent = `${Math.round((2 * Math.atan(area.w / (2 * mm)) * 180) / Math.PI)}°`;
     el.querySelector('.vfx-mm').textContent = `${mm}mm`;
-    el.querySelector('.vfx-at').textContent = o.frameLine ? o.frameLine(mm) : '';
+    el.querySelector('.vfx-at').textContent = o.frameLine ? o.frameLine(mm, area) : '';
+    const mb = el.querySelector('.vfx-mode'); if (mb) mb.textContent = `${modes[mi].label} ▾`;
     ruler.querySelectorAll('.vfx-stop').forEach((b, i) => { b.classList.toggle('on', i === idx); b.classList.toggle('cmp', i === cmp); b.setAttribute('aria-selected', i === idx); });
     vs.hidden = cmp == null;
     if (cmp != null) vs.textContent = `vs ${stops[cmp].mm}mm ✕`;
@@ -117,7 +122,7 @@ export async function openViewfinder(o) {
     const tooWide = fw > SW * 1.02 || fh > SH * 1.02;
     // Upright, a phone sees far less across than along; sideways it may well hold this lens.
     const short = Math.min(vw, vh) / Math.max(vw, vh);
-    const fitsSideways = SH > SW && cam.w / (2 * mm) <= TAN_HALF_LONG && cam.h / (2 * mm) <= TAN_HALF_LONG * short;
+    const fitsSideways = SH > SW && area.w / (2 * mm) <= TAN_HALF_LONG && area.h / (2 * mm) <= TAN_HALF_LONG * short;
     wide.textContent = T(fitsSideways ? 'vf_rotate' : 'vf_wider');
     wide.hidden = !tooWide;
     frame.classList.toggle('over', tooWide);
@@ -214,6 +219,11 @@ export async function openViewfinder(o) {
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') step(e.key === 'ArrowRight' ? 1 : -1);
   };
   el.querySelector('.vfx-close').onclick = close;
+  el.querySelector('.vfx-mode')?.addEventListener('click', () => {
+    mi = (mi + 1) % modes.length;
+    area = { w: modes[mi].w, h: modes[mi].h };
+    o.onMode?.(modes[mi].id); feel.detent(); draw();
+  });
   el.querySelector('.vfx-turn').onclick = () => turn(orient === 'landscape' ? 'portrait' : 'landscape');
   window.addEventListener('hashchange', close);
   document.addEventListener('keydown', onKey);

@@ -105,6 +105,7 @@ const L = {
   vf_start: { he: 'פתח את מצלמת הטלפון', en: 'Open the phone camera' },
   vf_ruler: { he: 'בחירת מוקד', en: 'Focal length' },
   rec_format: { he: 'פורמט צילום', en: 'Recording format' },
+  same_frame: { he: 'אותו פריים כמו {list}', en: 'same frame as {list}' },
   n_formats: { he: '{n} פורמטים', en: '{n} formats' },
   mode_approx: { he: 'היצרן מפרסם את המצב הזה כיחס קרופ ולא במ״מ — הגודל מחושב ממנו', en: 'The maker gives this mode as a crop factor, not in mm — the size is worked out from it' },
   sensor_format: { he: 'פורמט חיישן', en: 'Sensor format' },
@@ -466,14 +467,17 @@ function fovTool(T, lang, ctx) {
     .filter(p => p.sensor)
     .map(p => { const product = ctx.catalog.byId(p.id); return { prof: product ? ctx.compat.profileFor(product) : null, product }; })
     .filter(x => x.product && x.prof)
-    .sort((a, b) => (a.product.brandName || '').localeCompare(b.product.brandName || '') || a.product.name.localeCompare(b.product.name));
+    .sort((a, b) => (b.prof.year || 0) - (a.prof.year || 0) || a.product.name.localeCompare(b.product.name));
   const FORMATS = ['FF', 'S35', 'MFT'].filter(k => cams.some(c => c.prof.format === k));
   if (s.fmt && !FORMATS.includes(s.fmt)) s.fmt = '';
   const inFmt = s.fmt ? cams.filter(c => c.prof.format === s.fmt) : cams;
   const brands = [...new Map(inFmt.map(c => [c.product.brand, c.product.brandName || c.product.brand])).entries()];
   if (s.camBrand && !brands.some(([b]) => b === s.camBrand) && s.picking) s.camBrand = '';
   if (!s.camBrand && brands.length === 1) s.camBrand = brands[0][0];
-  const models = inFmt.filter(c => c.product.brand === s.camBrand);
+  const frameKey = (c) => (c.prof.sensor.modes?.length ? JSON.stringify(c.prof.sensor.modes.map(m => [m.w, m.h])) : `${c.prof.sensor.w}x${c.prof.sensor.h}`);
+  const groupBy = (list) => { const g = new Map(); for (const c of list) { const k = frameKey(c); if (!g.has(k)) g.set(k, []); g.get(k).push(c); } return [...g.values()]; };
+  const models = groupBy(inFmt.filter(c => c.product.brand === s.camBrand));
+  const fmtCount = (k) => new Set(cams.filter(c => c.prof.format === k).map(frameKey)).size;
   if (!s.cam && !s.picking) {
     const p = activeProject(ctx.store.state.projects || []);
     const pc = p && cams.find(c => String(c.product.id) === String(p.buildCameraId));
@@ -488,7 +492,7 @@ function fovTool(T, lang, ctx) {
   const modeOf = (c) => { const ms = modesOf(c); return ms.find(m => m.id === s.modes?.[c.prof.id]) || ms[0] || null; };
   const areaOf = (c) => { const m = modeOf(c); return m ? { w: m.w, h: m.h, mode: m.label } : c.prof.sensor; };
   const curArea = cam ? areaOf(cam) : null;
-  const sensorNote = cam ? Tp('sensor_line', { w: curArea.w, h: curArea.h, mode: curArea.mode }) : '';
+  const sensorNote = cam ? [T('fmt_' + cam.prof.format), curArea.mode].filter(Boolean).join(' · ') : '';
   // Each recording format reads a different window of the sensor, so the choice changes the frame.
   const modeRow = cam && modesOf(cam).length > 1
     ? `<div class="fov-modes"><div class="tsub">${esc(T('rec_format'))}</div><div class="chips">${modesOf(cam).map(m => chip('data-cmode', m.id, esc(m.label), modeOf(cam).id === m.id)).join('')}</div>${modeOf(cam).pending ? `<p class="tnote">${esc(T('mode_approx'))}</p>` : ''}</div>`
@@ -501,12 +505,12 @@ function fovTool(T, lang, ctx) {
       </div>`
     : `<div class="card sh-sec" data-part="cam">
         <div class="tsub">1 · ${esc(T('sensor_format'))}</div>
-        <div class="chips">${chip('data-cfmt', '', esc(T('fmt_all')), !s.fmt)}${FORMATS.map(k => chip('data-cfmt', k, `${esc(T('fmt_' + k))} <i class="n">${cams.filter(c => c.prof.format === k).length}</i>`, s.fmt === k)).join('')}</div>
+        <div class="chips">${chip('data-cfmt', '', esc(T('fmt_all')), !s.fmt)}${FORMATS.map(k => chip('data-cfmt', k, `${esc(T('fmt_' + k))} <i class="n">${fmtCount(k)}</i>`, s.fmt === k)).join('')}</div>
         <div class="tsub" style="margin-top:12px">2 · ${esc(T('maker'))}</div>
         <div class="chips">${brands.map(([slug, n]) => chip('data-cbrand', slug, esc(n), slug === s.camBrand)).join('')}</div>
         <div class="fov-models-box">
           <div class="tsub">3 · ${esc(s.camBrand ? Tp('model_of', { brand: (brands.find(([b]) => b === s.camBrand) || [])[1] || '' }) : T('pick_maker_first'))}</div>
-          ${models.length ? `<div class="model-list">${models.map(c => `<button class="model-row ${cam && c.prof.id === cam.prof.id ? 'on' : ''}" data-cmodel="${esc(c.prof.id)}"><b>${esc(c.product.name)}</b><small>${esc(`${areaOf(c).w}×${areaOf(c).h} mm`)}${modesOf(c).length > 1 ? ` · ${esc(Tp('n_formats', { n: modesOf(c).length }))}` : ''}</small></button>`).join('')}</div>` : ''}
+          ${models.length ? `<div class="model-list">${models.map(g => { const c = g[0]; const same = g.slice(1).map(x => x.product.name); const sub = [c.prof.year, modesOf(c).length > 1 ? Tp('n_formats', { n: modesOf(c).length }) : '', same.length ? Tp('same_frame', { list: same.slice(0, 2).join(', ') + (same.length > 2 ? ` +${same.length - 2}` : '') }) : ''].filter(Boolean).join(' · '); return `<button class="model-row ${cam && g.includes(cam) ? 'on' : ''}" data-cmodel="${esc(c.prof.id)}"><b>${esc(c.product.name)}</b><small>${esc(sub)}</small></button>`; }).join('')}</div>` : ''}
         </div>
         <p class="tnote">${esc(T('verified_only'))}</p>
       </div>`;
@@ -645,7 +649,9 @@ function fovTool(T, lang, ctx) {
   </div>`;
   const cta = `<div class="fov-cta-space"></div><div class="bottombar fabbar"><button class="btn fab fov-cta" data-vf-start>${toolIcon('fov')}${esc(T('vf_start'))}</button></div>`;
 
-  fovView = { cam: { name: cam.product.name, w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown, frameLine: (mm) => { const z = frameAt(sn, mm, s.distance); return Tp('vf_at', { d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); } };
+  fovView = { cam: { name: cam.product.name, w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown,
+    modes: modesOf(cam), modeId: modeOf(cam)?.id, onMode: (id) => { S.fov.modes = { ...(S.fov.modes || {}), [cam.prof.id]: id }; keepFov(); },
+    frameLine: (mm, area = sn) => { const z = frameAt(area, mm, s.distance); return Tp('vf_at', { d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); } };
   keepFov();
 
   // The page is the camera and the viewfinder; the calculation from a distance waits folded.
