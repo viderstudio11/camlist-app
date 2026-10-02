@@ -73,7 +73,8 @@ export function createCatalog(data, manual = [], extra = null) {
   let manualProducts = [];
 
   const decorate = (p, isManual) => ({
-    id: p.id, name: p.name, brand: brandOf(p.brand),
+    // fixes: corrections to the source's own record (a name it gets wrong), each with who said so
+    id: p.id, name: extra?.fixes?.[p.id]?.name || p.name, brand: brandOf(p.brand),
     brandName: brandOf(p.brand) === GENERAL ? 'General' : p.brandName || brandNames.get(p.brand) || p.brand,
     dept: p.dept, subcats: p.subcats || [], image: p.image || extra?.images?.[p.id]?.image || null, url: p.url || null, manual: !!isManual, extra: !!p.extra,
     _n: '', _b: '', _all: '',

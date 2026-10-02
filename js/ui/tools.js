@@ -105,6 +105,11 @@ const L = {
   vf_start: { he: 'פתח את מצלמת הטלפון', en: 'Open the phone camera' },
   vf_ruler: { he: 'בחירת מוקד', en: 'Focal length' },
   rec_format: { he: 'פורמט צילום', en: 'Recording format' },
+  resolution: { he: 'רזולוציה', en: 'Resolution' },
+  sensor_area: { he: 'חיישן', en: 'Sensor' },
+  sens_FF: { he: 'FF', en: 'FF' },
+  sens_S35: { he: 'S35', en: 'S35' },
+  sens_OG: { he: 'Open Gate', en: 'Open Gate' },
   same_frame: { he: 'אותו פריים כמו {list}', en: 'same frame as {list}' },
   n_formats: { he: '{n} פורמטים', en: '{n} formats' },
   mode_approx: { he: 'היצרן מפרסם את המצב הזה כיחס קרופ ולא במ״מ — הגודל מחושב ממנו', en: 'The maker gives this mode as a crop factor, not in mm — the size is worked out from it' },
@@ -257,7 +262,7 @@ export const setPlaces = (data) => { placeData = data || placeData; };
 // Everything the user typed, kept while the app is open so switching tools does not reset the work.
 const S = {
   media: { brand: 'Sony', cam: 'fx6', fmt: '', fps: 25, mtype: '', card: 0, cardPicked: false, customCard: false, backup: false, hours: 10, customHours: false },
-  fov: { distance: 4, unit: 'm', shot: 'waist', focal: 0, cam: '', camBrand: '', fmt: '', modes: {}, picking: false, fromProject: false, calcOpen: false },
+  fov: { distance: 4, unit: 'm', shot: 'waist', focal: 0, cam: '', camBrand: '', res: '', sens: '', modes: {}, picking: false, fromProject: false, calcOpen: false },
   shutter: { fps: 25, mode: 'speed', speed: 50, angle: 180, mains: 50, projectFps: 25, customFps: false },
   offload: { gb: 1000, reader: 'CFexpress A', drive: 'ssd10', copies: 2, verify: true, customGb: false, fromMedia: false, readOther: false, readMBs: 800, writeOther: false, writeMBs: 1000, readers: 1, port: 'tb', cardGb: 0 },
   sun: { country: 'IL', city: 0, date: new Date().toISOString().slice(0, 10), dateMode: 'today', lat: null, lon: null },
@@ -269,7 +274,7 @@ const S = {
 // The lens tool remembers its camera and last lens on this phone, so opening it again picks up where
 // the user left off. Kept in this browser only; losing it just means starting from the project's camera.
 const FOV_KEY = 'camlist.fov';
-const FOV_KEEP = ['cam', 'camBrand', 'fmt', 'modes', 'focal', 'distance', 'unit', 'shot'];
+const FOV_KEEP = ['cam', 'camBrand', 'res', 'sens', 'modes', 'focal', 'distance', 'unit', 'shot'];
 try {
   const kept = JSON.parse(localStorage.getItem(FOV_KEY) || '{}');
   for (const k of FOV_KEEP) if (kept[k] != null) S.fov[k] = kept[k];
@@ -470,18 +475,45 @@ function fovTool(T, lang, ctx) {
     .map(p => { const product = ctx.catalog.byId(p.id); return { prof: product ? ctx.compat.profileFor(product) : null, product }; })
     .filter(x => x.product && x.prof)
     .sort((a, b) => (b.prof.year || 0) - (a.prof.year || 0) || a.product.name.localeCompare(b.product.name));
-  const FORMATS = ['FF', 'S35', 'MFT'].filter(k => cams.some(c => c.prof.format === k));
-  if (s.fmt && !FORMATS.includes(s.fmt)) s.fmt = '';
-  const inFmt = s.fmt ? cams.filter(c => c.prof.format === s.fmt) : cams;
-  const brands = [...new Map(inFmt.map(c => [c.product.brand, c.product.brandName || c.product.brand])).entries()];
+  // Catalog names carry the maker's marketing tail ('8K Digital Motion Picture Camera'); the model is enough here.
+  const short = (c) => c.product.name.replace(/\s+(\d+K\s+)?(Digital Motion Picture|Digital Cinema|Mirrorless|Cinema|Full[- ]Frame)?\s*Camera\b.*$/i, '').trim() || c.product.name;
+  // Every way of shooting: each recording format of each camera (or its one verified area), tagged by the
+  // resolutions it records and the part of the sensor it reads — read off the maker's own format names.
+  const RES = ['8K', '6K', '4K', 'HD'];
+  const resOf = (label) => {
+    const L = String(label || '').toUpperCase();
+    const k = [...L.matchAll(/(\d+(?:\.\d)?)K\b/g)].map(m => Number(m[1]));
+    const t = new Set();
+    for (const n of k) t.add(n >= 7.5 ? '8K' : n >= 4.5 ? '6K' : n >= 2.7 ? '4K' : 'HD');
+    if (/UHD|DCI/.test(L)) t.add('4K');
+    if (/(^|[^U])HD\b|1080/.test(L)) t.add('HD');
+    if (!t.size) t.add('4K');
+    return t;
+  };
+  const SENS = ['FF', 'S35', 'OG'];
+  const sensOf = (label, fmt) => {
+    const L = String(label || '');
+    if (/open gate|\b(3:2|4:3|6:5|1:1|8:9)\b/i.test(L)) return 'OG';
+    if (/super ?16|\bS16\b/i.test(L)) return 'S16';
+    if (/\bS35c?\b|super ?35/i.test(L)) return 'S35';
+    if (/\bFF|\bLF\b|full ?frame/i.test(L)) return 'FF';
+    return fmt;
+  };
+  const shots = cams.flatMap(c => {
+    const ms = c.prof.sensor.modes?.length ? c.prof.sensor.modes : [{ id: '', label: c.prof.sensor.mode, w: c.prof.sensor.w, h: c.prof.sensor.h }];
+    return ms.map(m => ({ c, m, res: resOf(m.label), sens: sensOf(m.label, c.prof.format), key: `${m.w}x${m.h}` }));
+  });
+  if (s.res && !RES.includes(s.res)) s.res = '';
+  if (s.sens && !SENS.includes(s.sens)) s.sens = '';
+  const byRes = s.res ? shots.filter(x => x.res.has(s.res)) : shots;
+  const bySens = s.sens ? byRes.filter(x => x.sens === s.sens) : byRes;
+  const count = (list) => new Set(list.map(x => x.key)).size;
+  const brands = [...new Map(bySens.map(x => [x.c.product.brand, x.c.product.brandName || x.c.product.brand])).entries()];
   if (s.camBrand && !brands.some(([b]) => b === s.camBrand) && s.picking) s.camBrand = '';
   if (!s.camBrand && brands.length === 1) s.camBrand = brands[0][0];
-  // Catalog names carry the maker's marketing tail ('8K Digital Motion Picture Camera'); the model is enough here.
-  const short = (c) => c.product.name.replace(/s+(d+Ks+)?(Digital Motion Picture|Digital Cinema|Mirrorless|Cinema|Full[- ]Frame)?s*Camera.*$/i, '').trim() || c.product.name;
-  const frameKey = (c) => (c.prof.sensor.modes?.length ? JSON.stringify(c.prof.sensor.modes.map(m => [m.w, m.h])) : `${c.prof.sensor.w}x${c.prof.sensor.h}`);
-  const groupBy = (list) => { const g = new Map(); for (const c of list) { const k = frameKey(c); if (!g.has(k)) g.set(k, []); g.get(k).push(c); } return [...g.values()]; };
-  const models = groupBy(inFmt.filter(c => c.product.brand === s.camBrand));
-  const fmtCount = (k) => new Set(cams.filter(c => c.prof.format === k).map(frameKey)).size;
+  // the same sensor window is the same frame: one row, named after the newest camera that has it
+  const rowsOf = (list) => { const g = new Map(); for (const x of list) { if (!g.has(x.key)) g.set(x.key, []); g.get(x.key).push(x); } return [...g.values()]; };
+  const models = rowsOf(bySens.filter(x => x.c.product.brand === s.camBrand));
   if (!s.cam && !s.picking) {
     const p = activeProject(ctx.store.state.projects || []);
     const pc = p && cams.find(c => String(c.product.id) === String(p.buildCameraId));
@@ -508,13 +540,15 @@ function fovTool(T, lang, ctx) {
         ${modeRow}
       </div>`
     : `<div class="card sh-sec" data-part="cam">
-        <div class="tsub">1 · ${esc(T('sensor_format'))}</div>
-        <div class="chips">${chip('data-cfmt', '', esc(T('fmt_all')), !s.fmt)}${FORMATS.map(k => chip('data-cfmt', k, `${esc(T('fmt_' + k))} <i class="n">${fmtCount(k)}</i>`, s.fmt === k)).join('')}</div>
-        <div class="tsub" style="margin-top:12px">2 · ${esc(T('maker'))}</div>
+        <div class="tsub">1 · ${esc(T('resolution'))}</div>
+        <div class="chips">${chip('data-cres', '', esc(T('fmt_all')), !s.res)}${RES.filter(r => shots.some(x => x.res.has(r))).map(r => chip('data-cres', r, `${r} <i class="n">${count(shots.filter(x => x.res.has(r)))}</i>`, s.res === r)).join('')}</div>
+        <div class="tsub" style="margin-top:12px">2 · ${esc(T('sensor_area'))}</div>
+        <div class="chips">${chip('data-csens', '', esc(T('fmt_all')), !s.sens)}${SENS.filter(k => byRes.some(x => x.sens === k)).map(k => chip('data-csens', k, `${esc(T('sens_' + k))} <i class="n">${count(byRes.filter(x => x.sens === k))}</i>`, s.sens === k)).join('')}</div>
+        <div class="tsub" style="margin-top:12px">3 · ${esc(T('maker'))}</div>
         <div class="chips">${brands.map(([slug, n]) => chip('data-cbrand', slug, esc(n), slug === s.camBrand)).join('')}</div>
         <div class="fov-models-box">
-          <div class="tsub">3 · ${esc(s.camBrand ? Tp('model_of', { brand: (brands.find(([b]) => b === s.camBrand) || [])[1] || '' }) : T('pick_maker_first'))}</div>
-          ${models.length ? `<div class="model-list">${models.map(g => { const c = g[0]; const same = g.slice(1).map(short); const sub = [c.prof.year, modesOf(c).length > 1 ? Tp('n_formats', { n: modesOf(c).length }) : '', same.length ? Tp('same_frame', { list: same.slice(0, 2).join(', ') + (same.length > 2 ? ` +${same.length - 2}` : '') }) : ''].filter(Boolean).join(' · '); return `<button class="model-row ${cam && g.includes(cam) ? 'on' : ''}" data-cmodel="${esc(c.prof.id)}"><b>${esc(short(c))}</b><small>${esc(sub)}</small></button>`; }).join('')}</div>` : ''}
+          <div class="tsub">4 · ${esc(s.camBrand ? Tp('model_of', { brand: (brands.find(([b]) => b === s.camBrand) || [])[1] || '' }) : T('pick_maker_first'))}</div>
+          ${models.length ? `<div class="model-list">${models.map(g => { const x = g[0]; const same = [...new Set(g.slice(1).map(y => short(y.c)))].filter(n => n !== short(x.c)); const sub = [x.m.label, x.c.prof.year, same.length ? Tp('same_frame', { list: same.slice(0, 2).join(', ') + (same.length > 2 ? ` +${same.length - 2}` : '') }) : ''].filter(Boolean).join(' · '); return `<button class="model-row ${cam && g.some(y => y.c === cam && (!y.m.id || y.m.id === modeOf(cam)?.id)) ? 'on' : ''}" data-cmodel="${esc(x.c.prof.id)}" data-cmodelmode="${esc(x.m.id)}"><b>${esc(short(x.c))}</b><small>${esc(sub)}</small></button>`; }).join('')}</div>` : ''}
         </div>
         <p class="tnote">${esc(T('verified_only'))}</p>
       </div>`;
@@ -641,7 +675,8 @@ function fovTool(T, lang, ctx) {
       </svg>
       <button class="fov-step" data-fstep="1" aria-label="${esc(T('lens_longer'))}" ${at === stops.length - 1 ? 'aria-disabled="true"' : ''}>›</button>
     </div>
-    <p class="tnote">${esc(Tp('vf_hint', { cam: cam.product.name }))}</p>
+    <button class="btn primary fov-open" data-vf-start>${toolIcon('fov')}${esc(T('vf_start'))}</button>
+    <p class="tnote">${esc(Tp('vf_hint', { cam: short(cam) }))}</p>
   </div>
 `;
   const frameAtLine = (mm) => { const z = frameAt(sn, mm, s.distance); return Tp('frame_at', { mm, d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); };
@@ -651,7 +686,6 @@ function fovTool(T, lang, ctx) {
     <div class="seg sh-mode"><button class="${unit === 'm' ? 'active' : ''}" data-unit="m">${esc(T('meters'))}</button><button class="${unit === 'ft' ? 'active' : ''}" data-unit="ft">${esc(T('feet'))}</button></div>
     <p class="fov-frameline">${esc(frameAtLine(shown))}</p>
   </div>`;
-  const cta = `<div class="fov-cta-space"></div><div class="bottombar fabbar"><button class="btn fab fov-cta" data-vf-start>${toolIcon('fov')}${esc(T('vf_start'))}</button></div>`;
 
   fovView = { cam: { name: short(cam), w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown,
     modes: modesOf(cam), modeId: modeOf(cam)?.id, onMode: (id) => { S.fov.modes = { ...(S.fov.modes || {}), [cam.prof.id]: id }; keepFov(); },
@@ -659,7 +693,7 @@ function fovTool(T, lang, ctx) {
   keepFov();
 
   // The page is the camera and the viewfinder; the calculation from a distance waits folded.
-  return `${pickCard}${viewfinder}${distRow}<details class="card fov-calc" ${s.calcOpen ? 'open' : ''} data-calc><summary>${esc(T('calc_by_distance'))}</summary>${distCard}${answer}</details>${cta}`;
+  return `${pickCard}${viewfinder}${distRow}<details class="card fov-calc" ${s.calcOpen ? 'open' : ''} data-calc><summary>${esc(T('calc_by_distance'))}</summary>${distCard}${answer}</details>`;
 }
 
 // ---------- shutter ----------
@@ -1084,7 +1118,11 @@ function wire(root, ctx, id, T, lang) {
   root.querySelectorAll('[data-lens]').forEach(b => { b.onclick = () => { S.fov.focal = Number(b.dataset.lens); ctx.render(); }; });
   root.querySelector('[data-lens-reset]')?.addEventListener('click', () => { S.fov.focal = 0; ctx.render(); });
   root.querySelectorAll('[data-cbrand]').forEach(b => { b.onclick = () => { Object.assign(S.fov, { camBrand: b.dataset.cbrand, cam: '', focal: 0, picking: true }); ctx.render(); }; });
-  root.querySelectorAll('[data-cmodel]').forEach(b => { b.onclick = () => { Object.assign(S.fov, { cam: b.dataset.cmodel, focal: 0, picking: false, fromProject: false }); ctx.render(); }; });
+  root.querySelectorAll('[data-cmodel]').forEach(b => { b.onclick = () => {
+    // a row is a camera in a format: choosing it sets both
+    const modes = b.dataset.cmodelmode ? { ...(S.fov.modes || {}), [b.dataset.cmodel]: b.dataset.cmodelmode } : S.fov.modes;
+    Object.assign(S.fov, { cam: b.dataset.cmodel, modes, focal: 0, picking: false, fromProject: false }); feel.detent(); ctx.render();
+  }; });
   // A new camera starts again from the card its maker's table used.
   const newCam = (m) => Object.assign(m, { fmt: '', cardPicked: false, customCard: false });
   root.querySelectorAll('[data-mbrand]').forEach(b => { b.onclick = () => { S.media.brand = b.dataset.mbrand; S.media.cam = ''; newCam(S.media); ctx.render(); }; });
@@ -1175,7 +1213,8 @@ function wire(root, ctx, id, T, lang) {
     if (i < 0 || i >= stops.length) { feel.end(); return; }
     S.fov.focal = stops[i].mm; feel.detent(); ctx.render();
   }; });
-  root.querySelectorAll('[data-cfmt]').forEach(b => { b.onclick = () => { S.fov.fmt = b.dataset.cfmt; S.fov.picking = true; ctx.render(); }; });
+  root.querySelectorAll('[data-cres]').forEach(b => { b.onclick = () => { Object.assign(S.fov, { res: b.dataset.cres, picking: true }); feel.detent(); ctx.render(); }; });
+  root.querySelectorAll('[data-csens]').forEach(b => { b.onclick = () => { Object.assign(S.fov, { sens: b.dataset.csens, picking: true }); feel.detent(); ctx.render(); }; });
   // the page's distance changes the frame, not the lens
   const fd2 = root.querySelector('[data-fdist2]');
   if (fd2) fd2.onchange = () => { const v = Number(fd2.value); if (v > 0) S.fov.distance = fromUnit(v, S.fov.unit); ctx.render(); };

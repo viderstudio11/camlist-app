@@ -1,5 +1,5 @@
 {
-  "_readme": "Supplementary products that Utopia does not carry. Merged into the catalog with source='extra' and shown with a 'not at Utopia' badge. dept = department slug, subcat = subcategory English name. Add entries freely. departments: new departments (slotted in after `after`); extend: subcategories added to existing departments; moves: re-file source products whose name matches `match` (first match wins) from subcategory `from` into department `to` / `subcat`. A product with brand null reads as General. presets: named sets of { id, qty } a screen can add in one tap (expendables = the basic cart set).",
+  "_readme": "Supplementary products that Utopia does not carry. Merged into the catalog with source='extra' and shown with a 'not at Utopia' badge. dept = department slug, subcat = subcategory English name. Add entries freely. departments: new departments (slotted in after `after`); extend: subcategories added to existing departments; moves: re-file source products whose name matches `match` (first match wins) from subcategory `from` into department `to` / `subcat`. A product with brand null reads as General. presets: named sets of { id, qty } a screen can add in one tap (expendables = the basic cart set). fixes: corrections to a source product by id ({ name, src }) — for when the source catalog names an item wrongly.",
   "brands": [
     {
       "id": "prograde",
@@ -1926,5 +1926,11 @@
     "Camera Support & Rigs": "ריגים ומגנטים",
     "Dolly & Sliders": "דולי וסליידרים",
     "Jib & Crane": "ג׳יב ועגורן"
+  },
+  "fixes": {
+    "25583": {
+      "name": "4CH V-Mount Charger",
+      "src": "Amir (2026-10-02): the FXLION quad charger in use is V-mount; Utopia lists it as 4CH B-Mount Charger (SKU ACS-BM4)"
+    }
   }
 }
