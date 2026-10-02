@@ -42,6 +42,7 @@ export async function openViewfinder(o) {
     <video class="vfx-video" playsinline autoplay muted></video>
     <div class="vfx-cmp" hidden><span></span></div>
     <div class="vfx-frame"><span class="vfx-mm"></span></div>
+    <div class="vfx-ui">
     <div class="vfx-wide" hidden></div>
     <div class="vfx-top">
       <div class="vfx-cam"><button class="vfx-cambtn" aria-label="${esc(T('vf_switch_cam'))}"><b class="vfx-camname"></b><span aria-hidden="true">▾</span></button><button class="vfx-mode" aria-label="${esc(T('rec_format'))}" hidden></button><small class="vfx-modetxt"></small></div>
@@ -59,6 +60,7 @@ export async function openViewfinder(o) {
         ${stops.map((s, i) => `<button class="vfx-stop ${s.have ? 'have' : ''}" role="option" data-i="${i}"><b>${s.mm}</b></button>`).join('')}
       </div>
       <p class="vfx-note">${esc(T('vf_hold'))}</p>
+    </div>
     </div>`;
   document.body.appendChild(el);
   document.documentElement.classList.add('vfx-on');
@@ -67,12 +69,18 @@ export async function openViewfinder(o) {
   // Full screen first (it must come straight from the tap), then the screen is turned.
   // Opens upright, as the phone is held; the turn button goes sideways (and back) on request.
   let orient = 'portrait';
-  const turn = (to) => {
+  // Sideways: Android turns the screen (orientation lock, in full screen). iPhone cannot — there the
+  // picture stays as it is (it is a window onto the scene either way) and only the controls and the
+  // frame turn a quarter, so with the phone held sideways everything reads upright.
+  const turn = async (to) => {
     orient = to;
     const lbl = el.querySelector('.vfx-turn-lbl');
     if (lbl) lbl.textContent = T(to === 'landscape' ? 'vf_to_portrait' : 'vf_to_landscape');
     el.classList.toggle('vfx-portrait', to === 'portrait');
-    screen.orientation?.lock?.(to).catch(() => {});
+    let locked = false;
+    if (screen.orientation?.lock) { try { await screen.orientation.lock(to); locked = true; } catch { /* not allowed here */ } }
+    el.classList.toggle('vfx-rot', !locked && to === 'landscape');
+    if (typeof draw === 'function') { draw(); centreOn(idx, false); curve(); }
   };
   const goFull = el.requestFullscreen?.({ navigationUI: 'hide' }) || el.webkitRequestFullscreen?.();
   Promise.resolve(goFull).catch(() => {});
@@ -133,16 +141,17 @@ export async function openViewfinder(o) {
     if (cmp != null) vs.textContent = `vs ${stops[cmp].mm}mm ✕`;
     const c = cmp != null && sizeOf(stops[cmp].mm);
     cmpEl.hidden = !c;
-    if (c) { cmpEl.style.width = `${c.w}px`; cmpEl.style.height = `${c.h}px`; cmpEl.querySelector('span').textContent = `${stops[cmp].mm}mm`; }
+    const rot = el.classList.contains('vfx-rot');
+    if (c) { cmpEl.style.width = `${rot ? c.h : c.w}px`; cmpEl.style.height = `${rot ? c.w : c.h}px`; cmpEl.querySelector('span').textContent = `${stops[cmp].mm}mm`; }
     const z = sizeOf(mm);
     if (!z) return;
     const fw = z.w, fh = z.h;
-    frame.style.width = `${fw}px`;
-    frame.style.height = `${fh}px`;
-    const tooWide = fw > SW * 1.02 || fh > SH * 1.02;
+    frame.style.width = `${rot ? fh : fw}px`;
+    frame.style.height = `${rot ? fw : fh}px`;
+    const tooWide = rot ? (fw > SH * 1.02 || fh > SW * 1.02) : (fw > SW * 1.02 || fh > SH * 1.02);
     // Upright, a phone sees far less across than along; sideways it may well hold this lens.
     const short = Math.min(vw, vh) / Math.max(vw, vh);
-    const fitsSideways = SH > SW && area.w / (2 * mm) <= TAN_HALF_LONG && area.h / (2 * mm) <= TAN_HALF_LONG * short;
+    const fitsSideways = !rot && SH > SW && area.w / (2 * mm) <= TAN_HALF_LONG && area.h / (2 * mm) <= TAN_HALF_LONG * short;
     wide.textContent = T(fitsSideways ? 'vf_rotate' : 'vf_wider');
     wide.hidden = !tooWide;
     frame.classList.toggle('over', tooWide);
@@ -213,10 +222,11 @@ export async function openViewfinder(o) {
 
   // A swipe across the picture steps one lens, for a thumb that is not on the ruler.
   let sx = null;
-  video.addEventListener('pointerdown', (e) => { sx = e.clientX; });
+  let sy = null;
+  video.addEventListener('pointerdown', (e) => { sx = e.clientX; sy = e.clientY; });
   video.addEventListener('pointerup', (e) => {
     if (sx == null) return;
-    const dx = e.clientX - sx; sx = null;
+    const dx = el.classList.contains('vfx-rot') ? e.clientY - sy : e.clientX - sx; sx = null;
     if (Math.abs(dx) < 40) return;
     step(dx < 0 ? 1 : -1);
   });

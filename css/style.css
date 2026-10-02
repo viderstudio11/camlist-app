@@ -1204,3 +1204,8 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 .fov-filterbtn.open i { transform: rotate(180deg); }
 .fov-filters { margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
 .fov-pick-cancel { margin-top: 10px; }
+/* viewfinder controls layer; turned a quarter on phones that cannot turn the screen (iPhone) */
+.vfx-ui { position: absolute; inset: 0; pointer-events: none; }
+.vfx-ui > * { pointer-events: auto; }
+.vfx-ui > .vfx-wide { pointer-events: none; }
+.vfx.vfx-rot .vfx-ui { inset: auto; top: 50%; left: 50%; width: 100vh; width: 100dvh; height: 100vw; transform: translate(-50%, -50%) rotate(90deg); }
