@@ -1,5 +1,5 @@
 import { loadScript, download } from './ui/dom.js';
-import { displayName, formatDateRange } from './export-text.js';
+import { displayName, formatDateRange, roleKey } from './export-text.js';
 import { safeName } from './export-xlsx.js';
 
 // OOXML defines the children of <w:rPr> as a sequence, so their order is part of the format.
@@ -92,7 +92,7 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
   const slateBoxes = [
     [t('production_co'), project.productionCo],
     [t('dates'), ltr(formatDateRange(project.dateFrom, project.dateTo))],
-    [t('tech_manager'), project.techManager],
+    [t(roleKey(project.role)), project.techManager],
     [t('contact'), contact],
   ].filter(([, v]) => v);
   const slateRows = [

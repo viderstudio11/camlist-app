@@ -1,5 +1,9 @@
 import { t } from './i18n.js';
 
+// Who the person named on the list is: the 1st AC by default, or the focus puller, or the DP.
+export const ROLES = ['ac', 'fp', 'dp'];
+export const roleKey = (role) => ({ fp: 'role_fp', dp: 'role_dp' }[role] || 'tech_manager');
+
 export function displayName(p) {
   const b = p.brandName;
   if (!b || p.brand === 'general' || p.name.toLowerCase().startsWith(b.toLowerCase())) return p.name;
@@ -29,7 +33,7 @@ export function buildShareText(project, groups, { lang = 'he', includeNotes = tr
   const own = (s) => (s ? `⁨${s}⁩` : '');
   const lines = [`*${project.name || t('untitled', {}, lang)}*`];
   if (project.productionCo) lines.push(own(project.productionCo));
-  const meta = [project.techManager ? `${t('tech_manager', {}, lang)}: ${own(project.techManager)}` : '', iso(formatDateRange(project.dateFrom, project.dateTo))].filter(Boolean);
+  const meta = [project.techManager ? `${t(roleKey(project.role), {}, lang)}: ${own(project.techManager)}` : '', iso(formatDateRange(project.dateFrom, project.dateTo))].filter(Boolean);
   if (meta.length) lines.push(meta.join(' · '));
   const contact = [project.phone, project.email].filter(Boolean).map(iso);
   if (contact.length) lines.push(contact.join(' · '));

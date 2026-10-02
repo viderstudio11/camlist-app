@@ -166,6 +166,7 @@ function renderSettings(ctx, _p, root) {
   const locale = getLang() === 'he' ? 'he-IL' : 'en-GB';
   root.innerHTML = `
     <div class="card form">
+      ${Projects.roleSwitch(t, s.role, 'defaultRole')}
       <label>${t('default_tech_manager')}<input name="techManager" value="${esc(s.techManager)}" autocomplete="off"></label>
     </div>
     <div class="section-title">${t('appearance')}</div>
@@ -189,6 +190,7 @@ function renderSettings(ctx, _p, root) {
       <div class="kv"><span>utopiacam.com</span><b>${esc(BUILD_DATE)}</b></div>
     </div>`;
   root.querySelector('[name=techManager]').onchange = (e) => store.setSettings({ techManager: e.target.value.trim() });
+  root.querySelector('[name=defaultRole]').addEventListener('change', (e) => store.setSettings({ role: e.target.value }));
   root.querySelector('[data-open-skins]').onclick = () => ctx.navigate('#/skins');
   // What this phone allows: the browser may have no Vibration API (iPhone) or refuse the call.
   root.querySelector('[data-vibtest]').onclick = () => {

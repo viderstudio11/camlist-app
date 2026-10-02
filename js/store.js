@@ -53,7 +53,7 @@ export function createStore(storage = localStorageAdapter()) {
     subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     setSettings(patch) { state.settings = { ...state.settings, ...patch }; state.settingsUpdatedAt = now(); emit(); },
     createProject(fields = {}) {
-      const p = { id: uid('p'), name: '', techManager: state.settings.techManager || '', dateFrom: '', dateTo: '', notes: '',
+      const p = { id: uid('p'), name: '', techManager: state.settings.techManager || '', role: state.settings.role || 'ac', dateFrom: '', dateTo: '', notes: '',
         ...fields, items: fields.items ? [...fields.items] : [], createdAt: now(), updatedAt: now() };
       state.projects.unshift(p); emit(); return p;
     },

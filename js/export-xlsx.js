@@ -1,5 +1,5 @@
 import { loadScript, download } from './ui/dom.js';
-import { displayName, formatDateRange } from './export-text.js';
+import { displayName, formatDateRange, roleKey } from './export-text.js';
 
 export const safeName = (s) => (String(s || '').trim() || 'gearlist').replace(/[\\/:*?"<>|]+/g, '-').slice(0, 60);
 
@@ -9,7 +9,7 @@ export async function exportXlsx(project, groups, { lang, includeNotes = true, i
   const rows = [
     [project.name || t('untitled')],
     [project.productionCo || ''],
-    [`${t('tech_manager')}: ${project.techManager || ''}`, formatDateRange(project.dateFrom, project.dateTo)],
+    [`${t(roleKey(project.role))}: ${project.techManager || ''}`, formatDateRange(project.dateFrom, project.dateTo)],
     [[project.phone, project.email].filter(Boolean).join(' · ')],
     [project.notes || ''],
     [],

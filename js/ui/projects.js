@@ -1,15 +1,32 @@
 import { esc, openSheet, confirmDialog, icons } from './dom.js';
-import { formatDateRange } from '../export-text.js';
+import { formatDateRange, ROLES, roleKey } from '../export-text.js';
 import { activeProject, deptStrip, cameraChips } from '../home.js';
 import { deptIcon, toolIcon } from './icons.js';
 import { toolLabel } from './tools.js';
+
+// The role switch: 1st AC / focus puller / DP. A hidden field carries the choice into the form.
+export const roleSwitch = (t, role = 'ac', name = 'role') => `<div class="role-switch"><span>${t('role_label')}</span><div class="seg" role="radiogroup">${ROLES.map(r => `<button type="button" class="${(role || 'ac') === r ? 'active' : ''}" data-role="${r}" role="radio" aria-checked="${(role || 'ac') === r}">${t(roleKey(r))}</button>`).join('')}</div><input type="hidden" name="${name}" value="${role || 'ac'}"></div>`;
+// One listener for every role switch (forms open in sheets, so it is delegated).
+document.addEventListener('click', (e) => {
+  const b = e.target.closest?.('.role-switch [data-role]');
+  if (!b) return;
+  const box = b.closest('.role-switch');
+  box.querySelectorAll('[data-role]').forEach(x => { x.classList.toggle('active', x === b); x.setAttribute('aria-checked', x === b); });
+  const input = box.querySelector('input[type=hidden]');
+  input.value = b.dataset.role;
+  input.dispatchEvent(new Event('change', { bubbles: true }));
+  const form = box.parentElement;
+  const lbl = form.querySelector('[data-role-label]');
+  if (lbl) lbl.textContent = b.textContent;
+});
 
 export function projectForm(t, p = {}) {
   const opt = `<em class="opt">(${t('optional')})</em>`;
   return `<div class="form">
     <label>${t('project_name')}<input name="name" value="${esc(p.name || '')}" autocomplete="off" enterkeyhint="done"></label>
     <label>${t('production_co')} ${opt}<input name="productionCo" value="${esc(p.productionCo || '')}" autocomplete="off"></label>
-    <label>${t('tech_manager')} ${opt}<input name="techManager" value="${esc(p.techManager || '')}" autocomplete="off"></label>
+    ${roleSwitch(t, p.role)}
+    <label><span data-role-label>${t(roleKey(p.role))}</span> ${opt}<input name="techManager" value="${esc(p.techManager || '')}" autocomplete="off"></label>
     <div class="two">
       <label>${t('phone')} ${opt}<input type="tel" name="phone" value="${esc(p.phone || '')}" autocomplete="off" inputmode="tel"></label>
       <label>${t('email')} ${opt}<input type="email" name="email" value="${esc(p.email || '')}" autocomplete="off" inputmode="email"></label>
@@ -53,7 +70,7 @@ export function render(ctx, _params, root) {
     const range = formatDateRange(active.dateFrom, active.dateTo);
     const cams = cameraChips(active.items, ctx.resolve, ctx.deptOrder());
     const strip = deptStrip(active.items, ctx.resolve, ctx.deptOrder());
-    const who = [active.productionCo, active.techManager ? `${t('tech_manager')}: ${active.techManager}` : ''].filter(Boolean).map(esc).join(' · ');
+    const who = [active.productionCo, active.techManager ? `${t(roleKey(active.role))}: ${active.techManager}` : ''].filter(Boolean).map(esc).join(' · ');
     hero = `<div class="home-sec"><span class="lbl">${t('active_project')}</span></div>
     <article class="phero" data-id="${esc(active.id)}">
       <div class="ticks"></div>
@@ -87,7 +104,7 @@ export function render(ctx, _params, root) {
   root.insertAdjacentHTML('beforeend', `<div class="bottombar fabbar"><button class="btn fab" data-new>${icons.plus}${t('new_project')}</button></div>`);
 
   root.querySelector('[data-new]').onclick = () => openSheet({
-    title: t('new_project'), bodyHTML: projectForm(t, { techManager: store.state.settings.techManager }),
+    title: t('new_project'), bodyHTML: projectForm(t, { techManager: store.state.settings.techManager, role: store.state.settings.role }),
     actions: [{ label: t('cancel'), kind: 'ghost' }, { label: t('save'), kind: 'primary', onClick: (body) => { const f = readForm(body); if (!f.name) { body.querySelector('[name=name]').focus(); return false; } const p = store.createProject(f); ctx.navigate(`#/p/${p.id}`); } }],
     onOpen: (body) => body.querySelector('[name=name]').focus(),
   });

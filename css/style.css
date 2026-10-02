@@ -1170,3 +1170,6 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 .vfx-mode { display: block; margin-top: 3px; border: 1px solid rgba(255,255,255,.45); background: rgba(0,0,0,.35); color: #fff; border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700; min-height: 32px; cursor: pointer; }
 .btn.primary.fov-open { width: 100%; min-height: 54px; margin-top: 10px; font-size: 16px; font-weight: 700; gap: 10px; border-radius: 16px; }
 .btn.primary.fov-open svg { width: 22px; height: 22px; }
+.role-switch { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.role-switch > span { font-size: 13px; font-weight: 700; color: var(--muted); }
+.role-switch .seg button { min-height: 40px; padding: 0 12px; }

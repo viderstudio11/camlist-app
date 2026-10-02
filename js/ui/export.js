@@ -1,6 +1,6 @@
 import { esc, icons, toast } from './dom.js';
 import { groupByDept } from '../list.js';
-import { buildShareText, displayName, formatDateRange } from '../export-text.js';
+import { buildShareText, displayName, formatDateRange, roleKey } from '../export-text.js';
 import { exportXlsx } from '../export-xlsx.js';
 import { feel } from '../feel.js';
 import { exportDocx } from '../export-docx.js';
@@ -23,7 +23,7 @@ const textPreview = (txt, previewDir) => txt.split('\n').map(l0 => {
 function docPreview(p, groups, t, sheet) {
   // each detail isolated, the dates left to right, so a Hebrew name beside them never flips them
   const range = formatDateRange(p.dateFrom, p.dateTo);
-  const meta = [p.productionCo && `<bdi>${esc(p.productionCo)}</bdi>`, p.techManager && `${esc(t('tech_manager'))}: <bdi>${esc(p.techManager)}</bdi>`, range && `<bdi dir="ltr">${esc(range)}</bdi>`].filter(Boolean);
+  const meta = [p.productionCo && `<bdi>${esc(p.productionCo)}</bdi>`, p.techManager && `${esc(t(roleKey(p.role)))}: <bdi>${esc(p.techManager)}</bdi>`, range && `<bdi dir="ltr">${esc(range)}</bdi>`].filter(Boolean);
   const rows = groups.map(g => {
     const items = g.entries.map(({ item, product, accessory }) => `
       <div class="dp-row ${accessory ? 'acc' : ''}"><b>${item.qty}×</b><span><bdi>${esc(displayName(product))}</bdi>${opts.includeNotes && item.note ? `<small><bdi>${esc(item.note)}</bdi></small>` : ''}</span></div>`).join('');

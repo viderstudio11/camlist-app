@@ -1,5 +1,5 @@
 import { esc } from './ui/dom.js';
-import { displayName, formatDateRange, fmtDate, todayStr } from './export-text.js';
+import { displayName, formatDateRange, fmtDate, todayStr, roleKey } from './export-text.js';
 
 // The printed list reads like a list: a thin clapper stripe on top, the production name, one line of
 // details, then each department with the quantity first. No rules between rows and no brand column —
@@ -26,13 +26,13 @@ export function renderPrint(ctx, project, groups, root, { includeNotes = true, i
 
   const dates = formatDateRange(project.dateFrom, project.dateTo);
   // Each detail is isolated, so a Hebrew name next to an English label (or a date range) never reorders.
-  const meta = [project.productionCo && `<bdi>${esc(project.productionCo)}</bdi>`, project.techManager && `${esc(t('tech_manager'))}: <bdi>${esc(project.techManager)}</bdi>`, dates && `<bdi dir="ltr">${esc(dates)}</bdi>`].filter(Boolean);
+  const meta = [project.productionCo && `<bdi>${esc(project.productionCo)}</bdi>`, project.techManager && `${esc(t(roleKey(project.role)))}: <bdi>${esc(project.techManager)}</bdi>`, dates && `<bdi dir="ltr">${esc(dates)}</bdi>`].filter(Boolean);
   const contact = [project.phone, project.email].filter(Boolean).join(' · ');
   // The slate's boxes, as on a clapperboard: production company, shoot days, 1st AC, contact.
   const slateCells = [
     [t('production_co'), project.productionCo && `<bdi>${esc(project.productionCo)}</bdi>`],
     [t('dates'), dates && `<bdi dir="ltr">${esc(dates)}</bdi>`],
-    [t('tech_manager'), project.techManager && `<bdi>${esc(project.techManager)}</bdi>`],
+    [t(roleKey(project.role)), project.techManager && `<bdi>${esc(project.techManager)}</bdi>`],
     [t('contact'), contact && `<bdi dir="ltr">${esc(contact)}</bdi>`],
   ].filter(([, v]) => v);
   root.innerHTML = `<div class="print" dir="${dir}" lang="${lang}">
