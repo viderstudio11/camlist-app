@@ -121,6 +121,8 @@ const L = {
   vf_hold: { he: 'גוללים את החוגה או מחליקים על התמונה. החזקה ארוכה על עדשה משווה אותה לנוכחית.', en: 'Turn the dial or swipe the picture. Hold a lens to compare it with the current one.' },
   vf_cmp_clear: { he: 'בטל השוואה', en: 'Clear comparison' },
   vf_turn: { he: 'החלפה בין רוחב לאורך', en: 'Switch between landscape and portrait' },
+  vf_to_landscape: { he: 'לרוחב', en: 'Landscape' },
+  vf_to_portrait: { he: 'לאורך', en: 'Portrait' },
   maker: { he: 'יצרן', en: 'Maker' },
   model_of: { he: 'דגם · {brand}', en: 'Model · {brand}' },
   pick_maker_first: { he: 'בחר יצרן כדי לראות את הדגמים', en: 'Pick a maker to see its models' },
@@ -474,6 +476,8 @@ function fovTool(T, lang, ctx) {
   const brands = [...new Map(inFmt.map(c => [c.product.brand, c.product.brandName || c.product.brand])).entries()];
   if (s.camBrand && !brands.some(([b]) => b === s.camBrand) && s.picking) s.camBrand = '';
   if (!s.camBrand && brands.length === 1) s.camBrand = brands[0][0];
+  // Catalog names carry the maker's marketing tail ('8K Digital Motion Picture Camera'); the model is enough here.
+  const short = (c) => c.product.name.replace(/s+(d+Ks+)?(Digital Motion Picture|Digital Cinema|Mirrorless|Cinema|Full[- ]Frame)?s*Camera.*$/i, '').trim() || c.product.name;
   const frameKey = (c) => (c.prof.sensor.modes?.length ? JSON.stringify(c.prof.sensor.modes.map(m => [m.w, m.h])) : `${c.prof.sensor.w}x${c.prof.sensor.h}`);
   const groupBy = (list) => { const g = new Map(); for (const c of list) { const k = frameKey(c); if (!g.has(k)) g.set(k, []); g.get(k).push(c); } return [...g.values()]; };
   const models = groupBy(inFmt.filter(c => c.product.brand === s.camBrand));
@@ -499,7 +503,7 @@ function fovTool(T, lang, ctx) {
     : '';
   const pickCard = cam && !s.picking
     ? `<div class="card sh-sec fov-cam" data-part="cam">
-        <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(cam.product.name)}</b><p class="tnote">${esc(sensorNote)}</p></div>
+        <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(short(cam))}</b><p class="tnote">${esc(sensorNote)}</p></div>
         <button class="btn sm" data-cchange>${esc(T('change'))}</button></div>
         ${modeRow}
       </div>`
@@ -510,7 +514,7 @@ function fovTool(T, lang, ctx) {
         <div class="chips">${brands.map(([slug, n]) => chip('data-cbrand', slug, esc(n), slug === s.camBrand)).join('')}</div>
         <div class="fov-models-box">
           <div class="tsub">3 · ${esc(s.camBrand ? Tp('model_of', { brand: (brands.find(([b]) => b === s.camBrand) || [])[1] || '' }) : T('pick_maker_first'))}</div>
-          ${models.length ? `<div class="model-list">${models.map(g => { const c = g[0]; const same = g.slice(1).map(x => x.product.name); const sub = [c.prof.year, modesOf(c).length > 1 ? Tp('n_formats', { n: modesOf(c).length }) : '', same.length ? Tp('same_frame', { list: same.slice(0, 2).join(', ') + (same.length > 2 ? ` +${same.length - 2}` : '') }) : ''].filter(Boolean).join(' · '); return `<button class="model-row ${cam && g.includes(cam) ? 'on' : ''}" data-cmodel="${esc(c.prof.id)}"><b>${esc(c.product.name)}</b><small>${esc(sub)}</small></button>`; }).join('')}</div>` : ''}
+          ${models.length ? `<div class="model-list">${models.map(g => { const c = g[0]; const same = g.slice(1).map(short); const sub = [c.prof.year, modesOf(c).length > 1 ? Tp('n_formats', { n: modesOf(c).length }) : '', same.length ? Tp('same_frame', { list: same.slice(0, 2).join(', ') + (same.length > 2 ? ` +${same.length - 2}` : '') }) : ''].filter(Boolean).join(' · '); return `<button class="model-row ${cam && g.includes(cam) ? 'on' : ''}" data-cmodel="${esc(c.prof.id)}"><b>${esc(short(c))}</b><small>${esc(sub)}</small></button>`; }).join('')}</div>` : ''}
         </div>
         <p class="tnote">${esc(T('verified_only'))}</p>
       </div>`;
@@ -649,7 +653,7 @@ function fovTool(T, lang, ctx) {
   </div>`;
   const cta = `<div class="fov-cta-space"></div><div class="bottombar fabbar"><button class="btn fab fov-cta" data-vf-start>${toolIcon('fov')}${esc(T('vf_start'))}</button></div>`;
 
-  fovView = { cam: { name: cam.product.name, w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown,
+  fovView = { cam: { name: short(cam), w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown,
     modes: modesOf(cam), modeId: modeOf(cam)?.id, onMode: (id) => { S.fov.modes = { ...(S.fov.modes || {}), [cam.prof.id]: id }; keepFov(); },
     frameLine: (mm, area = sn) => { const z = frameAt(area, mm, s.distance); return Tp('vf_at', { d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); } };
   keepFov();

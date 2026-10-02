@@ -52,8 +52,10 @@ function click(gain = 0.25, ms = 14, freq = 2400) {
 }
 
 export const feel = {
-  // one stop of a lens or aperture ring
-  detent() { buzz(18); click(0.22, 12, 2600); },
+  // one stop of a lens or aperture ring (30 ms: shorter pulses are lost on many phone motors)
+  detent() { buzz(30); click(0.22, 12, 2600); },
+  // the ring comes to rest on a lens
+  settle() { buzz(45); click(0.28, 16, 2000); },
   // the hard stop at either end of the ring
   end() { buzz([30, 70, 30]); click(0.32, 18, 900); setTimeout(() => click(0.32, 18, 900), 60); },
   // something went into the list

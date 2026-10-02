@@ -37,7 +37,8 @@ export function editProjectSheet(ctx, id) {
 
 // Home opens on the project you are working on: a hero card with its departments and cameras,
 // then the field tools, then every project. The wordmark shrinks into the top bar.
-const HOME_TOOLS = ['media', 'sun', 'shutter', 'fov', 'hours'];
+// Every tool sits on the home screen, two rows of four, so none hides behind an extra tap.
+const HOME_TOOLS = ['media', 'sun', 'shutter', 'fov', 'hours', 'offload', 'luts', 'units'];
 
 export function render(ctx, _params, root) {
   const { store, t } = ctx;
@@ -68,7 +69,7 @@ export function render(ctx, _params, root) {
     </article>`;
   }
 
-  const tools = `<div class="home-sec"><span class="lbl">${t('tools')}</span><button class="linkbtn" data-tools>${t('all')}</button></div>
+  const tools = `<div class="home-sec"><span class="lbl">${t('tools')}</span></div>
     <div class="toolrow">${HOME_TOOLS.map(k => `<button class="tr-t" data-tool="${k}"><span class="tool-ico">${toolIcon(k)}</span><span class="tr-n">${esc(toolLabel(k, lang))}</span></button>`).join('')}</div>`;
 
   const rows = projects.map(p => {

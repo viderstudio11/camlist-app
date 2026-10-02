@@ -43,7 +43,7 @@ export async function openViewfinder(o) {
     <div class="vfx-wide" hidden></div>
     <div class="vfx-top">
       <div class="vfx-cam"><b>${esc(cam.name)}</b>${modes.length > 1 ? `<button class="vfx-mode" aria-label="${esc(T('rec_format'))}"></button>` : `<small>${esc(cam.mode || '')}</small>`}</div>
-      <div class="vfx-btns"><button class="vfx-turn" aria-label="${esc(T('vf_turn'))}" title="${esc(T('vf_turn'))}">⟳</button><button class="vfx-close" aria-label="${esc(T('vf_stop'))}">✕</button></div>
+      <div class="vfx-btns"><button class="vfx-turn" aria-label="${esc(T('vf_turn'))}"><svg class="vfx-turn-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="14" height="9" rx="1.6"/><path d="M14 3.5a6 6 0 0 1 6 6"/><path d="M20 6.2v3.3h-3.3"/></svg><span class="vfx-turn-lbl">${esc(T('vf_to_landscape'))}</span></button><button class="vfx-close" aria-label="${esc(T('vf_stop'))}">✕</button></div>
     </div>
     <div class="vfx-bottom">
       <div class="vfx-read"><b class="vfx-big"></b><span class="vfx-deg"></span><button class="vfx-vs" hidden aria-label="${esc(T('vf_cmp_clear'))}"></button></div>
@@ -58,14 +58,17 @@ export async function openViewfinder(o) {
 
   // The app itself stays upright; the viewfinder opens sideways, the way a cine frame is seen.
   // Full screen first (it must come straight from the tap), then the screen is turned.
-  let orient = 'landscape';
+  // Opens upright, as the phone is held; the turn button goes sideways (and back) on request.
+  let orient = 'portrait';
   const turn = (to) => {
     orient = to;
+    const lbl = el.querySelector('.vfx-turn-lbl');
+    if (lbl) lbl.textContent = T(to === 'landscape' ? 'vf_to_portrait' : 'vf_to_landscape');
     el.classList.toggle('vfx-portrait', to === 'portrait');
     screen.orientation?.lock?.(to).catch(() => {});
   };
   const goFull = el.requestFullscreen?.({ navigationUI: 'hide' }) || el.webkitRequestFullscreen?.();
-  Promise.resolve(goFull).then(() => turn('landscape')).catch(() => {});
+  Promise.resolve(goFull).catch(() => {});
 
   let stream;
   try {
@@ -133,7 +136,8 @@ export async function openViewfinder(o) {
     const b = ruler.children[i];
     ruler.scrollTo({ left: b.offsetLeft - (ruler.clientWidth - b.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' });
   };
-  const tick = () => feel.detent();
+  let lastTick = 0;
+  const tick = () => { const now = performance.now(); if (now - lastTick > 70) { lastTick = now; feel.detent(); } };
   // stepping past either end of the ring knocks against the stop instead of moving
   const step = (dir) => {
     const n = idx + dir;
@@ -179,6 +183,9 @@ export async function openViewfinder(o) {
   ruler.addEventListener('pointerup', cancelHold);
   ruler.addEventListener('pointercancel', cancelHold);
   ruler.addEventListener('scroll', cancelHold, { passive: true });
+  // when the ring stops on a lens: a firmer click (a short quiet after the last scroll means it has settled)
+  let settleT = 0, settledAt = idx;
+  ruler.addEventListener('scroll', () => { clearTimeout(settleT); settleT = setTimeout(() => { if (settledAt !== idx) { settledAt = idx; feel.settle(); } }, 160); }, { passive: true });
   ruler.addEventListener('contextmenu', (e) => e.preventDefault());
   vs.onclick = () => { cmp = null; draw(); };
   ruler.addEventListener('click', (e) => {
@@ -224,7 +231,14 @@ export async function openViewfinder(o) {
     area = { w: modes[mi].w, h: modes[mi].h };
     o.onMode?.(modes[mi].id); feel.detent(); draw();
   });
-  el.querySelector('.vfx-turn').onclick = () => turn(orient === 'landscape' ? 'portrait' : 'landscape');
+  el.querySelector('.vfx-turn').onclick = () => {
+    const to = orient === 'landscape' ? 'portrait' : 'landscape';
+    // turning the screen needs full screen; ask again from this tap if it was refused or left
+    if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+      Promise.resolve(el.requestFullscreen?.({ navigationUI: 'hide' }) || el.webkitRequestFullscreen?.()).then(() => turn(to)).catch(() => turn(to));
+    } else turn(to);
+    feel.detent();
+  };
   window.addEventListener('hashchange', close);
   document.addEventListener('keydown', onKey);
   // Leaving full screen with the phone's back gesture closes the viewfinder too.
