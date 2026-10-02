@@ -531,10 +531,15 @@ function fovTool(T, lang, ctx) {
   const modeOf = (c) => { const ms = modesOf(c); return ms.find(m => m.id === s.modes?.[c.prof.id]) || ms[0] || null; };
   const areaOf = (c) => { const m = modeOf(c); return m ? { w: m.w, h: m.h, mode: m.label } : c.prof.sensor; };
   const curArea = cam ? areaOf(cam) : null;
-  const sensorNote = cam ? [T('fmt_' + cam.prof.format), curArea.mode].filter(Boolean).join(' · ') : '';
+  // the sensor part the chosen format reads (an S35 mode on a full-frame camera says S35)
+  const SENS_NAME = { FF: T('fmt_FF'), S35: 'Super 35', OG: 'Open Gate', S16: 'Super 16', MFT: 'MFT' };
+  const sensorNote = cam ? [SENS_NAME[sensOf(curArea.mode, cam.prof.format)] || T('fmt_' + cam.prof.format), curArea.mode].filter(Boolean).join(' · ') : '';
   // Each recording format reads a different window of the sensor, so the choice changes the frame.
   const modeRow = cam && modesOf(cam).length > 1
-    ? `<div class="fov-modes"><div class="tsub">${esc(T('rec_format'))}</div><div class="chips">${modesOf(cam).map(m => chip('data-cmode', m.id, esc(m.label), modeOf(cam).id === m.id)).join('')}</div>${modeOf(cam).pending ? `<p class="tnote">${esc(T('mode_approx'))}</p>` : ''}</div>`
+    ? `<div class="fov-modes"><div class="tsub">${esc(T('rec_format'))} · ${esc(Tp('n_formats', { n: modesOf(cam).length }))}</div>
+      <button class="fov-modebtn ${s.modesOpen ? 'open' : ''}" data-modes-toggle aria-expanded="${!!s.modesOpen}"><b>${esc(modeOf(cam).label)}</b><span aria-hidden="true">▾</span></button>
+      ${s.modesOpen ? `<div class="model-list fov-modelist">${modesOf(cam).map(m => `<button class="model-row ${modeOf(cam).id === m.id ? 'on' : ''}" data-cmode="${esc(m.id)}"><b>${esc(m.label)}</b></button>`).join('')}</div>` : ''}
+      ${modeOf(cam).pending ? `<p class="tnote">${esc(T('mode_approx'))}</p>` : ''}</div>`
     : '';
   const pickCard = cam && !s.picking
     ? `<div class="card sh-sec fov-cam" data-part="cam">
@@ -1221,7 +1226,8 @@ function wire(root, ctx, id, T, lang) {
   // the page's distance changes the frame, not the lens
   const fd2 = root.querySelector('[data-fdist2]');
   if (fd2) fd2.onchange = () => { const v = Number(fd2.value); if (v > 0) S.fov.distance = fromUnit(v, S.fov.unit); ctx.render(); };
-  root.querySelectorAll('[data-cmode]').forEach(b => { b.onclick = () => { S.fov.modes = { ...(S.fov.modes || {}), [S.fov.cam]: b.dataset.cmode }; feel.detent(); ctx.render(); }; });
+  root.querySelectorAll('[data-cmode]').forEach(b => { b.onclick = () => { S.fov.modes = { ...(S.fov.modes || {}), [S.fov.cam]: b.dataset.cmode }; S.fov.modesOpen = false; feel.detent(); ctx.render(); }; });
+  root.querySelector('[data-modes-toggle]')?.addEventListener('click', () => { S.fov.modesOpen = !S.fov.modesOpen; ctx.render(); });
   root.querySelector('[data-cchange]')?.addEventListener('click', () => { S.fov.picking = true; ctx.render(); });
 
   root.querySelectorAll('[data-scity]').forEach(b => { b.onclick = () => { Object.assign(S.sun, { city: Number(b.dataset.scity), lat: null, lon: null }); redraw(); }; });
