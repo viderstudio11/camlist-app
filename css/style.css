@@ -1209,3 +1209,17 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 .vfx-ui > * { pointer-events: auto; }
 .vfx-ui > .vfx-wide { pointer-events: none; }
 .vfx.vfx-rot .vfx-ui { inset: auto; top: 50%; left: 50%; width: 100vh; width: 100dvh; height: 100vw; transform: translate(-50%, -50%) rotate(90deg); }
+/* product card */
+.row[data-pid] > .thumb { position: relative; cursor: zoom-in; }
+.row[data-pid] > .thumb::after { content: "i"; position: absolute; inset-block-end: -3px; inset-inline-end: -3px; width: 15px; height: 15px; border-radius: 50%; background: var(--surface); border: 1px solid var(--border-2); color: var(--muted); font: italic 700 10px/13px Georgia, serif; text-align: center; }
+.pcard { display: grid; gap: 10px; }
+.pcard-img { background: #fff; border-radius: 14px; padding: 10px; display: grid; place-items: center; max-height: 220px; overflow: hidden; }
+.pcard-img img { max-width: 100%; max-height: 200px; object-fit: contain; }
+.pcard-name small { display: block; font-size: 12px; color: var(--muted); font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.pcard-name b { font-size: 18px; }
+.pcard .btn { width: 100%; justify-content: center; min-height: 48px; }
+.pcard-sub { font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: var(--dim); margin-top: 4px; }
+.pcard-stores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pcard-src { font-size: 13px; color: var(--muted); }
+.pcard a.btn { text-decoration: none; white-space: nowrap; }
+.pcard-stores a.btn { font-size: 14px; padding: 0 6px; }

@@ -1,4 +1,5 @@
 import { feel, setSound } from './feel.js';
+import { installProductCard } from './ui/product.js';
 import { createStore } from './store.js';
 import { createCatalog, loadCatalog } from './catalog.js';
 import { createCompat, loadCompat } from './compat.js';
@@ -265,6 +266,8 @@ document.addEventListener('contextmenu', (e) => {
   if (!e.target.closest?.('input, textarea, [contenteditable], .preview, .print')) e.preventDefault();
 });
 applyDir();
+// tap a product's picture anywhere: the product card with the maker's site and stores
+installProductCard(ctx);
 document.documentElement.dataset.theme = store.state.settings.theme || 'light';
 setSound(store.state.settings.sounds);
 document.documentElement.dataset.skin = isSkin(store.state.settings.skin) ? store.state.settings.skin : DEFAULT_SKIN;
