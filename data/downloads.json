@@ -1,5 +1,5 @@
 {
-  "_readme": "The Downloads area: official download pages by department. Every url was opened and checked on 2026-10-02 (pages that refuse scripted checks were opened in a browser). type = firmware | software | app | lut. Camera firmware is not listed here — it comes from data/compat.json (cameras[].firmware), and camera LUTs from data/luts.json, so each fact lives in one place.",
+  "_readme": "The Downloads area: official download pages by department. Every url was opened and checked on 2026-10-02 (pages that refuse scripted checks were opened in a browser). type = firmware | software | app | lut. Camera firmware is not listed here — it comes from data/compat.json (cameras[].firmware), and camera LUTs from data/luts.json, so each fact lives in one place. Camera support pages linked as firmware also carry the user manuals (Sony, Canon, ARRI, RED, Blackmagic, DJI, Panasonic Pro); the LUMIX S1H/BS1H pages are firmware-only.",
   "departments": [
     {
       "id": "cameras",
@@ -45,6 +45,11 @@
       "id": "tools",
       "he": "תוכנות יצרן",
       "en": "Maker software"
+    },
+    {
+      "id": "apps",
+      "he": "אפליקציות לטלפון",
+      "en": "Phone apps"
     }
   ],
   "items": [
@@ -346,14 +351,69 @@
       }
     },
     {
-      "dept": "tools",
+      "dept": "apps",
       "type": "app",
-      "brand": "Blackmagic Design",
+      "brand": "Sony",
+      "name": "Sony Creators’ App",
+      "url": "https://www.sony.net/cca/",
+      "note": {
+        "he": "שליטה במצלמות Sony והעברת קבצים · אנדרואיד ואייפון",
+        "en": "Control Sony cameras and move files · Android and iPhone"
+      }
+    },
+    {
+      "dept": "apps",
+      "type": "app",
+      "brand": "Sony",
+      "name": "Sony Monitor & Control",
+      "url": "https://www.sony.net/ccmc/",
+      "note": {
+        "he": "מוניטור ושליטה מהטלפון למצלמות Cinema Line · אנדרואיד ואייפון",
+        "en": "Monitor and control Cinema Line cameras from the phone · Android and iPhone"
+      }
+    },
+    {
+      "dept": "apps",
+      "type": "app",
+      "brand": "DJI",
+      "name": "DJI Ronin",
+      "url": "https://www.dji.com/downloads/djiapp/dji-ronin",
+      "note": {
+        "he": "הגדרות וכיול לגימבלים של DJI · אנדרואיד ואייפון",
+        "en": "Set up and calibrate DJI gimbals · Android and iPhone"
+      }
+    },
+    {
+      "dept": "apps",
+      "type": "app",
+      "brand": "DJI",
+      "name": "DJI Mimo",
+      "url": "https://www.dji.com/downloads/djiapp/dji-mimo",
+      "note": {
+        "he": "לגימבלים לטלפון ו-Osmo · אנדרואיד ואייפון",
+        "en": "For phone gimbals and Osmo cameras · Android and iPhone"
+      }
+    },
+    {
+      "dept": "apps",
+      "type": "app",
+      "brand": "Blackmagic",
       "name": "Blackmagic Camera",
       "url": "https://www.blackmagicdesign.com/products/blackmagiccamera",
       "note": {
-        "he": "אפליקציית צילום לטלפון",
-        "en": "Camera app for the phone"
+        "he": "אפליקציית צילום מקצועית לטלפון · אנדרואיד ואייפון",
+        "en": "A pro camera app for the phone · Android and iPhone"
+      }
+    },
+    {
+      "dept": "apps",
+      "type": "app",
+      "brand": "Accsoon",
+      "name": "Accsoon",
+      "url": "https://accsoon.com/pages/download",
+      "note": {
+        "he": "צפייה בשידור האלחוטי של CineEye / CineView · אנדרואיד ואייפון",
+        "en": "Watch the CineEye / CineView wireless feed · Android and iPhone"
       }
     }
   ]
