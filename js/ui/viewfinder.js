@@ -23,9 +23,11 @@ let open = null;
  */
 export async function openViewfinder(o) {
   if (open) return;
-  const { cam, stops, T } = o;
+  const { stops, T } = o;
+  // The camera in use can be swapped from here (o.cameras), and with it its recording formats.
+  let cam = o.cam;
   // The sensor window in use: the recording format's, switchable here with one tap.
-  const modes = o.modes || [];
+  let modes = o.modes || [];
   let mi = Math.max(0, modes.findIndex(m => m.id === o.modeId));
   let area = modes.length ? { w: modes[mi].w, h: modes[mi].h } : { w: cam.w, h: cam.h };
   let idx = Math.max(0, stops.findIndex(s => s.mm >= o.focal));
@@ -42,8 +44,13 @@ export async function openViewfinder(o) {
     <div class="vfx-frame"><span class="vfx-mm"></span></div>
     <div class="vfx-wide" hidden></div>
     <div class="vfx-top">
-      <div class="vfx-cam"><b>${esc(cam.name)}</b>${modes.length > 1 ? `<button class="vfx-mode" aria-label="${esc(T('rec_format'))}"></button>` : `<small>${esc(cam.mode || '')}</small>`}</div>
+      <div class="vfx-cam"><button class="vfx-cambtn" aria-label="${esc(T('vf_switch_cam'))}"><b class="vfx-camname"></b><span aria-hidden="true">▾</span></button><button class="vfx-mode" aria-label="${esc(T('rec_format'))}" hidden></button><small class="vfx-modetxt"></small></div>
       <div class="vfx-btns"><button class="vfx-turn" aria-label="${esc(T('vf_turn'))}"><svg class="vfx-turn-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="14" height="9" rx="1.6"/><path d="M14 3.5a6 6 0 0 1 6 6"/><path d="M20 6.2v3.3h-3.3"/></svg><span class="vfx-turn-lbl">${esc(T('vf_to_landscape'))}</span></button><button class="vfx-close" aria-label="${esc(T('vf_stop'))}">✕</button></div>
+    </div>
+    <div class="vfx-sheet" hidden role="dialog" aria-label="${esc(T('vf_switch_cam'))}">
+      <div class="vfx-sheet-head"><b>${esc(T('vf_switch_cam'))}</b><button class="vfx-sheet-x" aria-label="${esc(T('vf_stop'))}">✕</button></div>
+      <input class="vfx-q" type="search" placeholder="${esc(T('cam_search_ph'))}" autocomplete="off" enterkeyhint="search">
+      <div class="vfx-camlist"></div>
     </div>
     <div class="vfx-bottom">
       <div class="vfx-read"><b class="vfx-big"></b><span class="vfx-deg"></span><button class="vfx-vs" hidden aria-label="${esc(T('vf_cmp_clear'))}"></button></div>
@@ -70,17 +77,21 @@ export async function openViewfinder(o) {
   const goFull = el.requestFullscreen?.({ navigationUI: 'hide' }) || el.webkitRequestFullscreen?.();
   Promise.resolve(goFull).catch(() => {});
 
+  // Why the camera did not open decides what the user is told: no camera API at all (the in-app browser
+  // of WhatsApp, Instagram and the like, or a page not on https), permission refused, or no camera.
+  const fail = (why) => { leaveFullscreen(); document.documentElement.classList.remove('vfx-on'); el.remove(); return why; };
+  if (!navigator.mediaDevices?.getUserMedia) return fail('unsupported');
   let stream;
   try {
     stream = await navigator.mediaDevices.getUserMedia({
       video: { facingMode: { ideal: 'environment' }, width: { ideal: 1920 }, height: { ideal: 1080 } },
       audio: false,
     });
-  } catch {
-    leaveFullscreen();
-    document.documentElement.classList.remove('vfx-on');
-    el.remove();
-    return false;
+  } catch (err) {
+    if (err?.name === 'NotAllowedError' || err?.name === 'SecurityError') return fail('denied');
+    // some phones (older iPhones among them) refuse the size request: ask again for any rear camera
+    try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false }); }
+    catch (err2) { return fail(err2?.name === 'NotAllowedError' ? 'denied' : err2?.name === 'NotFoundError' ? 'nocamera' : 'failed'); }
   }
 
   const video = el.querySelector('video');
@@ -88,6 +99,8 @@ export async function openViewfinder(o) {
   const wide = el.querySelector('.vfx-wide');
   const ruler = el.querySelector('.vfx-ruler');
   video.srcObject = stream;
+  video.setAttribute('playsinline', ''); video.setAttribute('webkit-playsinline', '');
+  video.play?.().catch(() => {});
 
   // Where the cine frame falls on screen. The video fills the screen (cover), so the phone's angle
   // per screen pixel comes from the stream's own size and the cover scale.
@@ -110,7 +123,11 @@ export async function openViewfinder(o) {
     el.querySelector('.vfx-deg').textContent = `${Math.round((2 * Math.atan(area.w / (2 * mm)) * 180) / Math.PI)}°`;
     el.querySelector('.vfx-mm').textContent = `${mm}mm`;
     el.querySelector('.vfx-at').textContent = o.frameLine ? o.frameLine(mm, area) : '';
-    const mb = el.querySelector('.vfx-mode'); if (mb) mb.textContent = `${modes[mi].label} ▾`;
+    el.querySelector('.vfx-camname').textContent = cam.name;
+    const mb = el.querySelector('.vfx-mode');
+    mb.hidden = modes.length < 2;
+    if (modes.length > 1) mb.textContent = `${modes[mi].label} ▾`;
+    el.querySelector('.vfx-modetxt').textContent = modes.length > 1 ? '' : (modes[0]?.label || cam.mode || '');
     ruler.querySelectorAll('.vfx-stop').forEach((b, i) => { b.classList.toggle('on', i === idx); b.classList.toggle('cmp', i === cmp); b.setAttribute('aria-selected', i === idx); });
     vs.hidden = cmp == null;
     if (cmp != null) vs.textContent = `vs ${stops[cmp].mm}mm ✕`;
@@ -222,14 +239,48 @@ export async function openViewfinder(o) {
     o.onClose(stops[idx].mm);
   };
   const onKey = (e) => {
+    if (e.target.closest?.('.vfx-sheet')) { if (e.key === 'Escape') sheet.hidden = true; return; }
     if (e.key === 'Escape') close();
     if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') step(e.key === 'ArrowRight' ? 1 : -1);
   };
   el.querySelector('.vfx-close').onclick = close;
-  el.querySelector('.vfx-mode')?.addEventListener('click', () => {
+  el.querySelector('.vfx-mode').addEventListener('click', () => {
+    if (modes.length < 2) return;
     mi = (mi + 1) % modes.length;
     area = { w: modes[mi].w, h: modes[mi].h };
-    o.onMode?.(modes[mi].id); feel.detent(); draw();
+    o.onMode?.(cam.id, modes[mi].id); feel.detent(); draw();
+  });
+  // Switching camera without leaving: the project's and recent cameras first, or search by name.
+  const sheet = el.querySelector('.vfx-sheet');
+  const list = el.querySelector('.vfx-camlist');
+  const q = el.querySelector('.vfx-q');
+  const tagOf = (id) => (o.projectId != null && String(id) === String(o.projectId) ? T('cam_from_project') : (o.recent || []).map(String).includes(String(id)) ? T('cam_recent') : '');
+  const listCams = () => {
+    const term = q.value.trim().toLowerCase();
+    const all = o.cameras || [];
+    const quick = [o.projectId, ...(o.recent || [])].filter(x => x != null).map(String);
+    const found = term ? all.filter(c => c.name.toLowerCase().includes(term))
+      : [...quick.map(id => all.find(c => String(c.id) === id)).filter(Boolean), ...all.filter(c => !quick.includes(String(c.id)))];
+    list.innerHTML = [...new Map(found.map(c => [String(c.id), c])).values()].slice(0, 40).map(c =>
+      `<button class="vfx-camrow ${String(c.id) === String(cam.id) ? 'on' : ''}" data-cam="${esc(c.id)}"><b>${esc(c.name)}</b><small>${esc(String(c.id) === String(cam.id) ? T('cam_now') : tagOf(c.id))}</small></button>`).join('')
+      || `<p class="vfx-empty">${esc(T('cam_none'))}</p>`;
+  };
+  const setCam = (c) => {
+    cam = c;
+    modes = c.modes || [];
+    mi = Math.max(0, modes.findIndex(m => m.id === o.modeFor?.(c.id)));
+    area = modes.length ? { w: modes[mi].w, h: modes[mi].h } : { w: c.w, h: c.h };
+    o.onCamera?.(c.id);
+    feel.detent(); draw();
+  };
+  el.querySelector('.vfx-cambtn').addEventListener('click', () => { sheet.hidden = !sheet.hidden; if (!sheet.hidden) { q.value = ''; listCams(); } });
+  el.querySelector('.vfx-sheet-x').addEventListener('click', () => { sheet.hidden = true; });
+  q.addEventListener('input', listCams);
+  list.addEventListener('click', (e) => {
+    const b = e.target.closest('[data-cam]'); if (!b) return;
+    const c = (o.cameras || []).find(x => String(x.id) === b.dataset.cam);
+    if (c) setCam(c);
+    sheet.hidden = true;
   });
   el.querySelector('.vfx-turn').onclick = () => {
     const to = orient === 'landscape' ? 'portrait' : 'landscape';

@@ -105,6 +105,16 @@ const L = {
   vf_start: { he: 'פתח את מצלמת הטלפון', en: 'Open the phone camera' },
   vf_ruler: { he: 'בחירת מוקד', en: 'Focal length' },
   rec_format: { he: 'פורמט צילום', en: 'Recording format' },
+  cam_yours: { he: 'המצלמות שלך', en: 'Your cameras' },
+  cam_search_ph: { he: 'הקלד מצלמה: fx9, venice, alexa…', en: 'Type a camera: fx9, venice, alexa…' },
+  cam_hits: { he: '{n} תוצאות', en: '{n} results' },
+  cam_none: { he: 'לא נמצאה מצלמה בשם הזה', en: 'No camera by that name' },
+  cam_from_project: { he: 'פרויקט', en: 'project' },
+  cam_recent: { he: 'לאחרונה', en: 'recent' },
+  cam_now: { he: 'עכשיו', en: 'now' },
+  filters: { he: 'סינון', en: 'Filter' },
+  cancel_pick: { he: 'השאר את המצלמה הנוכחית', en: 'Keep the current camera' },
+  vf_switch_cam: { he: 'החלפת מצלמה', en: 'Switch camera' },
   firmware: { he: 'עדכון תוכנה אחרון', en: 'Latest firmware' },
   resolution: { he: 'רזולוציה', en: 'Resolution' },
   sensor_area: { he: 'חיישן', en: 'Sensor' },
@@ -141,6 +151,10 @@ const L = {
   vf_hint: { he: 'רואים במצלמת הטלפון מה כל עדשה תתפוס על {cam} מהמקום שאתה עומד בו. גוללים בין העדשות והמסגרת משתנה בלייב.', en: 'See on your phone camera what each lens takes in on the {cam} from where you stand. Scroll through lenses and the frame follows live.' },
   vf_wider: { he: 'העדשה הזו רחבה יותר ממה שהטלפון רואה — כל המסך בתוך הפריים. התרחק או בחר עדשה ארוכה יותר.', en: 'This lens is wider than the phone sees — the whole screen is inside the frame. Step back or pick a longer lens.' },
   vf_denied: { he: 'אין גישה למצלמה. צריך לאשר הרשאה בדפדפן.', en: 'No camera access. The browser needs permission.' },
+  vf_err_inapp: { he: 'הדפדפן הזה לא מאפשר מצלמה — כנראה נפתח מתוך וואטסאפ/אינסטגרם. פתח את הקישור ב-Safari (או בכרום) ונסה שוב.', en: 'This browser can’t use the camera — it was probably opened inside WhatsApp or Instagram. Open the link in Safari (or Chrome) and try again.' },
+  vf_err_denied_ios: { he: 'הגישה למצלמה נחסמה. באייפון: לחץ על "aA" בשורת הכתובת ← הגדרות אתר ← מצלמה ← אפשר. או: הגדרות ← Safari ← מצלמה ← אפשר.', en: 'Camera access is blocked. On iPhone: tap "aA" in the address bar → Website Settings → Camera → Allow. Or Settings → Safari → Camera → Allow.' },
+  vf_err_denied: { he: 'הגישה למצלמה נחסמה. לחץ על סמל המנעול ליד הכתובת ← הרשאות ← מצלמה ← אפשר, ונסה שוב.', en: 'Camera access is blocked. Tap the lock by the address → Permissions → Camera → Allow, and try again.' },
+  vf_err_nocam: { he: 'לא נמצאה מצלמה במכשיר.', en: 'No camera was found on this device.' },
   vf_approx: { he: 'הערכה לפי המצלמה הראשית של הטלפון (1×). גוללים בפס או מחליקים על התמונה.', en: 'An estimate based on the phone’s main (1×) camera. Scroll the strip or swipe the picture.' },
   focal: { he: 'מוקד (מ״מ)', en: 'Focal length (mm)' },
   camera_step: { he: 'מצלמה', en: 'Camera' },
@@ -263,7 +277,7 @@ export const setPlaces = (data) => { placeData = data || placeData; };
 // Everything the user typed, kept while the app is open so switching tools does not reset the work.
 const S = {
   media: { brand: 'Sony', cam: 'fx6', fmt: '', fps: 25, mtype: '', card: 0, cardPicked: false, customCard: false, backup: false, hours: 10, customHours: false },
-  fov: { distance: 4, unit: 'm', shot: 'waist', focal: 0, cam: '', camBrand: '', res: '', sens: '', modes: {}, picking: false, fromProject: false, calcOpen: false },
+  fov: { distance: 4, unit: 'm', shot: 'waist', focal: 0, cam: '', camBrand: '', res: '', sens: '', modes: {}, recent: [], q: '', filtersOpen: false, picking: false, fromProject: false, calcOpen: false },
   shutter: { fps: 25, mode: 'speed', speed: 50, angle: 180, mains: 50, projectFps: 25, customFps: false },
   offload: { gb: 1000, reader: 'CFexpress A', drive: 'ssd10', copies: 2, verify: true, customGb: false, fromMedia: false, readOther: false, readMBs: 800, writeOther: false, writeMBs: 1000, readers: 1, port: 'tb', cardGb: 0 },
   sun: { country: 'IL', city: 0, date: new Date().toISOString().slice(0, 10), dateMode: 'today', lat: null, lon: null },
@@ -275,7 +289,9 @@ const S = {
 // The lens tool remembers its camera and last lens on this phone, so opening it again picks up where
 // the user left off. Kept in this browser only; losing it just means starting from the project's camera.
 const FOV_KEY = 'camlist.fov';
-const FOV_KEEP = ['cam', 'camBrand', 'res', 'sens', 'modes', 'focal', 'distance', 'unit', 'shot'];
+const FOV_KEEP = ['cam', 'camBrand', 'res', 'sens', 'modes', 'recent', 'focal', 'distance', 'unit', 'shot'];
+// The cameras used last, newest first — the picker and the viewfinder offer them before anything else.
+const pushRecent = (id) => { S.fov.recent = [String(id), ...(S.fov.recent || []).map(String).filter(x => x !== String(id))].slice(0, 5); };
 try {
   const kept = JSON.parse(localStorage.getItem(FOV_KEY) || '{}');
   for (const k of FOV_KEEP) if (kept[k] != null) S.fov[k] = kept[k];
@@ -541,6 +557,22 @@ function fovTool(T, lang, ctx) {
       ${s.modesOpen ? `<div class="model-list fov-modelist">${modesOf(cam).map(m => `<button class="model-row ${modeOf(cam).id === m.id ? 'on' : ''}" data-cmode="${esc(m.id)}"><b>${esc(m.label)}</b></button>`).join('')}</div>` : ''}
       ${modeOf(cam).pending ? `<p class="tnote">${esc(T('mode_approx'))}</p>` : ''}</div>`
     : '';
+  // the project's camera and the recent ones, as quick picks
+  const projProf = (() => { const p = activeProject(ctx.store.state.projects || []); const pc = p && cams.find(c => String(c.product.id) === String(p.buildCameraId)); return pc ? String(pc.prof.id) : null; })();
+  const quickIds = [...new Set([projProf, ...(s.recent || []).map(String)].filter(Boolean))].slice(0, 5);
+  const quick = quickIds.map(id => cams.find(c => String(c.prof.id) === id)).filter(Boolean);
+  const rowHTML = (g) => { const x = g[0]; const same = [...new Set(g.slice(1).map(y => short(y.c)))].filter(n => n !== short(x.c)); const sub = [x.m.label, x.c.prof.year, same.length ? Tp('same_frame', { list: same.slice(0, 2).join(', ') + (same.length > 2 ? ` +${same.length - 2}` : '') }) : ''].filter(Boolean).join(' · '); return `<button class="model-row ${cam && g.some(y => y.c === cam && (!y.m.id || y.m.id === modeOf(cam)?.id)) ? 'on' : ''}" data-cmodel="${esc(x.c.prof.id)}" data-cmodelmode="${esc(x.m.id)}"><b>${esc(short(x.c))}</b><small>${esc(sub)}</small></button>`; };
+  const term = (s.q || '').trim().toLowerCase();
+  const hits = term ? rowsOf(bySens.filter(x => (short(x.c) + ' ' + x.c.product.name + ' ' + (x.c.product.brandName || '')).toLowerCase().includes(term) && (!unfiltered || !x.m.id || x.m === x.c.prof.sensor.modes[0]))) : [];
+  const resultsHTML = term
+    ? `<div class="fov-models-box"><div class="tsub">${esc(Tp('cam_hits', { n: hits.length }))}</div>${hits.length ? `<div class="model-list">${hits.slice(0, 30).map(rowHTML).join('')}</div>` : `<p class="tnote">${esc(T('cam_none'))}</p>`}</div>`
+    : `<div class="tsub" style="margin-top:12px">${esc(T('maker'))}</div>
+        <div class="chips">${brands.map(([slug, n]) => chip('data-cbrand', slug, esc(n), slug === s.camBrand)).join('')}</div>
+        <div class="fov-models-box">
+          <div class="tsub">${esc(s.camBrand ? Tp('model_of', { brand: (brands.find(([b]) => b === s.camBrand) || [])[1] || '' }) : T('pick_maker_first'))}</div>
+          ${models.length ? `<div class="model-list">${models.map(rowHTML).join('')}</div>` : ''}
+        </div>`;
+  const filterSummary = [s.res, s.sens && T('sens_' + s.sens)].filter(Boolean).join(' · ') || T('fmt_all');
   const pickCard = cam && !s.picking
     ? `<div class="card sh-sec fov-cam" data-part="cam">
         <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(short(cam))}</b><p class="tnote">${esc(sensorNote)}</p>${cam.prof.firmware ? `<a class="fw-link" href="${esc(cam.prof.firmware)}" target="_blank" rel="noopener">${esc(T('firmware'))} ↗</a>` : ''}</div>
@@ -548,17 +580,18 @@ function fovTool(T, lang, ctx) {
         ${modeRow}
       </div>`
     : `<div class="card sh-sec" data-part="cam">
-        <div class="tsub">1 · ${esc(T('resolution'))}</div>
-        <div class="chips">${chip('data-cres', '', esc(T('fmt_all')), !s.res)}${RES.filter(r => shots.some(x => x.res.has(r))).map(r => chip('data-cres', r, `${r} <i class="n">${count(shots.filter(x => x.res.has(r)))}</i>`, s.res === r)).join('')}</div>
-        <div class="tsub" style="margin-top:12px">2 · ${esc(T('sensor_area'))}</div>
-        <div class="chips">${chip('data-csens', '', esc(T('fmt_all')), !s.sens)}${SENS.filter(k => byRes.some(x => x.sens === k)).map(k => chip('data-csens', k, `${esc(T('sens_' + k))} <i class="n">${count(byRes.filter(x => x.sens === k))}</i>`, s.sens === k)).join('')}</div>
-        <div class="tsub" style="margin-top:12px">3 · ${esc(T('maker'))}</div>
-        <div class="chips">${brands.map(([slug, n]) => chip('data-cbrand', slug, esc(n), slug === s.camBrand)).join('')}</div>
-        <div class="fov-models-box">
-          <div class="tsub">4 · ${esc(s.camBrand ? Tp('model_of', { brand: (brands.find(([b]) => b === s.camBrand) || [])[1] || '' }) : T('pick_maker_first'))}</div>
-          ${models.length ? `<div class="model-list">${models.map(g => { const x = g[0]; const same = [...new Set(g.slice(1).map(y => short(y.c)))].filter(n => n !== short(x.c)); const sub = [x.m.label, x.c.prof.year, same.length ? Tp('same_frame', { list: same.slice(0, 2).join(', ') + (same.length > 2 ? ` +${same.length - 2}` : '') }) : ''].filter(Boolean).join(' · '); return `<button class="model-row ${cam && g.some(y => y.c === cam && (!y.m.id || y.m.id === modeOf(cam)?.id)) ? 'on' : ''}" data-cmodel="${esc(x.c.prof.id)}" data-cmodelmode="${esc(x.m.id)}"><b>${esc(short(x.c))}</b><small>${esc(sub)}</small></button>`; }).join('')}</div>` : ''}
-        </div>
+        ${quick.length ? `<div class="tsub">${esc(T('cam_yours'))}</div><div class="chips fov-quick">${quick.map(c => chip('data-crecent', c.prof.id, `${esc(short(c))}${String(c.prof.id) === projProf ? ` <i class="n">${esc(T('cam_from_project'))}</i>` : ''}`, cam && c === cam)).join('')}</div>` : ''}
+        <input class="fov-q" type="search" data-camq value="${esc(s.q || '')}" placeholder="${esc(T('cam_search_ph'))}" autocomplete="off" enterkeyhint="search" aria-label="${esc(T('cam_search_ph'))}">
+        <button class="fov-filterbtn ${s.filtersOpen ? 'open' : ''}" data-filters-toggle aria-expanded="${!!s.filtersOpen}"><span>${esc(T('filters'))}</span><b>${esc(filterSummary)}</b><i aria-hidden="true">▾</i></button>
+        ${s.filtersOpen ? `<div class="fov-filters">
+          <div class="tsub">${esc(T('resolution'))}</div>
+          <div class="chips">${chip('data-cres', '', esc(T('fmt_all')), !s.res)}${RES.filter(r => shots.some(x => x.res.has(r))).map(r => chip('data-cres', r, `${r} <i class="n">${count(shots.filter(x => x.res.has(r)))}</i>`, s.res === r)).join('')}</div>
+          <div class="tsub" style="margin-top:10px">${esc(T('sensor_area'))}</div>
+          <div class="chips">${chip('data-csens', '', esc(T('fmt_all')), !s.sens)}${SENS.filter(k => byRes.some(x => x.sens === k)).map(k => chip('data-csens', k, `${esc(T('sens_' + k))} <i class="n">${count(byRes.filter(x => x.sens === k))}</i>`, s.sens === k)).join('')}</div>
+        </div>` : ''}
+        <div data-part="camresults">${resultsHTML}</div>
         <p class="tnote">${esc(T('verified_only'))}</p>
+        ${cam ? `<button class="btn sm fov-pick-cancel" data-cpick-cancel>${esc(T('cancel_pick'))}</button>` : ''}
       </div>`;
 
   const distCard = `<div class="card sh-sec" data-part="dist">
@@ -695,8 +728,13 @@ function fovTool(T, lang, ctx) {
     <p class="fov-frameline">${esc(frameAtLine(shown))}</p>
   </div>`;
 
-  fovView = { cam: { name: short(cam), w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown,
-    modes: modesOf(cam), modeId: modeOf(cam)?.id, onMode: (id) => { S.fov.modes = { ...(S.fov.modes || {}), [cam.prof.id]: id }; keepFov(); },
+  fovView = { cam: { id: cam.prof.id, name: short(cam), w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown,
+    modes: modesOf(cam), modeId: modeOf(cam)?.id,
+    cameras: cams.map(c => ({ id: c.prof.id, name: short(c), modes: modesOf(c), w: c.prof.sensor.w, h: c.prof.sensor.h, mode: c.prof.sensor.mode })),
+    projectId: projProf, recent: (s.recent || []).slice(),
+    modeFor: (id) => S.fov.modes?.[id],
+    onMode: (camId, id) => { S.fov.modes = { ...(S.fov.modes || {}), [camId]: id }; keepFov(); },
+    onCamera: (id) => { Object.assign(S.fov, { cam: String(id), fromProject: false }); pushRecent(id); keepFov(); },
     frameLine: (mm, area = sn) => { const z = frameAt(area, mm, s.distance); return Tp('vf_at', { d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); } };
   keepFov();
 
@@ -1125,12 +1163,31 @@ function wire(root, ctx, id, T, lang) {
   root.querySelectorAll('[data-lutmodel]').forEach(b => { b.onclick = () => { S.luts.model = b.dataset.lutmodel; ctx.render(); }; });
   root.querySelectorAll('[data-lens]').forEach(b => { b.onclick = () => { S.fov.focal = Number(b.dataset.lens); ctx.render(); }; });
   root.querySelector('[data-lens-reset]')?.addEventListener('click', () => { S.fov.focal = 0; ctx.render(); });
-  root.querySelectorAll('[data-cbrand]').forEach(b => { b.onclick = () => { Object.assign(S.fov, { camBrand: b.dataset.cbrand, cam: '', focal: 0, picking: true }); ctx.render(); }; });
+  root.querySelectorAll('[data-cbrand]').forEach(b => { b.onclick = () => { Object.assign(S.fov, { camBrand: b.dataset.cbrand, picking: true }); ctx.render(); }; });
   root.querySelectorAll('[data-cmodel]').forEach(b => { b.onclick = () => {
     // a row is a camera in a format: choosing it sets both
     const modes = b.dataset.cmodelmode ? { ...(S.fov.modes || {}), [b.dataset.cmodel]: b.dataset.cmodelmode } : S.fov.modes;
-    Object.assign(S.fov, { cam: b.dataset.cmodel, modes, focal: 0, picking: false, fromProject: false }); feel.detent(); ctx.render();
+    Object.assign(S.fov, { cam: b.dataset.cmodel, modes, focal: 0, picking: false, fromProject: false, q: '' }); pushRecent(b.dataset.cmodel); feel.detent(); ctx.render();
   }; });
+  root.querySelectorAll('[data-crecent]').forEach(b => { b.onclick = () => { Object.assign(S.fov, { cam: b.dataset.crecent, focal: 0, picking: false, fromProject: false, q: '' }); pushRecent(b.dataset.crecent); feel.detent(); ctx.render(); }; });
+  root.querySelector('[data-filters-toggle]')?.addEventListener('click', () => { S.fov.filtersOpen = !S.fov.filtersOpen; ctx.render(); });
+  root.querySelector('[data-cpick-cancel]')?.addEventListener('click', () => { Object.assign(S.fov, { picking: false, q: '' }); ctx.render(); });
+  // typing redraws only the results, so the keyboard stays up
+  const camq = root.querySelector('[data-camq]');
+  if (camq) camq.oninput = () => {
+    S.fov.q = camq.value;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = fovTool(T, lang, ctx);
+    const fresh = tpl.content.querySelector('[data-part="camresults"]');
+    const cur = root.querySelector('[data-part="camresults"]');
+    if (!fresh || !cur) return;
+    cur.replaceWith(fresh);
+    fresh.querySelectorAll('[data-cmodel]').forEach(b => { b.onclick = () => {
+      const modes = b.dataset.cmodelmode ? { ...(S.fov.modes || {}), [b.dataset.cmodel]: b.dataset.cmodelmode } : S.fov.modes;
+      Object.assign(S.fov, { cam: b.dataset.cmodel, modes, focal: 0, picking: false, fromProject: false, q: '' }); pushRecent(b.dataset.cmodel); feel.detent(); ctx.render();
+    }; });
+    fresh.querySelectorAll('[data-cbrand]').forEach(b => { b.onclick = () => { Object.assign(S.fov, { camBrand: b.dataset.cbrand, picking: true }); ctx.render(); }; });
+  };
   // A new camera starts again from the card its maker's table used.
   const newCam = (m) => Object.assign(m, { fmt: '', cardPicked: false, customCard: false });
   root.querySelectorAll('[data-mbrand]').forEach(b => { b.onclick = () => { S.media.brand = b.dataset.mbrand; S.media.cam = ''; newCam(S.media); ctx.render(); }; });
@@ -1212,7 +1269,12 @@ function wire(root, ctx, id, T, lang) {
   root.querySelector('[data-vf-start]')?.addEventListener('click', async () => {
     if (!fovView) return;
     const ok = await openViewfinder({ ...fovView, T, onClose: (mm) => { S.fov.focal = mm; ctx.render(); } });
-    if (ok === false) toast(T('vf_denied'), { kind: 'err', ms: 4000 });
+    // tell the user what to do, by the reason (and by phone: iPhone permissions live elsewhere)
+    if (ok && ok !== true) {
+      const ios = /iPhone|iPad|iPod/.test(navigator.userAgent);
+      const key = ok === 'unsupported' ? 'vf_err_inapp' : ok === 'denied' ? (ios ? 'vf_err_denied_ios' : 'vf_err_denied') : ok === 'nocamera' ? 'vf_err_nocam' : 'vf_denied';
+      toast(T(key), { kind: 'err', ms: 9000 });
+    }
   });
   root.querySelector('[data-calc]')?.addEventListener('toggle', (e) => { S.fov.calcOpen = e.currentTarget.open; });
   root.querySelectorAll('[data-fstep]').forEach(b => { b.onclick = () => {

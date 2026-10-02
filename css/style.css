@@ -1179,3 +1179,28 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 .fov-modebtn span { color: var(--accent); font-size: 14px; transition: transform .2s; }
 .fov-modebtn.open span { transform: rotate(180deg); }
 .fov-modelist { margin-top: 6px; }
+/* viewfinder: camera switch */
+.vfx-cambtn { display: inline-flex; align-items: center; gap: 6px; border: 1.5px solid var(--accent); background: rgba(0,0,0,.45); color: #fff; border-radius: 999px; padding: 6px 12px; font: inherit; font-size: 14px; cursor: pointer; min-height: 38px; max-width: 58vw; }
+.vfx-cambtn b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.vfx-cambtn span { color: var(--accent); }
+.vfx-modetxt { display: block; font-size: 12px; opacity: .8; margin-top: 3px; }
+.vfx-sheet { position: absolute; left: 12px; right: 12px; top: calc(var(--sat, 0px) + 70px); max-height: 62%; display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 16px; background: rgba(22,23,26,.96); color: #fff; z-index: 3; box-shadow: 0 12px 40px rgba(0,0,0,.5); }
+.vfx-sheet[hidden] { display: none; }
+.vfx-sheet-head { display: flex; justify-content: space-between; align-items: center; }
+.vfx-sheet-x { width: 40px; height: 40px; border-radius: 50%; border: 0; background: rgba(255,255,255,.14); color: #fff; font-size: 16px; cursor: pointer; }
+.vfx-q { min-height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,.25); background: #22242A; color: #fff; padding: 0 12px; font: inherit; font-size: 15px; }
+.vfx-camlist { overflow-y: auto; display: grid; gap: 6px; }
+.vfx-camrow { display: flex; justify-content: space-between; align-items: center; min-height: 46px; padding: 0 12px; border-radius: 11px; border: 1px solid rgba(255,255,255,.12); background: #22242A; color: #fff; font: inherit; cursor: pointer; text-align: start; }
+.vfx-camrow small { font-size: 12px; opacity: .7; }
+.vfx-camrow.on { border-color: var(--accent); }
+.vfx-empty { opacity: .7; font-size: 13px; margin: 6px 2px; }
+/* lens tool picker: quick picks, search, folded filters */
+.fov-quick { margin-bottom: 4px; }
+.fov-q { width: 100%; min-height: 48px; margin-top: 8px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text); font: inherit; font-size: 16px; }
+.fov-filterbtn { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 44px; margin-top: 8px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--border); background: transparent; color: var(--text); font: inherit; cursor: pointer; }
+.fov-filterbtn span { font-size: 13px; color: var(--muted); font-weight: 700; }
+.fov-filterbtn b { flex: 1; text-align: start; font-size: 13px; }
+.fov-filterbtn i { font-style: normal; color: var(--accent); transition: transform .2s; }
+.fov-filterbtn.open i { transform: rotate(180deg); }
+.fov-filters { margin-top: 8px; padding: 10px 12px; border-radius: 12px; background: var(--surface-2); }
+.fov-pick-cancel { margin-top: 10px; }
