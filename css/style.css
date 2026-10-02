@@ -1173,3 +1173,4 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 .role-switch { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .role-switch > span { font-size: 13px; font-weight: 700; color: var(--muted); }
 .role-switch .seg button { min-height: 40px; padding: 0 12px; }
+.fw-link { display: inline-flex; align-items: center; min-height: 32px; margin-top: 4px; font-size: 12.5px; font-weight: 700; color: var(--accent-ink, var(--accent)); text-decoration: none; border-bottom: 1px dashed currentColor; }

@@ -105,6 +105,7 @@ const L = {
   vf_start: { he: 'פתח את מצלמת הטלפון', en: 'Open the phone camera' },
   vf_ruler: { he: 'בחירת מוקד', en: 'Focal length' },
   rec_format: { he: 'פורמט צילום', en: 'Recording format' },
+  firmware: { he: 'עדכון תוכנה אחרון', en: 'Latest firmware' },
   resolution: { he: 'רזולוציה', en: 'Resolution' },
   sensor_area: { he: 'חיישן', en: 'Sensor' },
   sens_FF: { he: 'FF', en: 'FF' },
@@ -535,7 +536,7 @@ function fovTool(T, lang, ctx) {
     : '';
   const pickCard = cam && !s.picking
     ? `<div class="card sh-sec fov-cam" data-part="cam">
-        <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(short(cam))}</b><p class="tnote">${esc(sensorNote)}</p></div>
+        <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(short(cam))}</b><p class="tnote">${esc(sensorNote)}</p>${cam.prof.firmware ? `<a class="fw-link" href="${esc(cam.prof.firmware)}" target="_blank" rel="noopener">${esc(T('firmware'))} ↗</a>` : ''}</div>
         <button class="btn sm" data-cchange>${esc(T('change'))}</button></div>
         ${modeRow}
       </div>`

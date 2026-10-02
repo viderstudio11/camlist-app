@@ -111,7 +111,7 @@ export function render(ctx, { id }, root) {
     kitHTML = `<section class="kit">
       <div class="kit-head">
         ${thumbHTML(active, 'cameras')}
-        <div class="kit-title"><small>${t('base_kit')} · ${t('building_around')}</small><b dir="auto">${esc(displayName(active))}</b><div class="pchips">${profileChips(activeProf, t)}</div></div>
+        <div class="kit-title"><small>${t('base_kit')} · ${t('building_around')}</small><b dir="auto">${esc(displayName(active))}</b><div class="pchips">${profileChips(activeProf, t)}</div>${activeProf.firmware ? `<a class="fw-link" href="${esc(activeProf.firmware)}" target="_blank" rel="noopener">${t('firmware_latest')} ↗</a>` : ''}</div>
         <button class="iconbtn" data-clear-build aria-label="${t('clear_build')}" title="${t('clear_build')}">×</button>
       </div>
       <div class="slots">${slots.map(s => `
