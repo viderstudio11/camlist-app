@@ -1,0 +1,360 @@
+{
+  "_readme": "The Downloads area: official download pages by department. Every url was opened and checked on 2026-10-02 (pages that refuse scripted checks were opened in a browser). type = firmware | software | app | lut. Camera firmware is not listed here — it comes from data/compat.json (cameras[].firmware), and camera LUTs from data/luts.json, so each fact lives in one place.",
+  "departments": [
+    {
+      "id": "cameras",
+      "he": "מצלמות",
+      "en": "Cameras"
+    },
+    {
+      "id": "monitors",
+      "he": "מוניטורים",
+      "en": "Monitors"
+    },
+    {
+      "id": "wireless",
+      "he": "וידאו ואודיו אלחוטי",
+      "en": "Wireless video & audio"
+    },
+    {
+      "id": "gimbals",
+      "he": "גימבלים",
+      "en": "Gimbals"
+    },
+    {
+      "id": "lenscontrol",
+      "he": "שליטה בעדשה",
+      "en": "Lens control"
+    },
+    {
+      "id": "media",
+      "he": "מדיה וקוראים",
+      "en": "Media & readers"
+    },
+    {
+      "id": "offload",
+      "he": "תוכנות העתקה",
+      "en": "Offload software"
+    },
+    {
+      "id": "luts",
+      "he": "LUTs",
+      "en": "LUTs"
+    },
+    {
+      "id": "tools",
+      "he": "תוכנות יצרן",
+      "en": "Maker software"
+    }
+  ],
+  "items": [
+    {
+      "dept": "monitors",
+      "type": "firmware",
+      "brand": "SmallHD",
+      "name": "SmallHD",
+      "url": "https://smallhd.com/pages/software",
+      "note": {
+        "he": "מוניטורים — עדכוני תוכנה ו-PageOS",
+        "en": "Monitors — firmware and PageOS"
+      }
+    },
+    {
+      "dept": "monitors",
+      "type": "firmware",
+      "brand": "Atomos",
+      "name": "Atomos",
+      "url": "https://www.atomos.com/product-support/",
+      "note": {
+        "he": "Ninja / Shinobi / Sumo — עדכוני תוכנה",
+        "en": "Ninja / Shinobi / Sumo — firmware"
+      }
+    },
+    {
+      "dept": "monitors",
+      "type": "firmware",
+      "brand": "Blackmagic Design",
+      "name": "Blackmagic Video Assist",
+      "url": "https://www.blackmagicdesign.com/support/family/monitoring-and-test",
+      "note": {
+        "he": "עדכוני תוכנה למוניטור-מקליט",
+        "en": "Monitor-recorder updates"
+      }
+    },
+    {
+      "dept": "wireless",
+      "type": "firmware",
+      "brand": "Teradek",
+      "name": "Teradek",
+      "url": "https://teradek.com/pages/downloads",
+      "note": {
+        "he": "Bolt / Ranger / Serv — עדכוני תוכנה",
+        "en": "Bolt / Ranger / Serv — firmware"
+      }
+    },
+    {
+      "dept": "wireless",
+      "type": "firmware",
+      "brand": "Hollyland",
+      "name": "Hollyland",
+      "url": "https://www.hollyland.com/download",
+      "note": {
+        "he": "Mars / Cosmo / Lark — עדכוני תוכנה",
+        "en": "Mars / Cosmo / Lark — firmware"
+      }
+    },
+    {
+      "dept": "wireless",
+      "type": "firmware",
+      "brand": "DJI",
+      "name": "DJI Transmission",
+      "url": "https://www.dji.com/transmission/downloads",
+      "note": {
+        "he": "עדכוני תוכנה ותוכנות",
+        "en": "Firmware and software"
+      }
+    },
+    {
+      "dept": "wireless",
+      "type": "firmware",
+      "brand": "Accsoon",
+      "name": "Accsoon",
+      "url": "https://accsoon.com/pages/download",
+      "note": {
+        "he": "CineEye / CineView — עדכוני תוכנה ואפליקציה",
+        "en": "CineEye / CineView — firmware and app"
+      }
+    },
+    {
+      "dept": "wireless",
+      "type": "firmware",
+      "brand": "DJI",
+      "name": "DJI Mic 2",
+      "url": "https://www.dji.com/mic-2/downloads",
+      "note": {
+        "he": "מיקרופון אלחוטי — עדכוני תוכנה",
+        "en": "Wireless mic — firmware"
+      }
+    },
+    {
+      "dept": "gimbals",
+      "type": "firmware",
+      "brand": "DJI",
+      "name": "DJI RS 4",
+      "url": "https://www.dji.com/rs-4/downloads",
+      "note": {
+        "he": "עדכוני תוכנה ואפליקציית Ronin",
+        "en": "Firmware and the Ronin app"
+      }
+    },
+    {
+      "dept": "gimbals",
+      "type": "firmware",
+      "brand": "DJI",
+      "name": "DJI RS 4 Pro",
+      "url": "https://www.dji.com/rs-4-pro/downloads",
+      "note": {
+        "he": "עדכוני תוכנה ואפליקציית Ronin",
+        "en": "Firmware and the Ronin app"
+      }
+    },
+    {
+      "dept": "gimbals",
+      "type": "firmware",
+      "brand": "DJI",
+      "name": "DJI Ronin 4D",
+      "url": "https://www.dji.com/ronin-4d/downloads",
+      "note": {
+        "he": "עדכוני תוכנה",
+        "en": "Firmware"
+      }
+    },
+    {
+      "dept": "lenscontrol",
+      "type": "firmware",
+      "brand": "DJI",
+      "name": "DJI Focus Pro",
+      "url": "https://www.dji.com/focus-pro/downloads",
+      "note": {
+        "he": "עדכוני תוכנה",
+        "en": "Firmware"
+      }
+    },
+    {
+      "dept": "lenscontrol",
+      "type": "firmware",
+      "brand": "Tilta",
+      "name": "Tilta",
+      "url": "https://tilta.com/download/",
+      "note": {
+        "he": "Nucleus ואביזרים — עדכוני תוכנה",
+        "en": "Nucleus and accessories — firmware"
+      }
+    },
+    {
+      "dept": "lenscontrol",
+      "type": "firmware",
+      "brand": "Preston",
+      "name": "Preston",
+      "url": "https://prestoncinema.com/support",
+      "note": {
+        "he": "FIZ — עדכוני תוכנה ותמיכה",
+        "en": "FIZ — firmware and support"
+      }
+    },
+    {
+      "dept": "lenscontrol",
+      "type": "firmware",
+      "brand": "cmotion",
+      "name": "cmotion",
+      "url": "https://cmotion.eu/support/",
+      "note": {
+        "he": "cPRO / cforce — עדכוני תוכנה",
+        "en": "cPRO / cforce — firmware"
+      }
+    },
+    {
+      "dept": "media",
+      "type": "software",
+      "brand": "Angelbird",
+      "name": "Angelbird",
+      "url": "https://www.angelbird.com/support/",
+      "note": {
+        "he": "כרטיסים וקוראים — דרייברים וכלים",
+        "en": "Cards and readers — drivers and tools"
+      }
+    },
+    {
+      "dept": "media",
+      "type": "software",
+      "brand": "Lexar",
+      "name": "Lexar",
+      "url": "https://www.lexar.com/support/downloads/",
+      "note": {
+        "he": "כרטיסים וקוראים — הורדות",
+        "en": "Cards and readers — downloads"
+      }
+    },
+    {
+      "dept": "media",
+      "type": "software",
+      "brand": "SanDisk",
+      "name": "SanDisk",
+      "url": "https://www.sandisk.com/support",
+      "note": {
+        "he": "תמיכה והורדות",
+        "en": "Support and downloads"
+      }
+    },
+    {
+      "dept": "offload",
+      "type": "software",
+      "brand": "Hedge",
+      "name": "OffShoot (Hedge)",
+      "url": "https://hedge.video/offshoot",
+      "note": {
+        "he": "העתקה מאומתת עם checksum, Mac ו-Windows",
+        "en": "Checksum-verified copies, Mac and Windows"
+      }
+    },
+    {
+      "dept": "offload",
+      "type": "software",
+      "brand": "Imagine Products",
+      "name": "ShotPut Pro",
+      "url": "https://www.imagineproducts.com/product/shotput-pro",
+      "note": {
+        "he": "תקן ותיק להעתקה על הסט, כולל דוחות",
+        "en": "A long-standing on-set offload standard, with reports"
+      }
+    },
+    {
+      "dept": "offload",
+      "type": "software",
+      "brand": "Pomfort",
+      "name": "Silverstack (Pomfort)",
+      "url": "https://pomfort.com/silverstack/",
+      "note": {
+        "he": "העתקה, ניהול מדיה ודוחות DIT",
+        "en": "Offload, media management and DIT reports"
+      }
+    },
+    {
+      "dept": "offload",
+      "type": "software",
+      "brand": "YoYotta",
+      "name": "YoYotta",
+      "url": "https://www.yoyotta.com/",
+      "note": {
+        "he": "העתקה וגיבוי לסרטי LTO",
+        "en": "Offload and LTO tape backup"
+      }
+    },
+    {
+      "dept": "offload",
+      "type": "software",
+      "brand": "Blackmagic Design",
+      "name": "DaVinci Resolve",
+      "url": "https://www.blackmagicdesign.com/products/davinciresolve",
+      "note": {
+        "he": "כלי ההעתקה המובנה בגרסה החינמית",
+        "en": "The copy tool built into the free version"
+      }
+    },
+    {
+      "dept": "tools",
+      "type": "software",
+      "brand": "Blackmagic Design",
+      "name": "Blackmagic RAW",
+      "url": "https://www.blackmagicdesign.com/products/blackmagicraw",
+      "note": {
+        "he": "נגן וערכת פיתוח לקובצי BRAW",
+        "en": "Player and SDK for BRAW files"
+      }
+    },
+    {
+      "dept": "tools",
+      "type": "software",
+      "brand": "RED",
+      "name": "REDCINE-X PRO",
+      "url": "https://www.red.com/downloads",
+      "note": {
+        "he": "תוכנות RED לעבודה עם R3D",
+        "en": "RED software for R3D files"
+      }
+    },
+    {
+      "dept": "tools",
+      "type": "software",
+      "brand": "ARRI",
+      "name": "ARRI Reference Tool",
+      "url": "https://www.arri.com/en/learn-help/learn-help-camera-system/tools/arri-reference-tool",
+      "note": {
+        "he": "צפייה ובדיקה של קובצי ARRI",
+        "en": "View and check ARRI files"
+      }
+    },
+    {
+      "dept": "tools",
+      "type": "software",
+      "brand": "ARRI",
+      "name": "ARRI Tools",
+      "url": "https://www.arri.com/en/learn-help/learn-help-camera-system/tools",
+      "note": {
+        "he": "קווי מסגרת, LUTs וחישובי פורמטים",
+        "en": "Frame lines, LUTs and format calculators"
+      }
+    },
+    {
+      "dept": "tools",
+      "type": "app",
+      "brand": "Blackmagic Design",
+      "name": "Blackmagic Camera",
+      "url": "https://www.blackmagicdesign.com/products/blackmagiccamera",
+      "note": {
+        "he": "אפליקציית צילום לטלפון",
+        "en": "Camera app for the phone"
+      }
+    }
+  ]
+}

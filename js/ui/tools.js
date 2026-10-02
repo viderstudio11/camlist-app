@@ -105,6 +105,17 @@ const L = {
   vf_start: { he: 'פתח את מצלמת הטלפון', en: 'Open the phone camera' },
   vf_ruler: { he: 'בחירת מוקד', en: 'Focal length' },
   rec_format: { he: 'פורמט צילום', en: 'Recording format' },
+  downloads: { he: 'הורדות', en: 'Downloads' },
+  downloads_sub: { he: 'עדכוני תוכנה, LUTs ותוכנות — מהיצרנים', en: 'Firmware, LUTs and software — from the makers' },
+  dl_firmware: { he: 'עדכון תוכנה', en: 'Firmware' },
+  dl_software: { he: 'תוכנה', en: 'Software' },
+  dl_app: { he: 'אפליקציה', en: 'App' },
+  dl_open: { he: 'להורדה', en: 'Download' },
+  dl_none: { he: 'לא נמצא — נסה שם אחר', en: 'Nothing found — try another name' },
+  dl_search_ph: { he: 'חיפוש: מצלמה, מוניטור, תוכנה…', en: 'Search: camera, monitor, software…' },
+  dl_lut_finder: { he: 'מציאת LUT לפי מצלמה ←', en: 'Find a LUT by camera →' },
+  dl_note: { he: 'כל הקישורים לעמודים הרשמיים של היצרנים, ונבדקו ידנית. גרסה עדכנית — בעמוד היצרן.', en: 'Every link goes to the maker’s own page and was checked by hand. The current version is on the maker’s page.' },
+  dl_for_cam: { he: 'הורדות למצלמה הזו', en: 'Downloads for this camera' },
   cam_yours: { he: 'המצלמות שלך', en: 'Your cameras' },
   cam_search_ph: { he: 'הקלד מצלמה: fx9, venice, alexa…', en: 'Type a camera: fx9, venice, alexa…' },
   cam_hits: { he: '{n} תוצאות', en: '{n} results' },
@@ -270,6 +281,10 @@ export const setCodecs = (data) => { media = createMedia(data); };
 
 let lutData = { logs: [] };
 export const setLuts = (data) => { lutData = data || lutData; };
+let dlData = { departments: [], items: [] };
+export const setDownloads = (data) => { dlData = data || dlData; };
+// a query carried by the route (#/tools/downloads?q=…), read once by the tool it opens
+let routeQuery = new URLSearchParams('');
 
 let placeData = { countries: [], defaultCountry: 'IL' };
 export const setPlaces = (data) => { placeData = data || placeData; };
@@ -283,6 +298,7 @@ const S = {
   sun: { country: 'IL', city: 0, date: new Date().toISOString().slice(0, 10), dateMode: 'today', lat: null, lon: null },
   units: { group: 'length', from: 'm', value: 1, mah: 6600, volts: 14.4, batMode: 'mah', wh: 98, ndKind: 'density', nd: 0.9, temp: 20, tempUnit: 'c' },
   luts: { brand: '', model: '' },
+  downloads: { dept: 'cameras', q: '' },
   hours: { call: '07:00', wrap: '19:30', breaks: 60, customBreaks: false, base: 10, tier1h: 2, tier1pct: 125, tier2pct: 150, turnaround: 11, dayRate: 0 },
 };
 
@@ -301,7 +317,7 @@ const keepFov = () => { try { localStorage.setItem(FOV_KEY, JSON.stringify(Objec
 // Short labels for places outside the tools screen (the home screen's tool row).
 export const toolLabel = (k, lang) => L[k]?.[lang] ?? L[k]?.he ?? k;
 
-const TOOLS = ['media', 'fov', 'shutter', 'hours', 'offload', 'sun', 'luts', 'units'];
+const TOOLS = ['media', 'fov', 'shutter', 'hours', 'offload', 'sun', 'downloads', 'units', 'luts'];
 
 
 export function render(ctx, { tool: id }, root) {
@@ -326,8 +342,9 @@ export function render(ctx, { tool: id }, root) {
   }
 
   if (id !== 'fov') closeViewfinder();
+  routeQuery = new URLSearchParams(arguments[1]?.query || '');
   ctx.setTopbar({ title: esc(T(id)), back: '#/tools' });
-  const body = { media: mediaTool, fov: fovTool, shutter: shutterTool, hours: hoursTool, offload: offloadTool, sun: sunTool, luts: lutsTool, units: unitsTool }[id];
+  const body = { media: mediaTool, fov: fovTool, shutter: shutterTool, hours: hoursTool, offload: offloadTool, sun: sunTool, luts: lutsTool, units: unitsTool, downloads: downloadsTool }[id];
   if (!body) { ctx.navigate('#/tools'); return; }
   root.innerHTML = `<div class="tool">${body(T, lang, ctx)}</div>`;
   wire(root, ctx, id, T, lang);
@@ -575,7 +592,7 @@ function fovTool(T, lang, ctx) {
   const filterSummary = [s.res, s.sens && T('sens_' + s.sens)].filter(Boolean).join(' · ') || T('fmt_all');
   const pickCard = cam && !s.picking
     ? `<div class="card sh-sec fov-cam" data-part="cam">
-        <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(short(cam))}</b><p class="tnote">${esc(sensorNote)}</p>${cam.prof.firmware ? `<a class="fw-link" href="${esc(cam.prof.firmware)}" target="_blank" rel="noopener">${esc(T('firmware'))} ↗</a>` : ''}</div>
+        <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(short(cam))}</b><p class="tnote">${esc(sensorNote)}</p><a class="fw-link" href="#/tools/downloads?q=${encodeURIComponent(short(cam))}">${esc(T('dl_for_cam'))} ›</a></div>
         <button class="btn sm" data-cchange>${esc(T('change'))}</button></div>
         ${modeRow}
       </div>`
@@ -1124,6 +1141,55 @@ function unitsTool(T, lang) {
   return body + tabs;
 }
 
+// ---------- downloads ----------
+// Official download pages in one place: camera firmware (from the camera data), the makers' LUTs (from the
+// LUT bank), and firmware / software for monitors, wireless, gimbals, lens control, media and offload.
+function downloadsTool(T, lang, ctx) {
+  const s = S.downloads;
+  const fromRoute = routeQuery.get('q');
+  if (fromRoute != null) { Object.assign(s, { q: fromRoute, dept: 'cameras' }); routeQuery = new URLSearchParams(''); }
+  const Tp = (k, p) => T(k).replace(/\{(\w+)\}/g, (_, x) => p[x] ?? '');
+  const chip = (attr, val, label, on) => `<button class="chip pick ${on ? 'on' : ''}" ${attr}="${esc(val)}">${label}</button>`;
+  const name = (o) => (lang === 'he' ? o.he : o.en);
+  const short = (n) => String(n || '').replace(/\s+(\d+K\s+)?(Digital Motion Picture|Digital Cinema|Mirrorless|Cinema|Full[- ]Frame)?\s*Camera\b.*$/i, '').trim() || n;
+  const norm = (x) => String(x || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  // cameras: firmware from the camera data, the log's LUT page matched by model name
+  const logs = lutData.logs || [];
+  const cams = (ctx?.compat?.profiles || []).map(p => ({ p, product: ctx.catalog.byId(p.id) })).filter(x => x.product)
+    .sort((a, b) => (b.p.year || 0) - (a.p.year || 0) || a.product.name.localeCompare(b.product.name))
+    .map(({ p, product }) => {
+      const nm = short(product.name);
+      const lut = logs.find(g => g.cameras.some(c => { const a = norm(c.name), b = norm(nm); return a && b && (a === b || a.includes(b) || b.includes(a)); }));
+      return { name: nm, brand: product.brandName || '', firmware: p.firmware || '', lut: lut ? (lut.cameras.find(c => norm(c.name) === norm(nm))?.url || lut.url) : '', log: lut?.name || '' };
+    })
+    .filter(c => c.firmware || c.lut);
+  const items = dlData.items || [];
+  const term = (s.q || '').trim().toLowerCase();
+  const hit = (txt) => !term || String(txt).toLowerCase().includes(term);
+  const TYPE = { firmware: T('dl_firmware'), software: T('dl_software'), app: T('dl_app'), lut: 'LUT' };
+  const link = (url, label) => `<a class="dl-link" href="${esc(url)}" target="_blank" rel="noopener">${esc(label)} ↗</a>`;
+  const camRow = (c) => `<div class="dl-row"><div class="dl-main"><b dir="auto">${esc(c.name)}</b><small>${esc([c.brand, c.log].filter(Boolean).join(' · '))}</small></div><div class="dl-links">${c.firmware ? link(c.firmware, T('dl_firmware')) : ''}${c.lut ? link(c.lut, 'LUT') : ''}</div></div>`;
+  const itemRow = (it) => `<div class="dl-row"><div class="dl-main"><b dir="auto">${esc(it.name)}</b><small><i class="dl-type">${esc(TYPE[it.type] || it.type)}</i>${it.note ? ' ' + esc(name(it.note)) : ''}</small></div><div class="dl-links">${link(it.url, T('dl_open'))}</div></div>`;
+  const lutRow = (g) => `<div class="dl-row"><div class="dl-main"><b dir="auto">${esc(g.brand)} — ${esc(g.name)}</b><small>${esc(g.source || '')}</small></div><div class="dl-links">${link(g.url, 'LUT')}</div></div>`;
+  const depts = dlData.departments || [];
+  const count = (d) => (d === 'cameras' ? cams.length : d === 'luts' ? logs.length : items.filter(i => i.dept === d).length);
+  let list;
+  if (term) {
+    const cHits = cams.filter(c => hit(c.name + ' ' + c.brand));
+    const iHits = items.filter(i => hit(i.name + ' ' + i.brand));
+    const lHits = logs.filter(g => hit(g.brand + ' ' + g.name));
+    list = (cHits.map(camRow).join('') + lHits.map(lutRow).join('') + iHits.map(itemRow).join('')) || `<p class="tnote">${esc(T('dl_none'))}</p>`;
+  } else if (s.dept === 'cameras') list = cams.map(camRow).join('');
+  else if (s.dept === 'luts') list = logs.map(lutRow).join('') + `<button class="btn sm dl-lutfinder" data-tool-go="luts">${esc(T('dl_lut_finder'))}</button>`;
+  else list = items.filter(i => i.dept === s.dept).map(itemRow).join('');
+  return `<div class="card sh-sec dl-card" data-part="dlhead">
+      <input class="fov-q" type="search" data-dlq value="${esc(s.q || '')}" placeholder="${esc(T('dl_search_ph'))}" autocomplete="off" enterkeyhint="search" aria-label="${esc(T('dl_search_ph'))}">
+      <div class="chips dl-depts">${depts.map(d => chip('data-dldept', d.id, `${esc(name(d))} <i class="n">${count(d.id)}</i>`, !term && s.dept === d.id)).join('')}</div>
+    </div>
+    <div class="card dl-list" data-part="dllist">${list}</div>
+    <p class="tnote">${esc(T('dl_note'))}</p>`;
+}
+
 // ---------- wiring ----------
 function wire(root, ctx, id, T, lang) {
   const s = S[id];
@@ -1159,6 +1225,16 @@ function wire(root, ctx, id, T, lang) {
   for (const [attr, key] of [['hbase', 'base'], ['ht1h', 'tier1h'], ['ht1p', 'tier1pct'], ['ht2p', 'tier2pct'], ['hturn', 'turnaround']]) {
     root.querySelectorAll(`[data-${attr}]`).forEach(b => { b.onclick = () => { hr[key] = Number(b.dataset[attr]); ctx.render(); }; });
   }
+  root.querySelectorAll('[data-dldept]').forEach(b => { b.onclick = () => { Object.assign(S.downloads, { dept: b.dataset.dldept, q: '' }); ctx.render(); }; });
+  root.querySelector('[data-tool-go]')?.addEventListener('click', (e) => ctx.navigate(`#/tools/${e.currentTarget.dataset.toolGo}`));
+  const dlq = root.querySelector('[data-dlq]');
+  if (dlq) dlq.oninput = () => {
+    S.downloads.q = dlq.value;
+    const tpl = document.createElement('template');
+    tpl.innerHTML = downloadsTool(T, lang, ctx);
+    for (const part of ['dllist']) { const fresh = tpl.content.querySelector(`[data-part="${part}"]`); root.querySelector(`[data-part="${part}"]`)?.replaceWith(fresh); }
+    root.querySelectorAll('[data-dldept]').forEach(b => b.classList.toggle('on', !S.downloads.q.trim() && b.dataset.dldept === S.downloads.dept));
+  };
   root.querySelectorAll('[data-lutbrand]').forEach(b => { b.onclick = () => { S.luts.brand = b.dataset.lutbrand; S.luts.model = ''; ctx.render(); }; });
   root.querySelectorAll('[data-lutmodel]').forEach(b => { b.onclick = () => { S.luts.model = b.dataset.lutmodel; ctx.render(); }; });
   root.querySelectorAll('[data-lens]').forEach(b => { b.onclick = () => { S.fov.focal = Number(b.dataset.lens); ctx.render(); }; });

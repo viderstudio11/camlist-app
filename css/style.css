@@ -1223,3 +1223,15 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 .pcard-src { font-size: 13px; color: var(--muted); }
 .pcard a.btn { text-decoration: none; white-space: nowrap; }
 .pcard-stores a.btn { font-size: 14px; padding: 0 6px; }
+/* downloads */
+.dl-depts { margin-top: 10px; }
+.card.dl-list { margin-top: 12px; padding: 4px 14px; }
+.dl-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 0; border-bottom: 1px solid var(--hair, rgba(0,0,0,.08)); }
+.dl-row:last-child { border-bottom: 0; }
+.dl-main { min-width: 0; }
+.dl-main b { display: block; font-size: 14px; }
+.dl-main small { display: block; font-size: 12px; color: var(--muted); margin-top: 2px; }
+.dl-type { font-style: normal; font-weight: 800; font-size: 10.5px; letter-spacing: .06em; text-transform: uppercase; color: var(--accent-ink, var(--accent)); margin-inline-end: 4px; }
+.dl-links { display: flex; gap: 6px; flex: 0 0 auto; }
+.dl-link { display: inline-flex; align-items: center; min-height: 36px; padding: 0 10px; border-radius: 10px; border: 1px solid var(--border-2); font-size: 12.5px; font-weight: 700; color: var(--text); text-decoration: none; white-space: nowrap; }
+.dl-lutfinder { margin: 12px 0; }

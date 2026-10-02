@@ -96,7 +96,7 @@ function route() {
   if ((m = h.match(/^#\/p\/([^/]+)\/print$/))) return { screen: Export, params: { id: m[1], print: true } };
   if ((m = h.match(/^#\/p\/([^/]+)$/))) return { screen: List, params: { id: m[1] } };
   if (h === '#/tools') return { screen: Tools, params: {} };
-  if ((m = h.match(/^#\/tools\/([a-z]+)$/))) return { screen: Tools, params: { tool: m[1] } };
+  if ((m = h.match(/^#\/tools\/([a-z]+)(?:\?(.*))?$/))) return { screen: Tools, params: { tool: m[1], query: m[2] || '' } };
   if (h === '#/skins') return { screen: { render: renderSkins }, params: {} };
   if (h === '#/settings') return { screen: { render: renderSettings }, params: {} };
   return { screen: Projects, params: {} };
@@ -215,7 +215,7 @@ function renderSettings(ctx, _p, root) {
 async function boot() {
   fetch('logos/index.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).then(idx => { if (idx) { setLogoIndex(idx); render(); } }).catch(() => {});
   try {
-    const [data, cdata, xdata, rdata, pdata, kdata, ldata, gdata] = await Promise.all([
+    const [data, cdata, xdata, rdata, pdata, kdata, ldata, ddata, gdata] = await Promise.all([
       loadCatalog(),
       loadCompat().catch(() => compatData),
       fetch('data/extra.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).catch(() => null),
@@ -223,6 +223,7 @@ async function boot() {
       loadPower().catch(() => powerData),
       loadCodecs().catch(() => null),
       fetch('data/luts.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).catch(() => null),
+      fetch('data/downloads.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).catch(() => null),
       fetch('data/places.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).catch(() => null),
     ]);
     recency = createRecency(rdata || {});
@@ -234,6 +235,7 @@ async function boot() {
     power = createPower(powerData, catalog, compat);
     if (kdata) Tools.setCodecs(kdata);
     if (ldata) Tools.setLuts(ldata);
+    if (ddata) Tools.setDownloads(ddata);
     if (gdata) Tools.setPlaces(gdata);
     catalogError = null;
   } catch (e) { catalogError = e; }
