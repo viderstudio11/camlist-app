@@ -514,7 +514,9 @@ function fovTool(T, lang, ctx) {
   if (!s.camBrand && brands.length === 1) s.camBrand = brands[0][0];
   // the same sensor window is the same frame: one row, named after the newest camera that has it
   const rowsOf = (list) => { const g = new Map(); for (const x of list) { if (!g.has(x.key)) g.set(x.key, []); g.get(x.key).push(x); } return [...g.values()]; };
-  const models = rowsOf(bySens.filter(x => x.c.product.brand === s.camBrand));
+  // with no resolution or sensor chosen, one row per camera (its default format); a filter brings out every matching format
+  const unfiltered = !s.res && !s.sens;
+  const models = rowsOf(bySens.filter(x => x.c.product.brand === s.camBrand && (!unfiltered || !x.m.id || x.m === x.c.prof.sensor.modes[0])));
   if (!s.cam && !s.picking) {
     const p = activeProject(ctx.store.state.projects || []);
     const pc = p && cams.find(c => String(c.product.id) === String(p.buildCameraId));
