@@ -1,79 +1,79 @@
 {
  "_readme": "Written weekly by scripts/watch-downloads.js. changed = the date a page's version numbers last changed (null until a change is seen). status 403/0 = the page refuses scripted reads; it is skipped, not guessed.",
- "updated": "2026-10-02",
+ "updated": "2026-10-04",
  "pages": {
   "https://pro.sony/ue_US/products/handheld-camcorders/ilme-fx6": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pro.sony/ue_US/products/handheld-camcorders/pxw-fx9": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pro.sony/ue_US/products/handheld-camcorders/ilme-fx3": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pro.sony/ue_US/products/handheld-camcorders/ilme-fx30": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pro.sony/ue_US/products/digital-cinema-cameras/venice2": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pro.sony/ue_US/products/digital-cinema-cameras/burano": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pro.sony/ue_US/products/handheld-camcorders/pxw-fs7": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pro.sony/ue_US/products/handheld-camcorders/pxw-fs7m2": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pro.sony/ue_US/products/digital-cinema-cameras/pmw-f5": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pro.sony/ue_US/products/digital-cinema-cameras/pmw-f55": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.arri.com/en/technical-service/firmware/software-and-firmware-updates-for-cameras": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "c68c0c73756d1095",
    "latest": [
@@ -86,77 +86,77 @@
    "changed": null
   },
   "https://www.usa.canon.com/support/p/eos-c300": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.usa.canon.com/support/p/eos-c300-mark-ii": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.usa.canon.com/support/p/eos-c500-mark-ii": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.usa.canon.com/support/p/eos-c400": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.usa.canon.com/support/p/eos-c70": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.usa.canon.com/support/p/eos-c80": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.usa.canon.com/support/p/eos-5d-mark-ii": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.red.com/downloads": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.blackmagicdesign.com/support/family/professional-cameras": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pro-av.panasonic.net/en/cinema_camera_varicam_eva/support/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://av.jpn.support.panasonic.com/support/global/cs/dsc/download/ff/dl/s1h.html": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "b1ecfb585084cb10",
    "latest": [
@@ -169,7 +169,7 @@
    "changed": null
   },
   "https://av.jpn.support.panasonic.com/support/global/cs/dsc/download/ff/dl/bs1h.html": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "12d927599ee4563c",
    "latest": [
@@ -181,7 +181,7 @@
    "changed": null
   },
   "https://www.dji.com/ronin-4d/downloads": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "f14ba871639c2656",
    "latest": [
@@ -194,42 +194,42 @@
    "changed": null
   },
   "https://smallhd.com/pages/software": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.atomos.com/product-support/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.blackmagicdesign.com/support/family/monitoring-and-test": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://teradek.com/pages/downloads": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.hollyland.com/download": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.dji.com/transmission/downloads": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "f14ba871639c2656",
    "latest": [
@@ -242,7 +242,7 @@
    "changed": null
   },
   "https://accsoon.com/pages/download": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "3855347c2262645d",
    "latest": [
@@ -255,7 +255,7 @@
    "changed": null
   },
   "https://www.dji.com/mic-2/downloads": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "779c48984c8f86be",
    "latest": [
@@ -267,7 +267,7 @@
    "changed": null
   },
   "https://www.dji.com/rs-4/downloads": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "9be6375151939f0a",
    "latest": [
@@ -277,7 +277,7 @@
    "changed": null
   },
   "https://www.dji.com/rs-4-pro/downloads": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "9be6375151939f0a",
    "latest": [
@@ -287,7 +287,7 @@
    "changed": null
   },
   "https://www.dji.com/focus-pro/downloads": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "6f988c255ae3e60c",
    "latest": [
@@ -298,7 +298,7 @@
    "changed": null
   },
   "https://tilta.com/download/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "130561b8afa3555b",
    "latest": [
@@ -309,56 +309,56 @@
    "changed": null
   },
   "https://prestoncinema.com/support": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://cmotion.eu/support/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.angelbird.com/support/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.lexar.com/support/downloads/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.sandisk.com/support": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://hedge.video/offshoot": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.imagineproducts.com/product/shotput-pro": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pomfort.com/silverstack/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "e1f7a3a299f62225",
    "latest": [
@@ -367,28 +367,28 @@
    "changed": null
   },
   "https://www.yoyotta.com/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.blackmagicdesign.com/products/davinciresolve": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.blackmagicdesign.com/products/blackmagicraw": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.arri.com/en/learn-help/learn-help-camera-system/tools/arri-reference-tool": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "0f5b0f106187829a",
    "latest": [
@@ -401,7 +401,7 @@
    "changed": null
   },
   "https://www.arri.com/en/learn-help/learn-help-camera-system/tools": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "10cefd64f36cf45c",
    "latest": [
@@ -414,21 +414,21 @@
    "changed": null
   },
   "https://www.sony.net/cca/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.sony.net/ccmc/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.dji.com/downloads/djiapp/dji-ronin": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "e4841fbc46b33898",
    "latest": [
@@ -440,7 +440,7 @@
    "changed": null
   },
   "https://www.dji.com/downloads/djiapp/dji-mimo": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "e4841fbc46b33898",
    "latest": [
@@ -452,21 +452,21 @@
    "changed": null
   },
   "https://www.blackmagicdesign.com/products/blackmagiccamera": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://pro.sony/ue_US/technology/professional-video-lut-look-up-table": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 403,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.arri.com/en/learn-help/learn-help-camera-system/tools/lut-generator": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "10cefd64f36cf45c",
    "latest": [
@@ -479,14 +479,14 @@
    "changed": null
   },
   "https://www.reddigitalcinema.com/download/ipp2-output-presets": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://asia.canon/en/support/0200751202": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "6746a82081d852d5",
    "latest": [
@@ -495,21 +495,21 @@
    "changed": null
   },
   "https://pro-av.panasonic.net/en/cinema_camera_varicam_eva/support/lut/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://av.jpn.support.panasonic.com/support/global/cs/dsc/download/lut/index.html": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
    "changed": null
   },
   "https://www.fujifilm-x.com/global/support/download/lut/": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "791b309f57567551",
    "latest": [
@@ -520,7 +520,7 @@
    "changed": null
   },
   "https://www.dji.com/downloads/softwares/dji-zenmuse-x9-dlog2rec709-lut": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "e4841fbc46b33898",
    "latest": [
@@ -532,7 +532,7 @@
    "changed": null
   },
   "https://www.dji.com/downloads/softwares/osmo-pocket-3-dlog-to-rec709": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "e4841fbc46b33898",
    "latest": [
@@ -544,7 +544,7 @@
    "changed": null
   },
   "https://www.dji.com/downloads/products/osmo-action-5-pro": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "aac30d2050a3bf3a",
    "latest": [
@@ -557,7 +557,7 @@
    "changed": null
   },
   "https://downloadcenter.nikonimglib.com/en/download/sw/244.html": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": "eb34dcfc53734ac2",
    "latest": [
@@ -570,7 +570,7 @@
    "changed": null
   },
   "https://community.gopro.com/s/article/GoPro-Log-Profiles-LUT-Downloads?language=en_US": {
-   "checked": "2026-10-02",
+   "checked": "2026-10-04",
    "status": 200,
    "sig": null,
    "latest": [],
