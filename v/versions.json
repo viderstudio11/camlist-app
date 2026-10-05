@@ -1,5 +1,10 @@
 [
  {
+  "version": "v2.8.1",
+  "date": "2026-10-05",
+  "label": "Fixes: maker link opens the official site; camera list fits the screen"
+ },
+ {
   "version": "v2.8.0",
   "date": "2026-10-02",
   "label": "Lens tool rebuilt (live viewfinder, formats, filters, camera switch), CamList Lens app, camera-world themes, slate export, roles, product card with stores, Downloads with weekly watch"
