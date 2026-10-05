@@ -40,7 +40,7 @@ export async function openViewfinder(o) {
   el.setAttribute('aria-label', T('viewfinder'));
   el.innerHTML = `
     <video class="vfx-video" playsinline autoplay muted></video>
-    <div class="vfx-cmp" hidden><span></span></div>
+    <div class="vfx-cmp c0" hidden><span></span></div><div class="vfx-cmp c1" hidden><span></span></div><div class="vfx-cmp c2" hidden><span></span></div>
     <div class="vfx-frame"><span class="vfx-mm"></span></div>
     <div class="vfx-ui">
     <div class="vfx-wide" hidden></div>
@@ -113,8 +113,9 @@ export async function openViewfinder(o) {
   // Where the cine frame falls on screen. The video fills the screen (cover), so the phone's angle
   // per screen pixel comes from the stream's own size and the cover scale.
   // A lens held for comparison: a second, dashed frame, so two lenses can be weighed from the same spot.
-  let cmp = null;
-  const cmpEl = el.querySelector('.vfx-cmp');
+  const MAX_CMP = 3;
+  let cmp = [];
+  const cmpEls = [...el.querySelectorAll('.vfx-cmp')];
   const vs = el.querySelector('.vfx-vs');
   const sizeOf = (mm) => {
     const vw = video.videoWidth, vh = video.videoHeight;
@@ -136,13 +137,16 @@ export async function openViewfinder(o) {
     mb.hidden = modes.length < 2;
     if (modes.length > 1) mb.textContent = `${modes[mi].label} ▾`;
     el.querySelector('.vfx-modetxt').textContent = modes.length > 1 ? '' : (modes[0]?.label || cam.mode || '');
-    ruler.querySelectorAll('.vfx-stop').forEach((b, i) => { b.classList.toggle('on', i === idx); b.classList.toggle('cmp', i === cmp); b.setAttribute('aria-selected', i === idx); });
-    vs.hidden = cmp == null;
-    if (cmp != null) vs.textContent = `vs ${stops[cmp].mm}mm ✕`;
-    const c = cmp != null && sizeOf(stops[cmp].mm);
-    cmpEl.hidden = !c;
+    ruler.querySelectorAll('.vfx-stop').forEach((b, i) => { const k = cmp.indexOf(i); b.classList.toggle('on', i === idx); b.classList.toggle('cmp', k >= 0); b.classList.remove('c0', 'c1', 'c2'); if (k >= 0) b.classList.add(`c${k}`); b.setAttribute('aria-selected', i === idx); });
+    vs.hidden = !cmp.length;
+    if (cmp.length) vs.innerHTML = `vs ${cmp.map((i, k) => `<i class="vs-dot c${k}"></i>${stops[i].mm}`).join(' ')} ✕`;
     const rot = el.classList.contains('vfx-rot');
-    if (c) { cmpEl.style.width = `${rot ? c.h : c.w}px`; cmpEl.style.height = `${rot ? c.w : c.h}px`; cmpEl.querySelector('span').textContent = `${stops[cmp].mm}mm`; }
+    cmpEls.forEach((e, k) => {
+      const i = cmp[k];
+      const c = i != null && sizeOf(stops[i].mm);
+      e.hidden = !c;
+      if (c) { e.style.width = `${rot ? c.h : c.w}px`; e.style.height = `${rot ? c.w : c.h}px`; e.querySelector('span').textContent = `${stops[i].mm}mm`; }
+    });
     const z = sizeOf(mm);
     if (!z) return;
     const fw = z.w, fh = z.h;
@@ -191,16 +195,18 @@ export async function openViewfinder(o) {
     });
   }, { passive: true });
   // Holding a lens pins it as the comparison frame; holding it again (or tapping "vs") lets it go.
-  let hold = 0, held = false;
+  let hold = 0, held = false, hx = 0, hy = 0;
   ruler.addEventListener('pointerdown', (e) => {
     const b = e.target.closest('.vfx-stop');
     if (!b) return;
     held = false;
+    hx = e.clientX; hy = e.clientY;
     clearTimeout(hold);
     hold = setTimeout(() => {
       held = true;
       const i = Number(b.dataset.i);
-      cmp = cmp === i ? null : i;
+      // hold again to let a lens go; a fourth replaces the oldest
+      cmp = cmp.includes(i) ? cmp.filter(x => x !== i) : [...cmp, i].slice(-MAX_CMP);
       feel.pin();
       draw();
     }, 450);
@@ -208,12 +214,13 @@ export async function openViewfinder(o) {
   const cancelHold = () => clearTimeout(hold);
   ruler.addEventListener('pointerup', cancelHold);
   ruler.addEventListener('pointercancel', cancelHold);
-  ruler.addEventListener('scroll', cancelHold, { passive: true });
+  // only the finger moving lets the hold go — the dial still gliding from a tap does not
+  ruler.addEventListener('pointermove', (e) => { if (Math.hypot(e.clientX - hx, e.clientY - hy) > 10) cancelHold(); });
   // when the ring stops on a lens: a firmer click (a short quiet after the last scroll means it has settled)
   let settleT = 0, settledAt = idx;
   ruler.addEventListener('scroll', () => { clearTimeout(settleT); settleT = setTimeout(() => { if (settledAt !== idx) { settledAt = idx; feel.settle(); } }, 160); }, { passive: true });
   ruler.addEventListener('contextmenu', (e) => e.preventDefault());
-  vs.onclick = () => { cmp = null; draw(); };
+  vs.onclick = () => { cmp = []; draw(); };
   ruler.addEventListener('click', (e) => {
     const b = e.target.closest('.vfx-stop');
     if (!b || held) { held = false; return; }

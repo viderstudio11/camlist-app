@@ -1240,3 +1240,18 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 .model-row b { flex: 0 0 auto; white-space: nowrap; }
 .model-row small { flex: 1 1 auto; }
 .model-list, .fov-models-box, .card.sh-sec { min-width: 0; max-width: 100%; }
+/* the fold every tool shares */
+.card.tool-more { margin-top: 12px; padding: 0; overflow: hidden; }
+.tool-more > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; min-height: 52px; padding: 10px 16px; }
+.tool-more > summary::-webkit-details-marker { display: none; }
+.tool-more > summary span { font-size: 13px; font-weight: 800; color: var(--muted); flex: 0 0 auto; }
+.tool-more > summary b { flex: 1; min-width: 0; font-size: 13px; text-align: end; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tool-more > summary::after { content: '+'; font-size: 20px; color: var(--accent); flex: 0 0 auto; }
+.tool-more[open] > summary::after { content: '–'; }
+.tool-more > .card { box-shadow: none; border-radius: 0; margin: 0; border: 0; border-top: 1px solid var(--hair, rgba(0,0,0,.08)); }
+/* comparison frames: up to three, each its own colour */
+.vfx-cmp.c1 { border-color: #3fd4e6; } .vfx-cmp.c1 span { background: #3fd4e6; }
+.vfx-cmp.c2 { border-color: #ff5fa2; } .vfx-cmp.c2 span { background: #ff5fa2; }
+.vfx-stop.cmp.c1 { border-color: #3fd4e6; } .vfx-stop.cmp.c2 { border-color: #ff5fa2; }
+.vs-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-inline: 4px 2px; background: #fff; vertical-align: middle; }
+.vs-dot.c1 { background: #3fd4e6; } .vs-dot.c2 { background: #ff5fa2; }

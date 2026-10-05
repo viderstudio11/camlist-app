@@ -105,6 +105,12 @@ const L = {
   vf_start: { he: 'פתח את מצלמת הטלפון', en: 'Open the phone camera' },
   vf_ruler: { he: 'בחירת מוקד', en: 'Focal length' },
   rec_format: { he: 'פורמט צילום', en: 'Recording format' },
+  sun_place_date: { he: 'מקום ותאריך', en: 'Place and date' },
+  sun_acc: { he: 'דיוק של כדקה, לפי משוואות NOAA. הרים ומבנים בכיוון השמש מקדימים את השקיעה בפועל.', en: 'Accurate to about a minute (NOAA equations). Hills and buildings toward the sun bring the actual sunset earlier.' },
+  media_more: { he: 'פורמט, פריים רייט, כרטיס ושעות', en: 'Format, frame rate, card and hours' },
+  sh_more: { he: 'שאטר, חשמל ופרויקט', en: 'Shutter, mains and project' },
+  off_more: { he: 'עותקים, אימות וחיבורים', en: 'Copies, verify and connections' },
+  hr_rules_rate: { he: 'חוקי שעות ותעריף (נשמרים)', en: 'Hours rules and rate (kept)' },
   downloads: { he: 'הורדות', en: 'Downloads' },
   downloads_sub: { he: 'עדכוני תוכנה, LUTs ותוכנות — מהיצרנים', en: 'Firmware, LUTs and software — from the makers' },
   dl_firmware: { he: 'עדכון תוכנה', en: 'Firmware' },
@@ -147,7 +153,7 @@ const L = {
   lens_now: { he: 'עדשה', en: 'Lens' },
   lens_wider: { he: 'עדשה רחבה יותר', en: 'Wider lens' },
   lens_longer: { he: 'עדשה ארוכה יותר', en: 'Longer lens' },
-  vf_hold: { he: 'גוללים את החוגה או מחליקים על התמונה. החזקה ארוכה על עדשה משווה אותה לנוכחית.', en: 'Turn the dial or swipe the picture. Hold a lens to compare it with the current one.' },
+  vf_hold: { he: 'גוללים את החוגה או מחליקים על התמונה. החזקה ארוכה על עדשה מוסיפה אותה להשוואה — עד שלוש, כל אחת בצבע משלה.', en: 'Turn the dial or swipe the picture. Hold a lens to add it to the comparison — up to three, each in its own colour.' },
   vf_cmp_clear: { he: 'בטל השוואה', en: 'Clear comparison' },
   vf_turn: { he: 'החלפה בין רוחב לאורך', en: 'Switch between landscape and portrait' },
   vf_to_landscape: { he: 'לרוחב', en: 'Landscape' },
@@ -308,6 +314,12 @@ const S = {
   hours: { call: '07:00', wrap: '19:30', breaks: 60, customBreaks: false, base: 10, tier1h: 2, tier1pct: 125, tier2pct: 150, turnaround: 11, dayRate: 0 },
 };
 
+// The timesheet keeps its rules and rate on this phone: set once, not every day.
+const HOURS_KEY = 'camlist.hours';
+const HOURS_KEEP = ['breaks', 'customBreaks', 'base', 'tier1h', 'tier1pct', 'tier2pct', 'turnaround', 'dayRate'];
+try { const kept = JSON.parse(localStorage.getItem(HOURS_KEY) || '{}'); for (const k of HOURS_KEEP) if (kept[k] != null) S.hours[k] = kept[k]; } catch { /* private window */ }
+const keepHours = () => { try { localStorage.setItem(HOURS_KEY, JSON.stringify(Object.fromEntries(HOURS_KEEP.map(k => [k, S.hours[k]])))); } catch { /* ignore */ } };
+
 // The lens tool remembers its camera and last lens on this phone, so opening it again picks up where
 // the user left off. Kept in this browser only; losing it just means starting from the project's camera.
 const FOV_KEY = 'camlist.fov';
@@ -323,7 +335,7 @@ const keepFov = () => { try { localStorage.setItem(FOV_KEY, JSON.stringify(Objec
 // Short labels for places outside the tools screen (the home screen's tool row).
 export const toolLabel = (k, lang) => L[k]?.[lang] ?? L[k]?.he ?? k;
 
-const TOOLS = ['media', 'fov', 'shutter', 'hours', 'offload', 'sun', 'downloads', 'units', 'luts'];
+const TOOLS = ['media', 'fov', 'shutter', 'hours', 'offload', 'sun', 'downloads', 'units'];
 
 
 export function render(ctx, { tool: id }, root) {
@@ -357,6 +369,10 @@ export function render(ctx, { tool: id }, root) {
 }
 
 // ---------- shared field helpers ----------
+// Every tool: the answer first, the one or two questions that change it, and the rest folded under one
+// card whose line says what is set now. The fold stays open while the app is open.
+const OPEN = {};
+const more = (key, label, summary, inner) => `<details class="card tool-more" data-more="${key}" ${OPEN[key] ? 'open' : ''}><summary><span>${esc(label)}</span><b>${esc(summary)}</b></summary>${inner}</details>`;
 const field = (label, inner) => `<label class="tfield"><span>${esc(label)}</span>${inner}</label>`;
 const sel = (name, options, value) => `<select data-f="${name}">${options.map(o =>
   `<option value="${esc(o.v)}" ${String(o.v) === String(value) ? 'selected' : ''}>${esc(o.l)}</option>`).join('')}</select>`;
@@ -447,28 +463,27 @@ function mediaTool(T) {
   const hoursOther = !HOUR_CHIPS.includes(s.hours) || s.customHours;
   const cardOther = !kind.sizes.includes(s.card) || s.customCard;
 
-  return `${answer}${pick}
-    <div class="card sh-sec">
-      <div class="tsub">2 · ${esc(T('format_pick'))}</div>
+  return `${answer}${pick}${more('media', T('media_more'), `${group.res} ${fmt.codec} · ${s.fps}p · ${gb(s.card)} · ${s.hours}h`, `<div class="card sh-sec">
+      <div class="tsub">${esc(T('format_pick'))}</div>
       ${groups.length > 1 ? `<div class="chips">${groups.map(g => chip('data-mres', g.res, esc(g.res), g === group)).join('')}</div>` : `<p class="tnote">${esc(group.res)}</p>`}
       <div class="chips fov-models">${group.formats.map(f => chip('data-mfmt', f.key, esc(f.codec), f.key === fmt.key)).join('')}</div>
     </div>
     <div class="card sh-sec">
-      <div class="tsub">3 · ${esc(T('fps'))}</div>
+      <div class="tsub">${esc(T('fps'))}</div>
       <div class="chips">${fmt.fps.map(x => chip('data-mfps', x, String(x), x === s.fps)).join('')}</div>
     </div>
     <div class="card sh-sec">
-      <div class="tsub">4 · ${esc(T('card'))}</div>
+      <div class="tsub">${esc(T('card'))}</div>
       ${kinds.length > 1 ? `<div class="chips">${kinds.map(t => chip('data-mtype', t.type, esc(t.type), t.type === s.mtype)).join('')}</div>` : kind.type ? `<p class="tnote">${esc(kind.type)}</p>` : ''}
       <div class="chips fov-models">${kind.sizes.map(x => chip('data-mcard', x, gb(x), !cardOther && x === s.card)).join('')}${chip('data-mcard-custom', 1, esc(T('other_val')), cardOther)}</div>
       ${cardOther ? `<div class="sh-custom">${field('GB', numIn('card', s.card, { min: 1, max: 100000, step: 1 }))}</div>` : ''}
       ${cam.oneSlot ? '' : `<label class="switch"><span>${esc(T('backup_lbl'))}</span><input type="checkbox" data-f="backup" ${s.backup ? 'checked' : ''}></label>`}
     </div>
     <div class="card sh-sec">
-      <div class="tsub">5 · ${esc(T('shoot_hours'))}</div>
+      <div class="tsub">${esc(T('shoot_hours'))}</div>
       <div class="chips">${HOUR_CHIPS.map(x => chip('data-mhours', x, String(x), !hoursOther && x === s.hours)).join('')}${chip('data-mhours-custom', 1, esc(T('other_val')), hoursOther)}</div>
       ${hoursOther ? `<div class="sh-custom">${field(T('shoot_hours'), numIn('hours', s.hours, { min: 0.5, max: 48, step: 0.5 }))}</div>` : ''}
-    </div>`;
+    </div>`)}`;
 }
 
 // ---------- field of view ----------
@@ -814,7 +829,7 @@ function shutterTool(T) {
       ${s.customFps || !FRAME_RATES.includes(s.fps) ? `<div class="sh-custom">${field(T('fps'), numIn('fps', s.fps, { min: 1, max: 1000, step: 'any' }))}</div>` : ''}
     </div>
 
-    <div class="card sh-sec">
+    ${more('shutter', T('sh_more'), `${T('mains_' + s.mains)} · ${fmt(s.projectFps)} fps`, `<div class="card sh-sec">
       <div class="sh-head"><div class="tsub">${esc(T('shutter_lbl'))}</div>
         <div class="seg sh-mode"><button class="${s.mode === 'speed' ? 'active' : ''}" data-shmode="speed">${esc(T('speed_short'))}</button><button class="${s.mode === 'angle' ? 'active' : ''}" data-shmode="angle">${esc(T('angle_short'))}</button></div></div>
       <div class="chips">${options.map(o => chip('data-shv', o.value, esc(o.label), isOn(o),
@@ -827,7 +842,7 @@ function shutterTool(T) {
       <div class="chips">${chip('data-mains', 50, esc(T('mains_50')), s.mains === 50)}${chip('data-mains', 60, esc(T('mains_60')), s.mains === 60)}</div>
       <div class="tsub" style="margin-top:14px">${esc(T('project_fps'))}</div>
       <div class="chips">${[23.98, 24, 25, 29.97, 30].map(x => chip('data-proj', x, fmt(x), x === s.projectFps)).join('')}</div>
-    </div>`;
+    </div>`)}`;
 }
 
 // ---------- offload ----------
@@ -882,19 +897,19 @@ function offloadTool(T, lang) {
       <div class="tsub">2 · ${esc(T('off_source'))}</div>
       <div class="chips">${READERS.map(x => chip('data-oread', x.id, esc(name(x)), !s.readOther && x.id === rd.id)).join('')}${chip('data-oread-custom', 1, esc(T('other_val')), s.readOther)}</div>
       ${s.readOther ? `<div class="sh-custom">${field('MB/s', numIn('readMBs', s.readMBs, { min: 1, max: 10000, step: 10 }))}</div>` : ''}
-      <div class="sh-row"><span>${esc(T('off_readers'))}</span><div class="chips">${[1, 2].map(x => chip('data-oreaders', x, String(x), x === s.readers)).join('')}</div></div>
     </div>
     <div class="card sh-sec">
       <div class="tsub">3 · ${esc(T('drive'))}</div>
       <div class="chips">${DRIVES.map(x => chip('data-odrive', x.id, esc(name(x)), !s.writeOther && x.id === dv.id)).join('')}${chip('data-odrive-custom', 1, esc(T('other_val')), s.writeOther)}</div>
       ${s.writeOther ? `<div class="sh-custom">${field('MB/s', numIn('writeMBs', s.writeMBs, { min: 1, max: 10000, step: 10 }))}</div>` : ''}
-      <div class="sh-row"><span>${esc(T('off_port'))}</span><div class="chips">${PORTS.map(x => chip('data-oport', x.id, esc(x.label), x.id === s.port)).join('')}</div></div>
     </div>
-    <div class="card sh-sec">
-      <div class="tsub">4 · ${esc(T('copies'))}</div>
+    ${more('offload', T('off_more'), `${s.copies}× · ${s.verify ? T('verify') : '—'} · ${s.readers}× · ${(PORTS.find(x => x.id === s.port) || {}).label || ''}`, `<div class="card sh-sec">
+      <div class="sh-row"><span>${esc(T('off_readers'))}</span><div class="chips">${[1, 2].map(x => chip('data-oreaders', x, String(x), x === s.readers)).join('')}</div></div>
+      <div class="sh-row"><span>${esc(T('off_port'))}</span><div class="chips">${PORTS.map(x => chip('data-oport', x.id, esc(x.label), x.id === s.port)).join('')}</div></div>
+      <div class="tsub" style="margin-top:10px">${esc(T('copies'))}</div>
       <div class="chips">${[1, 2, 3].map(x => chip('data-ocopies', x, String(x), x === s.copies)).join('')}</div>
       <label class="switch"><span>${esc(T('verify'))}</span><input type="checkbox" data-f="verify" ${s.verify ? 'checked' : ''}></label>
-    </div>`;
+    </div>`)}`;
 }
 
 // ---------- sun ----------
@@ -983,6 +998,7 @@ function sunTool(T, lang) {
     <p class="sh-line"><span class="k-gold-t">${esc(T('golden'))}</span> ${span(day.goldenEvening)} · <span class="k-blue-t">${esc(T('blue'))}</span> ${span(day.blueEvening)}</p>
     ${status ? `<p class="sun-status ${status.key}">${esc(Tp(status.key, { t: hm(status.ms / 3600000) }))}</p>` : ''}
     ${sunArc(day, at, T, s.dateMode === 'today' ? new Date() : null)}
+    <p class="tnote">${esc(T('sun_acc'))}</p>
     <p class="tnote">${esc(Tp('sun_morning', { rise: at(day.sunrise), gold: span(day.goldenMorning), blue: span(day.blueMorning), len: hm(day.dayLengthHours) }))}</p>
     ${tz && tz !== deviceZone() ? `<p class="tnote">${esc(Tp('tz_note', { place: placeName, tz }))}</p>` : ''}
     <details class="src-more">
@@ -992,17 +1008,16 @@ function sunTool(T, lang) {
   </div>`;
 
   const dateOther = s.dateMode === 'pick';
-  return `${answer}
-    <div class="card sh-sec">
-      <div class="tsub">1 · ${esc(T('place'))}</div>
+  return `${answer}${more('sun', T('sun_place_date'), `${placeName} · ${dayWord}`, `<div class="card sh-sec">
+      <div class="tsub">${esc(T('place'))}</div>
       <div class="sun-country">${sel('country', countries.map(c => ({ v: c.code, l: name(c) })), s.country)}</div>
       <div class="chips fov-models">${cityList.map((c, i) => chip('data-scity', i, esc(name(c)), !here && i === s.city)).join('')}${chip('data-geo', 1, `${icons.pin || '◎'} ${esc(T('my_location'))}`, here)}</div>
     </div>
     <div class="card sh-sec">
-      <div class="tsub">2 · ${esc(T('date'))}</div>
+      <div class="tsub" style="margin-top:12px">${esc(T('date'))}</div>
       <div class="chips">${chip('data-sdate', 'today', esc(T('today')), s.dateMode === 'today')}${chip('data-sdate', 'tomorrow', esc(T('tomorrow')), s.dateMode === 'tomorrow')}${chip('data-sdate', 'pick', esc(T('other_date')), dateOther)}</div>
       ${dateOther ? `<div class="sh-custom"><input type="date" data-f="date" value="${esc(s.date)}"></div>` : ''}
-    </div>`;
+    </div>`)}`;
 }
 
 // ---------- LUT bank ----------
@@ -1061,6 +1076,7 @@ function hoursTool(T, lang) {
   const seg = (h, cls) => (h > 0 ? `<i class="${cls}" style="width:${((h / total) * 100).toFixed(1)}%"></i>` : '');
   const parts = [`${hm(r.regular)} ${T('hr_regular')}`, r.tier1 && `${hm(r.tier1)} ${Tp('hr_at', { p: s.tier1pct })}`, r.tier2 && `${hm(r.tier2)} ${Tp('hr_at', { p: s.tier2pct })}`].filter(Boolean);
   const breakOther = ![0, 30, 45, 60].includes(s.breaks) || s.customBreaks;
+  keepHours();
 
   return `<div class="card sh-answer ${r.tier1 ? 'warn-soft' : 'ok'}">
       <div class="fov-top"><b class="sh-big">${hm(r.worked)}</b><span class="sh-small">${esc(T('worked'))}</span></div>
@@ -1070,23 +1086,23 @@ function hoursTool(T, lang) {
       <p class="sh-line">${esc(T('next_call'))}: <b>${r.nextCall}</b>${r.nextDay ? ` · ${esc(T('next_day'))}` : ''} <span class="tnote">(${esc(Tp('hr_rest', { h: s.turnaround }))})</span></p>
     </div>
     <div class="card sh-sec">
-      <div class="tsub">1 · ${esc(T('hr_times'))}</div>
+      <div class="tsub">${esc(T('hr_times'))}</div>
       <div class="hr-times">${field(T('call_time'), `<input type="time" data-f="call" value="${esc(s.call)}">`)}${field(T('wrap_time'), `<input type="time" data-f="wrap" value="${esc(s.wrap)}">`)}</div>
       <div class="sh-row"><span>${esc(T('hr_breaks'))}</span><div class="chips">${[0, 30, 45, 60].map(x => chip('data-hbreak', x, x ? `${x}′` : '0', !breakOther && x === s.breaks)).join('')}${chip('data-hbreak-custom', 1, esc(T('other_val')), breakOther)}</div></div>
       ${breakOther ? `<div class="sh-custom">${field(T('break_min'), numIn('breaks', s.breaks, { min: 0, max: 600, step: 5 }))}</div>` : ''}
     </div>
-    <div class="card sh-sec">
-      <div class="tsub">2 · ${esc(T('hr_rules'))}</div>
+    ${more('hours', T('hr_rules_rate'), `${s.base}h · ${s.tier1pct}% / ${s.tier2pct}% · ${s.turnaround}h${s.dayRate ? ` · ₪${s.dayRate}` : ''}`, `<div class="card sh-sec">
+      <div class="tsub">${esc(T('hr_rules'))}</div>
       <div class="sh-row"><span>${esc(T('hr_day'))}</span><div class="chips">${[8, 9, 10, 12].map(x => chip('data-hbase', x, `${x}h`, x === s.base)).join('')}</div></div>
       <div class="sh-row"><span>${esc(T('hr_first'))}</span><div class="chips">${[1, 2, 3].map(x => chip('data-ht1h', x, `${x}h`, x === s.tier1h)).join('')}${[125, 150].map(x => chip('data-ht1p', x, `${x}%`, x === s.tier1pct)).join('')}</div></div>
       <div class="sh-row"><span>${esc(T('hr_after'))}</span><div class="chips">${[150, 175, 200].map(x => chip('data-ht2p', x, `${x}%`, x === s.tier2pct)).join('')}</div></div>
       <div class="sh-row"><span>${esc(T('turnaround_h'))}</span><div class="chips">${[8, 10, 11, 12].map(x => chip('data-hturn', x, `${x}h`, x === s.turnaround)).join('')}</div></div>
     </div>
     <div class="card sh-sec">
-      <div class="tsub">3 · ${esc(T('hr_rate'))}</div>
+      <div class="tsub" style="margin-top:12px">${esc(T('hr_rate'))}</div>
       <div class="sh-custom">${field('₪', numIn('dayRate', s.dayRate || '', { min: 0, max: 100000, step: 50 }))}</div>
       <p class="tnote">${esc(T('hr_rate_note'))}</p>
-    </div>`;
+    </div>`)}`;
 }
 
 // ---------- units ----------
@@ -1231,6 +1247,7 @@ function wire(root, ctx, id, T, lang) {
   for (const [attr, key] of [['hbase', 'base'], ['ht1h', 'tier1h'], ['ht1p', 'tier1pct'], ['ht2p', 'tier2pct'], ['hturn', 'turnaround']]) {
     root.querySelectorAll(`[data-${attr}]`).forEach(b => { b.onclick = () => { hr[key] = Number(b.dataset[attr]); ctx.render(); }; });
   }
+  root.querySelectorAll('[data-more]').forEach(d => d.addEventListener('toggle', () => { OPEN[d.dataset.more] = d.open; }));
   root.querySelectorAll('[data-dldept]').forEach(b => { b.onclick = () => { Object.assign(S.downloads, { dept: b.dataset.dldept, q: '' }); ctx.render(); }; });
   root.querySelector('[data-tool-go]')?.addEventListener('click', (e) => ctx.navigate(`#/tools/${e.currentTarget.dataset.toolGo}`));
   const dlq = root.querySelector('[data-dlq]');
@@ -1239,7 +1256,8 @@ function wire(root, ctx, id, T, lang) {
     const tpl = document.createElement('template');
     tpl.innerHTML = downloadsTool(T, lang, ctx);
     for (const part of ['dllist']) { const fresh = tpl.content.querySelector(`[data-part="${part}"]`); root.querySelector(`[data-part="${part}"]`)?.replaceWith(fresh); }
-    root.querySelectorAll('[data-dldept]').forEach(b => b.classList.toggle('on', !S.downloads.q.trim() && b.dataset.dldept === S.downloads.dept));
+    root.querySelectorAll('[data-more]').forEach(d => d.addEventListener('toggle', () => { OPEN[d.dataset.more] = d.open; }));
+  root.querySelectorAll('[data-dldept]').forEach(b => b.classList.toggle('on', !S.downloads.q.trim() && b.dataset.dldept === S.downloads.dept));
   };
   root.querySelectorAll('[data-lutbrand]').forEach(b => { b.onclick = () => { S.luts.brand = b.dataset.lutbrand; S.luts.model = ''; ctx.render(); }; });
   root.querySelectorAll('[data-lutmodel]').forEach(b => { b.onclick = () => { S.luts.model = b.dataset.lutmodel; ctx.render(); }; });
