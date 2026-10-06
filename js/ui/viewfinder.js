@@ -69,7 +69,7 @@ export async function openViewfinder(o) {
     </div>
     <div class="vfx-bottom">
       <div class="vfx-read"><b class="vfx-big"></b><span class="vfx-deg"></span><button class="vfx-vs" hidden aria-label="${esc(T('vf_cmp_clear'))}"></button></div>
-      <div class="vfx-at"></div>
+      <button class="vfx-at"><span class="vfx-attxt"></span><i class="vfx-atx" aria-hidden="true"></i></button>
       <div class="vfx-ruler" dir="ltr" role="listbox" aria-label="${esc(T('vf_ruler'))}">
         ${stops.map((s, i) => `<button class="vfx-stop ${s.have ? 'have' : ''}" role="option" data-i="${i}"><b>${s.mm}</b></button>`).join('')}
       </div>
@@ -139,6 +139,9 @@ export async function openViewfinder(o) {
   const fmtLabel = () => (modes.length ? modes[mi].label : (cam.mode || ''));
   const degOf = (mm) => Math.round((2 * Math.atan(area.w / (2 * mm)) * 180) / Math.PI);
   const CMP_COL = ['#ffffff', '#3fd4e6', '#ff5fa2'];
+  // The distance data (frame size at the distance, and on each comparison frame) can be put away; kept on this phone.
+  let info = true;
+  try { info = localStorage.getItem('camlist.vfinfo') !== '0'; } catch { /* private window */ }
   const sizeOf = (mm) => {
     const vw = video.videoWidth, vh = video.videoHeight;
     if (!vw || !vh) return null;
@@ -156,7 +159,13 @@ export async function openViewfinder(o) {
     el.querySelector('.vfx-fps').textContent = fps.toFixed(2);
     el.querySelector('.vfx-dfmt').textContent = fmtLabel();
     el.querySelector('.vfx-mm').textContent = `${mm}mm`;
-    el.querySelector('.vfx-at').textContent = o.frameLine ? o.frameLine(mm, area) : '';
+    const atEl = el.querySelector('.vfx-at');
+    atEl.classList.toggle('off', !info);
+    atEl.hidden = !o.frameLine;
+    atEl.querySelector('.vfx-attxt').textContent = info ? (o.frameLine ? o.frameLine(mm, area) : '') : `⟷ ${o.distance || ''}`;
+    atEl.querySelector('.vfx-attxt').dir = info ? 'auto' : 'ltr';
+    atEl.querySelector('.vfx-atx').textContent = info ? '✕' : '';
+    atEl.setAttribute('aria-label', T(info ? 'vf_info_hide' : 'vf_info_show'));
     el.querySelector('.vfx-camname').textContent = cam.name;
     const mb = el.querySelector('.vfx-mode');
     mb.hidden = modes.length < 2;
@@ -170,7 +179,7 @@ export async function openViewfinder(o) {
       const i = cmp[k];
       const c = i != null && sizeOf(stops[i].mm);
       e.hidden = !c;
-      if (c) { e.style.width = `${rot ? c.h : c.w}px`; e.style.height = `${rot ? c.w : c.h}px`; e.querySelector('span').style.left = inside(rot ? c.h : c.w); e.querySelector('span').textContent = o.frameSize ? `${stops[i].mm}mm · ${o.frameSize(stops[i].mm, area)}` : `${stops[i].mm}mm`; }
+      if (c) { e.style.width = `${rot ? c.h : c.w}px`; e.style.height = `${rot ? c.w : c.h}px`; e.querySelector('span').style.left = inside(rot ? c.h : c.w); e.querySelector('span').textContent = info && o.frameSize ? `${stops[i].mm}mm · ${o.frameSize(stops[i].mm, area)}` : `${stops[i].mm}mm`; }
     });
     const z = sizeOf(mm);
     if (!z) return;
@@ -252,6 +261,7 @@ export async function openViewfinder(o) {
   ruler.addEventListener('scroll', () => { clearTimeout(settleT); settleT = setTimeout(() => { if (settledAt !== idx) { settledAt = idx; feel.settle(); } }, 160); }, { passive: true });
   ruler.addEventListener('contextmenu', (e) => e.preventDefault());
   vs.onclick = () => { cmp = []; draw(); };
+  el.querySelector('.vfx-at').addEventListener('click', () => { info = !info; try { localStorage.setItem('camlist.vfinfo', info ? '1' : '0'); } catch { /* ignore */ } feel.detent(); draw(); });
   ruler.addEventListener('click', (e) => {
     const b = e.target.closest('.vfx-stop');
     if (!b || held) { held = false; return; }

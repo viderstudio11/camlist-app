@@ -148,6 +148,8 @@ const L = {
   vf_hold: { he: 'גוללים את החוגה או מחליקים על התמונה. החזקה ארוכה על עדשה מוסיפה אותה להשוואה — עד שלוש, כל אחת בצבע משלה.', en: 'Turn the dial or swipe the picture. Hold a lens to add it to the comparison — up to three, each in its own colour.' },
   vf_cmp_clear: { he: 'בטל השוואה', en: 'Clear comparison' },
   vf_fps: { he: 'פריים רייט — לחיצה מחליפה', en: 'Frame rate — tap to change' },
+  vf_info_hide: { he: 'הסתר את נתוני המרחק', en: 'Hide the distance data' },
+  vf_info_show: { he: 'הצג את נתוני המרחק', en: 'Show the distance data' },
   vf_rec: { he: 'הקלטת קליפ של הפריים', en: 'Record a clip of the frame' },
   vf_rec_stop: { he: 'עצור הקלטה', en: 'Stop recording' },
   vf_grab: { he: 'צלם פריים', en: 'Grab frame' },
@@ -515,6 +517,26 @@ const sliderToDist = (v) => {
   return d < 3 ? Math.round(d * 10) / 10 : d < 10 ? Math.round(d * 4) / 4 : Math.round(d);
 };
 
+// Camera names as crews say them: "Sony FX6", not "PXW-FX6"; "Blackmagic Pocket 4K", not "Pocket Cinema Camera 4K".
+const MAKER_SHORT = { sony: 'Sony', arri: 'ARRI', canon: 'Canon', red: 'RED', 'blackmagic-design': 'Blackmagic', panasonic: 'Panasonic', dji: 'DJI', fujifilm: 'Fujifilm', nikon: 'Nikon' };
+export const camModel = (product) => {
+  let n = String(product?.name || '');
+  const brand = String(product?.brandName || '');
+  if (brand && n.toLowerCase().startsWith(brand.toLowerCase() + ' ')) n = n.slice(brand.length + 1);
+  n = n.replace(/\((\d+(?:\.\d)?K)\)/gi, ' $1')                                     // "(8K)" → "8K"
+    .replace(/\s*\(?\b(RF|EF|PL|L|E)(\/(RF|EF|PL))*[- ]Mount\)?/gi, (m, a, b) => (/^\s+(EF|PL) MOUNT$/i.test(m) ? ` ${a}` : ''))
+    .replace(/\s*(Digital Motion Picture|Digital Cinema|Mirrorless Digital|Mirrorless|Cinema Box|Box Cinema|4-Axis Cinema|Cinema)?\s*Camera\b/gi, '')
+    .replace(/^(Lumix|EOS|ALPHA)\s+/i, '').replace(/^(PXW|ILME|PMW|AU|DC)-/i, '')
+    .replace(/\bMark\s+/gi, '').replace(/\bMonochrome\b/gi, 'Mono')
+    .replace(/\s+/g, ' ').trim();
+  return n || String(product?.name || '');
+};
+export const camFull = (product) => {
+  const b = MAKER_SHORT[product?.brand] || product?.brandName || '';
+  const m = camModel(product);
+  return b && !m.toLowerCase().startsWith(b.toLowerCase()) ? `${b} ${m}` : m;
+};
+
 // What the full-screen viewfinder needs, from the tool's last render.
 let fovView = null;
 function fovTool(T, lang, ctx) {
@@ -581,21 +603,21 @@ function fovTool(T, lang, ctx) {
   if (!brands.some(([b]) => b === s.camBrand)) s.camBrand = cam?.product.brand || brands[0]?.[0] || '';
   const models = cams.filter(c => c.product.brand === s.camBrand);
   // a row is the model's name and year — nothing else to read
-  const rowHTML = (c) => `<button class="model-row ${cam === c ? 'on' : ''}" data-cmodel="${esc(c.prof.id)}" data-cmodelmode=""><b>${esc(short(c))}</b><small>${esc(c.prof.year || '')}</small></button>`;
   const term = (s.q || '').trim().toLowerCase();
-  const hits = term ? cams.filter(c => (short(c) + ' ' + c.product.name + ' ' + (c.product.brandName || '')).toLowerCase().includes(term)) : [];
+  const rowHTML = (c) => `<button class="model-row ${cam === c ? 'on' : ''}" data-cmodel="${esc(c.prof.id)}" data-cmodelmode=""><b>${esc(term ? camFull(c.product) : camModel(c.product))}</b><small>${esc(c.prof.year || '')}</small></button>`;
+  const hits = term ? cams.filter(c => (camFull(c.product) + ' ' + c.product.name + ' ' + (c.product.brandName || '')).toLowerCase().includes(term)) : [];
   const resultsHTML = term
     ? `<div class="fov-models-box"><div class="tsub">${esc(Tp('cam_hits', { n: hits.length }))}</div>${hits.length ? `<div class="model-list">${hits.slice(0, 30).map(rowHTML).join('')}</div>` : `<p class="tnote">${esc(T('cam_none'))}</p>`}</div>`
     : `<div class="fov-makers" role="tablist" aria-label="${esc(T('maker'))}">${brands.map(([slug, n]) => `<button class="fov-maker ${slug === s.camBrand ? 'on' : ''}" role="tab" aria-selected="${slug === s.camBrand}" data-cbrand="${esc(slug)}">${esc(n)}</button>`).join('')}</div>
         <div class="model-list fov-modellist">${models.map(rowHTML).join('')}</div>`;
   const pickCard = cam && !s.picking
     ? `<div class="card sh-sec fov-cam" data-part="cam">
-        <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(short(cam))}</b><p class="tnote">${esc(sensorNote)}</p><a class="fw-link" href="#/tools/downloads?q=${encodeURIComponent(short(cam))}">${esc(T('dl_for_cam'))} ›</a></div>
+        <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(camFull(cam.product))}</b><p class="tnote">${esc(sensorNote)}</p><a class="fw-link" href="#/tools/downloads?q=${encodeURIComponent(short(cam))}">${esc(T('dl_for_cam'))} ›</a></div>
         <button class="btn sm" data-cchange>${esc(T('change'))}</button></div>
         ${modeRow}
       </div>`
     : `<div class="card sh-sec" data-part="cam">
-        ${quick.length ? `<div class="tsub">${esc(T('cam_yours'))}</div><div class="chips fov-quick">${quick.map(c => chip('data-crecent', c.prof.id, `${esc(short(c))}${String(c.prof.id) === projProf ? ` <i class="n">${esc(T('cam_from_project'))}</i>` : ''}`, cam && c === cam)).join('')}</div>` : ''}
+        ${quick.length ? `<div class="tsub">${esc(T('cam_yours'))}</div><div class="chips fov-quick">${quick.map(c => chip('data-crecent', c.prof.id, `${esc(camFull(c.product))}${String(c.prof.id) === projProf ? ` <i class="n">${esc(T('cam_from_project'))}</i>` : ''}`, cam && c === cam)).join('')}</div>` : ''}
         <input class="fov-q" type="search" data-camq value="${esc(s.q || '')}" placeholder="${esc(T('cam_search_ph'))}" autocomplete="off" enterkeyhint="search" aria-label="${esc(T('cam_search_ph'))}">
         <div data-part="camresults">${resultsHTML}</div>
         <p class="tnote">${esc(T('verified_only'))}</p>
@@ -725,7 +747,7 @@ function fovTool(T, lang, ctx) {
       <button class="fov-step" data-fstep="1" aria-label="${esc(T('lens_longer'))}" ${at === stops.length - 1 ? 'aria-disabled="true"' : ''}>›</button>
     </div>
     <button class="btn primary fov-open" data-vf-start>${toolIcon('fov')}${esc(T('vf_start'))}</button>
-    <p class="tnote">${esc(Tp('vf_hint', { cam: short(cam) }))}</p>
+    <p class="tnote">${esc(Tp('vf_hint', { cam: camFull(cam.product) }))}</p>
   </div>
 `;
   const frameAtLine = (mm) => { const z = frameAt(sn, mm, s.distance); return Tp('frame_at', { mm, d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); };
@@ -740,10 +762,10 @@ function fovTool(T, lang, ctx) {
     <p class="fov-frameline">${esc(frameAtLine(shown))}</p>
   </div>`;
 
-  fovView = { cam: { id: cam.prof.id, name: short(cam), w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown,
+  fovView = { cam: { id: cam.prof.id, name: camFull(cam.product), w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown,
     frameAtLine: () => frameAtLine(shown),
     modes: modesOf(cam), modeId: modeOf(cam)?.id,
-    cameras: cams.map(c => ({ id: c.prof.id, name: short(c), modes: modesOf(c), w: c.prof.sensor.w, h: c.prof.sensor.h, mode: c.prof.sensor.mode })),
+    cameras: cams.map(c => ({ id: c.prof.id, name: camFull(c.product), modes: modesOf(c), w: c.prof.sensor.w, h: c.prof.sensor.h, mode: c.prof.sensor.mode })),
     projectId: projProf, recent: (s.recent || []).slice(),
     modeFor: (id) => S.fov.modes?.[id],
     onMode: (camId, id) => { S.fov.modes = { ...(S.fov.modes || {}), [camId]: id }; keepFov(); },
