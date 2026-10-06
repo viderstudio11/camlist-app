@@ -13,6 +13,8 @@ import { proposeParents, setParent } from '../accassign.js';
 
 const collapsed = new Set();
 let showKit = false;
+// The kit row the user went to fill: coming back to the list lands on it, not at the top.
+let backTo = null;
 const openKits = new Set(); // items whose must-have checklist is open // set by "Build around": bring the new kit into view on the next draw
 
 // Each detail isolated, so a date range beside a Hebrew name never flips (02.10–01.10).
@@ -61,7 +63,7 @@ export function render(ctx, { id }, root) {
     return `<button class="buildbtn kitchip ${done === st.length ? 'active' : ''}" data-kitchip="${esc(product.id)}">${done === st.length ? '✓' : '▾'} ${t('kit_short')} ${done}/${st.length}</button>`;
   };
   const slotRows = (product) => kitSlots(product).map(x => `
-      <div class="slot ${x.done ? 'done' : ''}">
+      <div class="slot ${x.done ? 'done' : ''}" data-kslot="${esc(`${product.id}:${x.key}`)}">
         <span class="slot-check">${x.done ? '✓' : ''}</span>
         <span class="slot-label">${esc(ctx.lang() === 'he' ? x.he : x.en)}${x.power ? `<span class="seg pwr"><button class="${x.power.route === 'vlock' ? '' : 'active'}" data-mpower="${esc(product.id)}" data-route="native">${x.power.fam}</button><button class="${x.power.route === 'vlock' ? 'active' : ''}" data-mpower="${esc(product.id)}" data-route="vlock">V-Lock</button></span>` : ''}</span>
         <span class="slot-have">${x.have} / ${x.need}</span>
@@ -142,6 +144,11 @@ export function render(ctx, { id }, root) {
     <div class="assign-acts"><button class="btn sm primary" data-assign>${t('assign_review')}</button><button class="btn sm ghost" data-assign-later>${t('assign_later')}</button></div></section>` : '';
   root.innerHTML = headHTML + assignHTML + (groups.length ? sections.join('') : listHTML);
   if (showKit) { showKit = false; root.querySelector('.kit')?.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  if (backTo) {
+    const row = root.querySelector(backTo);
+    backTo = null;
+    if (row) { row.scrollIntoView({ block: 'center' }); row.classList.add('just-back'); setTimeout(() => row.classList.remove('just-back'), 1200); }
+  }
   root.insertAdjacentHTML('beforeend', `<div class="bottombar"><button class="btn primary" data-add>${icons.plus}${t('add_gear')}</button><button class="btn" data-export ${p.items.length ? '' : 'disabled'}>${icons.share}${t('export')}</button></div>`);
 
   // Adding gear starts from the departments page, not wherever the catalog was left.
@@ -177,6 +184,7 @@ export function render(ctx, { id }, root) {
     const d = slot?.find ? ctx.catalog.departments.find(x => x.slug === slot.find.dept) : null;
     const sub = d?.subcategories.find(x => x.en === slot.find.subcat);
     presetCatalog(d ? { dept: d.id, subcat: sub?.id ?? null } : {});
+    backTo = `.slot[data-kslot="${CSS.escape(`${b.dataset.kitfind}:${b.dataset.slot}`)}"]`;
     ctx.navigate(`#/p/${id}/add`);
   }; });
   // a monitor on NP-F: its own batteries, or V-Lock through a D-Tap cable — kept per monitor
@@ -231,6 +239,7 @@ export function render(ctx, { id }, root) {
   root.querySelectorAll('[data-choose]').forEach(b => { b.onclick = () => {
     const slot = compat.kitStatus(activeProf, p.items, ctx.resolve, allocFor(p, p.buildCameraId)).find(s => s.slot === b.dataset.choose);
     presetCatalog({ dept: slot.deptId, subcat: slot.subId, strict: true, kind: slot.kind || null, kitCam: p.buildCameraId, slot: slot.slot });
+    backTo = `.slot[data-slot="${CSS.escape(slot.slot)}"]`;
     ctx.navigate(`#/p/${id}/add`);
   }; });
 

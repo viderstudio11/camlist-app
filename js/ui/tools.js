@@ -160,8 +160,12 @@ const L = {
   vf_rec_stop: { he: 'עצור הקלטה', en: 'Stop recording' },
   vf_grab: { he: 'צלם פריים', en: 'Grab frame' },
   vf_share: { he: 'שלח לבמאי או שמור בגלריה', en: 'Send to the director or save to photos' },
-  vf_grabbed: { he: 'צולם. לחיצה על התמונה הקטנה — שליחה לבמאי או שמירה בגלריה.', en: 'Grabbed. Tap the thumbnail to send it to the director or save it to your photos.' },
-  vf_recorded: { he: 'הקליפ מוכן. לחיצה על התמונה הקטנה — שליחה או שמירה.', en: 'Clip ready. Tap the thumbnail to send or save it.' },
+  vf_grabbed: { he: 'צולם. לחיצה על התמונה הקטנה — שמירה בטלפון או שליחה לבמאי.', en: 'Grabbed. Tap the thumbnail to save it or send it to the director.' },
+  vf_recorded: { he: 'הקליפ מוכן. לחיצה על התמונה הקטנה — שמירה או שליחה.', en: 'Clip ready. Tap the thumbnail to save or send it.' },
+  vf_save: { he: 'שמור בטלפון', en: 'Save to phone' },
+  vf_send: { he: 'שלח לבמאי', en: 'Send to director' },
+  vf_saved_dl: { he: 'נשמר בהורדות — בגלריה הוא מופיע בתיקייה Download.', en: 'Saved to Downloads — your gallery shows it under Download.' },
+  vf_saved_files: { he: 'נשמר בקבצים (Files) ← הורדות.', en: 'Saved to Files → Downloads.' },
   vf_turn: { he: 'החלפה בין רוחב לאורך', en: 'Switch between landscape and portrait' },
   vf_to_landscape: { he: 'לרוחב', en: 'Landscape' },
   vf_to_portrait: { he: 'לאורך', en: 'Portrait' },
@@ -337,6 +341,9 @@ try {
   const kept = JSON.parse(localStorage.getItem(FOV_KEY) || '{}');
   for (const k of FOV_KEEP) if (kept[k] != null) S.fov[k] = kept[k];
 } catch { /* private window or blocked storage */ }
+// The distance tape's marks, as a focus puller's tape reads: fine up close, coarse far off.
+const DIST_M = [0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.5, 3, 3.5, 4, 4.5, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30, 40, 50, 75, 100];
+const DIST_FT = [2, 3, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 25, 30, 35, 40, 50, 60, 75, 100, 150, 200, 300];
 const keepFov = () => { try { localStorage.setItem(FOV_KEY, JSON.stringify(Object.fromEntries(FOV_KEEP.map(k => [k, S.fov[k]])))); } catch { /* ignore */ } };
 
 // Short labels for places outside the tools screen (the home screen's tool row).
@@ -766,14 +773,19 @@ function fovTool(T, lang, ctx) {
   </div>
 `;
   const frameAtLine = (mm) => { const z = frameAt(sn, mm, s.distance); return Tp('frame_at', { mm, d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); };
+  const TAPE = unit === 'ft' ? DIST_FT : DIST_M;
+  const tapeMajor = (v) => (unit === 'ft' ? [5, 10, 20, 50, 100, 200].includes(v) : [1, 2, 3, 5, 10, 20, 50, 100].includes(v));
+  const tape = `<div class="fov-tapewrap"><div class="fov-tape" dir="ltr" data-tape data-vals="${TAPE.join(',')}" role="slider" aria-label="${esc(T('distance_step'))}" aria-valuetext="${esc(`${dist(s.distance)} ${uLabel}`)}">${TAPE.map((v, i) => `<button class="fov-tick ${tapeMajor(v) ? 'major' : ''}" data-ti="${i}" tabindex="-1"><b>${v}</b></button>`).join('')}</div><i class="fov-needle" aria-hidden="true"></i></div>`;
   const distRow = `<div class="card fov-distrow" data-part="distrow">
     <label class="fov-distin"><span class="tsub">${esc(T('distance_step'))}</span>
       <input type="number" data-fdist2 value="${esc(dist(s.distance))}" min="0.2" max="600" step="0.1" inputmode="decimal" aria-label="${esc(T('distance_step'))}"></label>
     <div class="seg sh-mode"><button class="${unit === 'm' ? 'active' : ''}" data-unit="m">${esc(T('meters'))}</button><button class="${unit === 'ft' ? 'active' : ''}" data-unit="ft">${esc(T('feet'))}</button></div>
+    ${tape}
     <p class="fov-frameline">${esc(frameAtLine(shown))}</p>
   </div>`;
 
   fovView = { cam: { id: cam.prof.id, name: short(cam), w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown,
+    frameAtLine: () => frameAtLine(shown),
     modes: modesOf(cam), modeId: modeOf(cam)?.id,
     cameras: cams.map(c => ({ id: c.prof.id, name: short(c), modes: modesOf(c), w: c.prof.sensor.w, h: c.prof.sensor.h, mode: c.prof.sensor.mode })),
     projectId: projProf, recent: (s.recent || []).slice(),
@@ -1399,6 +1411,45 @@ function wire(root, ctx, id, T, lang) {
   // the page's distance changes the frame, not the lens
   const fd2 = root.querySelector('[data-fdist2]');
   if (fd2) fd2.onchange = () => { const v = Number(fd2.value); if (v > 0) S.fov.distance = fromUnit(v, S.fov.unit); ctx.render(); };
+  // Dragging the tape: the distance, the box and the frame line follow live, a detent on every mark.
+  const tapeEl = root.querySelector('[data-tape]');
+  if (tapeEl) {
+    const vals = tapeEl.dataset.vals.split(',').map(Number);
+    const here = toUnit(S.fov.distance, S.fov.unit);
+    let ti = vals.reduce((bi, v, i) => (Math.abs(v - here) < Math.abs(vals[bi] - here) ? i : bi), 0);
+    const centre = (i, smooth) => { const b = tapeEl.children[i]; tapeEl.scrollTo({ left: b.offsetLeft - (tapeEl.clientWidth - b.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' }); };
+    const mark = () => tapeEl.querySelectorAll('.fov-tick').forEach((b, i) => b.classList.toggle('on', i === ti));
+    const apply = () => {
+      S.fov.distance = fromUnit(vals[ti], S.fov.unit);
+      if (fd2) fd2.value = String(vals[ti]);
+      const fl = root.querySelector('.fov-frameline');
+      if (fl && fovView?.frameAtLine) fl.textContent = fovView.frameAtLine();
+      tapeEl.setAttribute('aria-valuetext', String(vals[ti]));
+    };
+    mark();
+    requestAnimationFrame(() => centre(ti, false));
+    // only the user's own drag moves the distance — not the tape being centred on a typed value
+    let user = false, lastTick = 0, settleT = 0, raf = 0;
+    ['pointerdown', 'touchstart', 'wheel'].forEach(ev => tapeEl.addEventListener(ev, () => { user = true; }, { passive: true }));
+    tapeEl.addEventListener('scroll', () => {
+      if (!user) return;
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const mid = tapeEl.scrollLeft + tapeEl.clientWidth / 2;
+        let best = ti, d = Infinity;
+        [...tapeEl.children].forEach((b, i) => { const c = Math.abs(b.offsetLeft + b.offsetWidth / 2 - mid); if (c < d) { d = c; best = i; } });
+        if (best === ti) return;
+        ti = best; mark(); apply();
+        const now = performance.now(); if (now - lastTick > 60) { lastTick = now; feel.detent(); }
+      });
+      clearTimeout(settleT);
+      settleT = setTimeout(() => { keepFov(); feel.settle(); if (S.fov.calcOpen) ctx.render(); }, 220);
+    }, { passive: true });
+    tapeEl.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-ti]'); if (!b) return;
+      user = true; ti = Number(b.dataset.ti); mark(); apply(); centre(ti, true); keepFov(); feel.detent();
+    });
+  }
   root.querySelectorAll('[data-cmode]').forEach(b => { b.onclick = () => { S.fov.modes = { ...(S.fov.modes || {}), [S.fov.cam]: b.dataset.cmode }; S.fov.modesOpen = false; feel.detent(); ctx.render(); }; });
   root.querySelector('[data-modes-toggle]')?.addEventListener('click', () => { S.fov.modesOpen = !S.fov.modesOpen; ctx.render(); });
   root.querySelector('[data-cchange]')?.addEventListener('click', () => { S.fov.picking = true; ctx.render(); });

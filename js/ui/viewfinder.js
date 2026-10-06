@@ -53,6 +53,11 @@ export async function openViewfinder(o) {
       <button class="vfx-thumb" aria-label="${esc(T('vf_share'))}" hidden><img alt=""><i aria-hidden="true" hidden>▶</i></button>
     </div>
     <div class="vfx-msg" role="status" hidden></div>
+    <div class="vfx-keep" role="dialog" aria-label="${esc(T('vf_share'))}" hidden>
+      <div class="vfx-keep-media"></div>
+      <div class="vfx-keep-acts"><button class="vfx-save">${esc(T('vf_save'))}</button><button class="vfx-send">${esc(T('vf_send'))}</button></div>
+      <button class="vfx-keep-x" aria-label="${esc(T('vf_stop'))}">✕</button>
+    </div>
     <div class="vfx-top">
       <div class="vfx-cam"><button class="vfx-cambtn" aria-label="${esc(T('vf_switch_cam'))}"><b class="vfx-camname"></b><span aria-hidden="true">▾</span></button><button class="vfx-mode" aria-label="${esc(T('rec_format'))}" hidden></button><small class="vfx-modetxt"></small></div>
       <div class="vfx-btns"><button class="vfx-turn" aria-label="${esc(T('vf_turn'))}"><svg class="vfx-turn-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="14" height="9" rx="1.6"/><path d="M14 3.5a6 6 0 0 1 6 6"/><path d="M20 6.2v3.3h-3.3"/></svg><span class="vfx-turn-lbl">${esc(T('vf_to_landscape'))}</span></button><button class="vfx-close" aria-label="${esc(T('vf_stop'))}">✕</button></div>
@@ -334,12 +339,29 @@ export async function openViewfinder(o) {
     say(ext === 'jpg' ? 'vf_grabbed' : 'vf_recorded');
   };
   // Send or keep: the phone's share sheet (WhatsApp to the director, Save to Photos); a download where there is none.
-  thumb.addEventListener('click', async () => {
+  // The thumbnail opens what was taken, larger, with its two ways out: keep it on the phone, or send it.
+  // A web page cannot write into the photo gallery itself. iPhone: the share sheet's "Save Image / Save Video"
+  // puts it in Photos. Android: it is downloaded, and the gallery shows it under "Download".
+  const keepEl = el.querySelector('.vfx-keep');
+  const ios = /iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  const canShareFile = (file) => { try { return !!navigator.canShare?.({ files: [file] }); } catch { return false; } };
+  const shareFile = async (file) => { try { await navigator.share({ files: [file], title: file.name }); } catch { /* closed */ } };
+  const downloadFile = ({ file, url }) => { const a = document.createElement('a'); a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove(); };
+  thumb.addEventListener('click', () => {
     if (!last) return;
-    const { file, url } = last;
-    if (navigator.canShare?.({ files: [file] })) { try { await navigator.share({ files: [file], title: file.name }); } catch { /* closed */ } return; }
-    const a = document.createElement('a'); a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+    const media = keepEl.querySelector('.vfx-keep-media');
+    media.innerHTML = last.file.type.startsWith('video/') ? `<video src="${last.url}" muted playsinline autoplay loop></video>` : `<img src="${last.url}" alt="">`;
+    keepEl.querySelector('.vfx-send').hidden = !canShareFile(last.file);
+    keepEl.hidden = false;
   });
+  const closeKeep = () => { keepEl.hidden = true; keepEl.querySelector('.vfx-keep-media').innerHTML = ''; };
+  keepEl.querySelector('.vfx-keep-x').addEventListener('click', closeKeep);
+  keepEl.querySelector('.vfx-save').addEventListener('click', async () => {
+    if (!last) return;
+    if (ios && canShareFile(last.file)) { await shareFile(last.file); return; }
+    downloadFile(last); say(ios ? 'vf_saved_files' : 'vf_saved_dl');
+  });
+  keepEl.querySelector('.vfx-send').addEventListener('click', () => { if (last) shareFile(last.file); });
   const shot = document.createElement('canvas');
   el.querySelector('.vfx-grab').addEventListener('click', () => {
     if (!comp(shot, 1920, false)) return;

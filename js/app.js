@@ -112,7 +112,8 @@ function render() {
   const { screen, params } = route();
   document.body.classList.toggle('home', screen === Projects);
   if (params.id && !store.getProject(params.id)) { location.hash = '#/'; return; }
-  window.scrollTo(0, 0);
+  // A new screen starts at the top; redrawing the same screen (a chip, a fold, a stepper) stays where the user is.
+  if (lastRoute !== location.hash.split('?')[0]) window.scrollTo(0, 0);
   ctx.split = isSplitRoute(location.hash || '#/', window.innerWidth);
   document.body.classList.toggle('split', ctx.split);
   if (ctx.split) renderSplit(root, splitProjectId(location.hash));
