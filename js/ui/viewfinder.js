@@ -1,6 +1,7 @@
 // The live viewfinder: the phone's camera full screen, with the frame the chosen cine camera and
 // lens would take in from where you stand. A focal ruler along the bottom scrolls like a zoom ring,
-// and the frame follows it live.
+// and the frame follows it live. Dressed as a camera monitor (ARRI-style data bars), it grabs a frame or
+// records a clip of exactly the cine frame, the camera data burned in, to send to the director or keep.
 import { esc } from './dom.js';
 import { feel } from '../feel.js';
 
@@ -42,8 +43,16 @@ export async function openViewfinder(o) {
     <video class="vfx-video" playsinline autoplay muted></video>
     <div class="vfx-cmp c0" hidden><span></span></div><div class="vfx-cmp c1" hidden><span></span></div><div class="vfx-cmp c2" hidden><span></span></div>
     <div class="vfx-frame"><span class="vfx-mm"></span></div>
+    <div class="vfx-centre" aria-hidden="true"></div>
     <div class="vfx-ui">
+    <div class="vfx-data" dir="ltr"><span class="vfx-rec">STBY</span><button class="vfx-fps" aria-label="${esc(T('vf_fps'))}"></button><span class="vfx-dfmt"></span><span class="vfx-tc"></span></div>
     <div class="vfx-wide" hidden></div>
+    <div class="vfx-side">
+      <button class="vfx-recbtn" aria-label="${esc(T('vf_rec'))}" hidden><i></i></button>
+      <button class="vfx-grab" aria-label="${esc(T('vf_grab'))}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.6"/></svg></button>
+      <button class="vfx-thumb" aria-label="${esc(T('vf_share'))}" hidden><img alt=""><i aria-hidden="true" hidden>▶</i></button>
+    </div>
+    <div class="vfx-msg" role="status" hidden></div>
     <div class="vfx-top">
       <div class="vfx-cam"><button class="vfx-cambtn" aria-label="${esc(T('vf_switch_cam'))}"><b class="vfx-camname"></b><span aria-hidden="true">▾</span></button><button class="vfx-mode" aria-label="${esc(T('rec_format'))}" hidden></button><small class="vfx-modetxt"></small></div>
       <div class="vfx-btns"><button class="vfx-turn" aria-label="${esc(T('vf_turn'))}"><svg class="vfx-turn-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="9" width="14" height="9" rx="1.6"/><path d="M14 3.5a6 6 0 0 1 6 6"/><path d="M20 6.2v3.3h-3.3"/></svg><span class="vfx-turn-lbl">${esc(T('vf_to_landscape'))}</span></button><button class="vfx-close" aria-label="${esc(T('vf_stop'))}">✕</button></div>
@@ -117,6 +126,14 @@ export async function openViewfinder(o) {
   let cmp = [];
   const cmpEls = [...el.querySelectorAll('.vfx-cmp')];
   const vs = el.querySelector('.vfx-vs');
+  // The monitor's data: frame rate (tap to change, kept), recording format, time-of-day timecode.
+  const FPS = [23.98, 24, 25, 29.97, 30, 48, 50, 60];
+  let fps = FPS.includes(o.fps) ? o.fps : 25;
+  const pad = (n) => String(n).padStart(2, '0');
+  const tcNow = () => { const d = new Date(); return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}:${pad(Math.floor((d.getMilliseconds() / 1000) * Math.round(fps)))}`; };
+  const fmtLabel = () => (modes.length ? modes[mi].label : (cam.mode || ''));
+  const degOf = (mm) => Math.round((2 * Math.atan(area.w / (2 * mm)) * 180) / Math.PI);
+  const CMP_COL = ['#ffffff', '#3fd4e6', '#ff5fa2'];
   const sizeOf = (mm) => {
     const vw = video.videoWidth, vh = video.videoHeight;
     if (!vw || !vh) return null;
@@ -124,12 +141,15 @@ export async function openViewfinder(o) {
     const scale = Math.max(el.clientWidth / vw, el.clientHeight / vh);
     return { w: ((area.w / (2 * mm)) / tanPerVideoPx) * 2 * scale, h: ((area.h / (2 * mm)) / tanPerVideoPx) * 2 * scale };
   };
+  const inside = (w) => `${Math.max(-1, (w - el.clientWidth) / 2 + 6)}px`;
   const draw = () => {
     const mm = stops[idx].mm;
     const vw = video.videoWidth, vh = video.videoHeight;
     const SW = el.clientWidth, SH = el.clientHeight;
     el.querySelector('.vfx-big').innerHTML = `${mm}<small>mm</small>`;
-    el.querySelector('.vfx-deg').textContent = `${Math.round((2 * Math.atan(area.w / (2 * mm)) * 180) / Math.PI)}°`;
+    el.querySelector('.vfx-deg').textContent = `${degOf(mm)}°`;
+    el.querySelector('.vfx-fps').textContent = fps.toFixed(2);
+    el.querySelector('.vfx-dfmt').textContent = fmtLabel();
     el.querySelector('.vfx-mm').textContent = `${mm}mm`;
     el.querySelector('.vfx-at').textContent = o.frameLine ? o.frameLine(mm, area) : '';
     el.querySelector('.vfx-camname').textContent = cam.name;
@@ -145,12 +165,13 @@ export async function openViewfinder(o) {
       const i = cmp[k];
       const c = i != null && sizeOf(stops[i].mm);
       e.hidden = !c;
-      if (c) { e.style.width = `${rot ? c.h : c.w}px`; e.style.height = `${rot ? c.w : c.h}px`; e.querySelector('span').textContent = `${stops[i].mm}mm`; }
+      if (c) { e.style.width = `${rot ? c.h : c.w}px`; e.style.height = `${rot ? c.w : c.h}px`; e.querySelector('span').style.left = inside(rot ? c.h : c.w); e.querySelector('span').textContent = o.frameSize ? `${stops[i].mm}mm · ${o.frameSize(stops[i].mm, area)}` : `${stops[i].mm}mm`; }
     });
     const z = sizeOf(mm);
     if (!z) return;
     const fw = z.w, fh = z.h;
     frame.style.width = `${rot ? fh : fw}px`;
+    el.querySelector('.vfx-mm').style.left = inside(rot ? fh : fw);
     frame.style.height = `${rot ? fw : fh}px`;
     const tooWide = rot ? (fw > SH * 1.02 || fh > SW * 1.02) : (fw > SW * 1.02 || fh > SH * 1.02);
     // Upright, a phone sees far less across than along; sideways it may well hold this lens.
@@ -195,15 +216,20 @@ export async function openViewfinder(o) {
     });
   }, { passive: true });
   // Holding a lens pins it as the comparison frame; holding it again (or tapping "vs") lets it go.
-  let hold = 0, held = false, hx = 0, hy = 0;
+  let hold = 0, held = false, hx = 0, hy = 0, holdEl = null;
   ruler.addEventListener('pointerdown', (e) => {
     const b = e.target.closest('.vfx-stop');
     if (!b) return;
     held = false;
     hx = e.clientX; hy = e.clientY;
     clearTimeout(hold);
+    const i0 = Number(b.dataset.i);
+    holdEl = b;
+    b.style.setProperty('--hold', cmp.includes(i0) ? 'rgba(255,255,255,.35)' : CMP_COL[Math.min(cmp.length, MAX_CMP - 1)]);
+    b.classList.add('holding');
     hold = setTimeout(() => {
       held = true;
+      b.classList.remove('holding');
       const i = Number(b.dataset.i);
       // hold again to let a lens go; a fourth replaces the oldest
       cmp = cmp.includes(i) ? cmp.filter(x => x !== i) : [...cmp, i].slice(-MAX_CMP);
@@ -211,7 +237,7 @@ export async function openViewfinder(o) {
       draw();
     }, 450);
   });
-  const cancelHold = () => clearTimeout(hold);
+  const cancelHold = () => { clearTimeout(hold); holdEl?.classList.remove('holding'); };
   ruler.addEventListener('pointerup', cancelHold);
   ruler.addEventListener('pointercancel', cancelHold);
   // only the finger moving lets the hold go — the dial still gliding from a tap does not
@@ -238,12 +264,153 @@ export async function openViewfinder(o) {
     step(dx < 0 ? 1 : -1);
   });
 
+  // ---- Capture: exactly the cine frame, cut from the phone's picture, with the data burned in ----
+  // Draws the frame into a canvas `long` pixels on its long side; false until the camera has a picture.
+  const comp = (cv, long, live) => {
+    const vw = video.videoWidth, vh = video.videoHeight;
+    if (!vw || !vh) return false;
+    const mm = stops[idx].mm;
+    const rot = el.classList.contains('vfx-rot');
+    const per = TAN_HALF_LONG / (Math.max(vw, vh) / 2);
+    const fw = ((area.w / (2 * mm)) / per) * 2, fh = ((area.h / (2 * mm)) / per) * 2;
+    const ar = area.w / area.h;
+    const OW = ar >= 1 ? long : Math.round(long * ar), OH = ar >= 1 ? Math.round(long / ar) : long;
+    if (cv.width !== OW) cv.width = OW;
+    if (cv.height !== OH) cv.height = OH;
+    const g = cv.getContext('2d');
+    g.fillStyle = '#000'; g.fillRect(0, 0, OW, OH);
+    // In video pixels. Sideways on iPhone the picture is not turned, so the cine width runs down the video
+    // and the cut is turned upright (the phone is held with its top to the left).
+    const sw = rot ? fh : fw, sh = rot ? fw : fh;
+    const sx = (vw - sw) / 2, sy = (vh - sh) / 2;
+    // only what the phone actually sees; past its edges the frame stays black
+    const x0 = Math.max(0, sx), y0 = Math.max(0, sy), x1 = Math.min(vw, sx + sw), y1 = Math.min(vh, sy + sh);
+    const DW = rot ? OH : OW, DH = rot ? OW : OH;
+    g.save();
+    if (rot) { g.translate(0, OH); g.rotate(-Math.PI / 2); }
+    g.drawImage(video, x0, y0, x1 - x0, y1 - y0, ((x0 - sx) / sw) * DW, ((y0 - sy) / sh) * DH, ((x1 - x0) / sw) * DW, ((y1 - y0) / sh) * DH);
+    g.restore();
+    const u = OH / 100;
+    const mono = (px, w = 600) => `${w} ${Math.round(px)}px ui-monospace, "SF Mono", Menlo, Consolas, monospace`;
+    // the lenses held for comparison, as on screen (only those longer than this one fit inside)
+    g.lineWidth = Math.max(2, u * 0.32);
+    cmp.forEach((i, k) => {
+      const r = mm / stops[i].mm;
+      if (r >= 1) return;
+      const w = OW * r, h = OH * r, x = (OW - w) / 2, y = (OH - h) / 2;
+      g.setLineDash([u * 1.6, u * 1.1]); g.strokeStyle = CMP_COL[k]; g.strokeRect(x, y, w, h); g.setLineDash([]);
+      const t = `${stops[i].mm}mm`;
+      g.font = mono(u * 2.6, 700);
+      const tw = g.measureText(t).width + u * 1.6;
+      g.fillStyle = CMP_COL[k]; g.fillRect(x + w - tw, y + h - u * 3.6, tw, u * 3.6);
+      g.fillStyle = '#111'; g.textBaseline = 'middle'; g.fillText(t, x + w - tw + u * 0.8, y + h - u * 1.8);
+    });
+    // the monitor's data bars, top and bottom
+    const bh = Math.round(u * 6);
+    g.fillStyle = 'rgba(24,24,24,.86)'; g.fillRect(0, 0, OW, bh); g.fillRect(0, OH - bh, OW, bh);
+    g.font = mono(bh * 0.5); g.textBaseline = 'middle'; g.textAlign = 'left';
+    const row = (y, parts) => { let x = bh * 0.45; for (const [t, c] of parts) { if (!t) continue; g.fillStyle = c || '#f2f2f2'; g.fillText(t, x, y); x += g.measureText(t).width + bh * 0.8; } };
+    const recTxt = live && rec ? `● REC ${recClock()}` : '';
+    row(bh / 2, [[recTxt, '#ff4d4d'], [fps.toFixed(2)], [fmtLabel()], [`TC ${tcNow()}`]]);
+    row(OH - bh / 2, [[cam.name], [`${mm}mm`], [`${degOf(mm)}°`], [o.distance && o.frameSize ? `@${o.distance} ${o.frameSize(mm, area)}` : '']]);
+    g.textAlign = 'right'; g.fillStyle = '#F2A33A'; g.fillText('CamList', OW - bh * 0.45, OH - bh / 2); g.textAlign = 'left';
+    return true;
+  };
+  const posterOf = (cv) => { const p = document.createElement('canvas'); const k = 160 / Math.max(cv.width, cv.height); p.width = Math.round(cv.width * k); p.height = Math.round(cv.height * k); p.getContext('2d').drawImage(cv, 0, 0, p.width, p.height); return p.toDataURL('image/jpeg', 0.7); };
+  const stamp = () => { const d = new Date(); return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`; };
+  const fileBase = () => `CamList_${cam.name.replace(/[^A-Za-z0-9.-]+/g, '-')}_${stops[idx].mm}mm_${stamp()}`;
+  const thumb = el.querySelector('.vfx-thumb');
+  const msg = el.querySelector('.vfx-msg');
+  let msgT = 0;
+  const say = (k) => { msg.textContent = T(k); msg.hidden = false; clearTimeout(msgT); msgT = setTimeout(() => { msg.hidden = true; }, 3800); };
+  let last = null;
+  const keep = (blob, ext, poster, base) => {
+    if (last?.url) URL.revokeObjectURL(last.url);
+    const file = new File([blob], `${base}.${ext}`, { type: blob.type });
+    last = { file, url: URL.createObjectURL(blob) };
+    thumb.querySelector('img').src = poster;
+    thumb.querySelector('i').hidden = ext === 'jpg';
+    thumb.hidden = false;
+    say(ext === 'jpg' ? 'vf_grabbed' : 'vf_recorded');
+  };
+  // Send or keep: the phone's share sheet (WhatsApp to the director, Save to Photos); a download where there is none.
+  thumb.addEventListener('click', async () => {
+    if (!last) return;
+    const { file, url } = last;
+    if (navigator.canShare?.({ files: [file] })) { try { await navigator.share({ files: [file], title: file.name }); } catch { /* closed */ } return; }
+    const a = document.createElement('a'); a.href = url; a.download = file.name; document.body.appendChild(a); a.click(); a.remove();
+  });
+  const shot = document.createElement('canvas');
+  el.querySelector('.vfx-grab').addEventListener('click', () => {
+    if (!comp(shot, 1920, false)) return;
+    feel.shutter();
+    el.classList.remove('vfx-flash'); void el.offsetWidth; el.classList.add('vfx-flash');
+    const poster = posterOf(shot), base = fileBase();
+    shot.toBlob((b) => { if (b) keep(b, 'jpg', poster, base); }, 'image/jpeg', 0.92);
+  });
+  // A clip: the same cut drawn every frame into a canvas the recorder films. No sound (no microphone asked).
+  const recCv = document.createElement('canvas');
+  const recBtn = el.querySelector('.vfx-recbtn');
+  const canRec = typeof MediaRecorder !== 'undefined' && typeof recCv.captureStream === 'function';
+  const MIME = canRec ? ['video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find(m => MediaRecorder.isTypeSupported?.(m)) : '';
+  recBtn.hidden = !canRec;
+  let rec = null, recStart = 0;
+  const recSecs = () => Math.floor((performance.now() - recStart) / 1000);
+  const recClock = () => { const t = recSecs(); return `${pad(Math.floor(t / 60))}:${pad(t % 60)}`; };
+  const recLabel = () => {
+    const on = !!rec;
+    recBtn.classList.toggle('on', on);
+    recBtn.setAttribute('aria-label', T(on ? 'vf_rec_stop' : 'vf_rec'));
+    const r = el.querySelector('.vfx-rec');
+    r.classList.toggle('on', on);
+    r.textContent = on ? `● REC ${recClock()}` : 'STBY';
+  };
+  const startRec = () => {
+    if (!comp(recCv, 1280, true)) return;
+    const st = recCv.captureStream(30);
+    let r;
+    try { r = new MediaRecorder(st, MIME ? { mimeType: MIME, videoBitsPerSecond: 6000000 } : undefined); } catch { st.getTracks().forEach(t => t.stop()); return; }
+    const chunks = [];
+    const poster = posterOf(recCv), base = fileBase();
+    r.ondataavailable = (e) => { if (e.data?.size) chunks.push(e.data); };
+    r.onstop = () => {
+      st.getTracks().forEach(t => t.stop());
+      const type = (r.mimeType || MIME || 'video/webm').split(';')[0];
+      if (chunks.length && open) keep(new Blob(chunks, { type }), type.includes('mp4') ? 'mp4' : 'webm', poster, base);
+    };
+    r.start(1000);
+    rec = r; recStart = performance.now();
+    feel.rec(true); recLabel();
+  };
+  const stopRec = () => { if (!rec) return; const r = rec; rec = null; if (r.state !== 'inactive') r.stop(); feel.rec(false); recLabel(); };
+  recBtn.addEventListener('click', () => (rec ? stopRec() : startRec()));
+  el.querySelector('.vfx-fps').addEventListener('click', () => {
+    if (rec) return;
+    fps = FPS[(FPS.indexOf(fps) + 1) % FPS.length];
+    o.onFps?.(fps); feel.detent(); draw();
+  });
+  // one loop while open: the timecode runs, and while recording the frame is drawn for the recorder
+  const tcEl = el.querySelector('.vfx-tc');
+  let loopId = 0;
+  const loop = () => {
+    tcEl.textContent = `TC ${tcNow()}`;
+    if (rec) {
+      comp(recCv, 1280, true);
+      el.querySelector('.vfx-rec').textContent = `● REC ${recClock()}`;
+      if (recSecs() >= 180) stopRec();   // three minutes: a reference clip, not a take
+    }
+    loopId = requestAnimationFrame(loop);
+  };
+  loopId = requestAnimationFrame(loop);
+
   const onResize = () => { draw(); centreOn(idx, false); curve(); };
   video.addEventListener('loadedmetadata', onResize);
   window.addEventListener('resize', onResize);
 
   const close = () => {
     if (!open) return;
+    cancelAnimationFrame(loopId);
+    stopRec();
     open = null;
     stream.getTracks().forEach(tr => tr.stop());
     window.removeEventListener('resize', onResize);
@@ -263,6 +430,7 @@ export async function openViewfinder(o) {
   el.querySelector('.vfx-close').onclick = close;
   el.querySelector('.vfx-mode').addEventListener('click', () => {
     if (modes.length < 2) return;
+    stopRec();
     mi = (mi + 1) % modes.length;
     area = { w: modes[mi].w, h: modes[mi].h };
     o.onMode?.(cam.id, modes[mi].id); feel.detent(); draw();
@@ -283,6 +451,7 @@ export async function openViewfinder(o) {
       || `<p class="vfx-empty">${esc(T('cam_none'))}</p>`;
   };
   const setCam = (c) => {
+    stopRec();
     cam = c;
     modes = c.modes || [];
     mi = Math.max(0, modes.findIndex(m => m.id === o.modeFor?.(c.id)));

@@ -155,6 +155,13 @@ const L = {
   lens_longer: { he: 'עדשה ארוכה יותר', en: 'Longer lens' },
   vf_hold: { he: 'גוללים את החוגה או מחליקים על התמונה. החזקה ארוכה על עדשה מוסיפה אותה להשוואה — עד שלוש, כל אחת בצבע משלה.', en: 'Turn the dial or swipe the picture. Hold a lens to add it to the comparison — up to three, each in its own colour.' },
   vf_cmp_clear: { he: 'בטל השוואה', en: 'Clear comparison' },
+  vf_fps: { he: 'פריים רייט — לחיצה מחליפה', en: 'Frame rate — tap to change' },
+  vf_rec: { he: 'הקלטת קליפ של הפריים', en: 'Record a clip of the frame' },
+  vf_rec_stop: { he: 'עצור הקלטה', en: 'Stop recording' },
+  vf_grab: { he: 'צלם פריים', en: 'Grab frame' },
+  vf_share: { he: 'שלח לבמאי או שמור בגלריה', en: 'Send to the director or save to photos' },
+  vf_grabbed: { he: 'צולם. לחיצה על התמונה הקטנה — שליחה לבמאי או שמירה בגלריה.', en: 'Grabbed. Tap the thumbnail to send it to the director or save it to your photos.' },
+  vf_recorded: { he: 'הקליפ מוכן. לחיצה על התמונה הקטנה — שליחה או שמירה.', en: 'Clip ready. Tap the thumbnail to send or save it.' },
   vf_turn: { he: 'החלפה בין רוחב לאורך', en: 'Switch between landscape and portrait' },
   vf_to_landscape: { he: 'לרוחב', en: 'Landscape' },
   vf_to_portrait: { he: 'לאורך', en: 'Portrait' },
@@ -304,7 +311,7 @@ export const setPlaces = (data) => { placeData = data || placeData; };
 // Everything the user typed, kept while the app is open so switching tools does not reset the work.
 const S = {
   media: { brand: 'Sony', cam: 'fx6', fmt: '', fps: 25, mtype: '', card: 0, cardPicked: false, customCard: false, backup: false, hours: 10, customHours: false },
-  fov: { distance: 4, unit: 'm', shot: 'waist', focal: 0, cam: '', camBrand: '', res: '', sens: '', modes: {}, recent: [], q: '', filtersOpen: false, picking: false, fromProject: false, calcOpen: false },
+  fov: { distance: 4, unit: 'm', shot: 'waist', focal: 0, fps: 25, cam: '', camBrand: '', res: '', sens: '', modes: {}, recent: [], q: '', filtersOpen: false, picking: false, fromProject: false, calcOpen: false },
   shutter: { fps: 25, mode: 'speed', speed: 50, angle: 180, mains: 50, projectFps: 25, customFps: false },
   offload: { gb: 1000, reader: 'CFexpress A', drive: 'ssd10', copies: 2, verify: true, customGb: false, fromMedia: false, readOther: false, readMBs: 800, writeOther: false, writeMBs: 1000, readers: 1, port: 'tb', cardGb: 0 },
   sun: { country: 'IL', city: 0, date: new Date().toISOString().slice(0, 10), dateMode: 'today', lat: null, lon: null },
@@ -323,7 +330,7 @@ const keepHours = () => { try { localStorage.setItem(HOURS_KEY, JSON.stringify(O
 // The lens tool remembers its camera and last lens on this phone, so opening it again picks up where
 // the user left off. Kept in this browser only; losing it just means starting from the project's camera.
 const FOV_KEY = 'camlist.fov';
-const FOV_KEEP = ['cam', 'camBrand', 'res', 'sens', 'modes', 'recent', 'focal', 'distance', 'unit', 'shot'];
+const FOV_KEEP = ['cam', 'camBrand', 'res', 'sens', 'modes', 'recent', 'focal', 'distance', 'unit', 'shot', 'fps'];
 // The cameras used last, newest first — the picker and the viewfinder offer them before anything else.
 const pushRecent = (id) => { S.fov.recent = [String(id), ...(S.fov.recent || []).map(String).filter(x => x !== String(id))].slice(0, 5); };
 try {
@@ -773,7 +780,11 @@ function fovTool(T, lang, ctx) {
     modeFor: (id) => S.fov.modes?.[id],
     onMode: (camId, id) => { S.fov.modes = { ...(S.fov.modes || {}), [camId]: id }; keepFov(); },
     onCamera: (id) => { Object.assign(S.fov, { cam: String(id), fromProject: false }); pushRecent(id); keepFov(); },
-    frameLine: (mm, area = sn) => { const z = frameAt(area, mm, s.distance); return Tp('vf_at', { d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); } };
+    frameLine: (mm, area = sn) => { const z = frameAt(area, mm, s.distance); return Tp('vf_at', { d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); },
+    // the same, short and in Latin units: for the frame labels and the data burned into a grab
+    frameSize: (mm, area = sn) => { const z = frameAt(area, mm, s.distance); return `${num(toUnit(z.widthM, unit), 2)}×${num(toUnit(z.heightM, unit), 2)}${unit}`; },
+    distance: `${dist(s.distance)}${unit}`,
+    fps: s.fps || 25, onFps: (f) => { S.fov.fps = f; keepFov(); } };
   keepFov();
 
   // The page is the camera and the viewfinder; the calculation from a distance waits folded.

@@ -51,6 +51,19 @@ function click(gain = 0.25, ms = 14, freq = 2400) {
   } catch { /* audio unavailable */ }
 }
 
+// A clean tone, the camera's record beep.
+function beep(freq = 1000, ms = 90, gain = 0.18) {
+  if (!sound) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === 'suspended') ac.resume();
+    const o = ac.createOscillator(); o.type = 'sine'; o.frequency.value = freq;
+    const g = ac.createGain(); const t = ac.currentTime;
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(gain, t + 0.008); g.gain.setValueAtTime(gain, t + ms / 1000 - 0.015); g.gain.linearRampToValueAtTime(0, t + ms / 1000);
+    o.connect(g).connect(ac.destination); o.start(t); o.stop(t + ms / 1000 + 0.02);
+  } catch { /* audio unavailable */ }
+}
+
 export const feel = {
   // one stop of a lens or aperture ring (30 ms: shorter pulses are lost on many phone motors)
   detent() { buzz(30); click(0.22, 12, 2600); },
@@ -64,4 +77,8 @@ export const feel = {
   pin() { buzz([25, 60, 25]); click(0.25, 14, 1800); },
   // the slate: a sharp clap when a document is exported
   clap() { buzz(40); click(0.6, 40, 1400); },
+  // a frame grabbed: the shutter
+  shutter() { buzz(25); click(0.5, 26, 1700); setTimeout(() => click(0.35, 20, 1100), 70); },
+  // recording starts (one beep) or stops (two)
+  rec(on) { buzz(on ? 40 : [30, 60, 30]); beep(1000, 90); if (!on) setTimeout(() => beep(1000, 90), 150); },
 };
