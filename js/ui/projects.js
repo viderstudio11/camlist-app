@@ -55,7 +55,7 @@ export function editProjectSheet(ctx, id) {
 // Home opens on the project you are working on: a hero card with its departments and cameras,
 // then the field tools, then every project. The wordmark shrinks into the top bar.
 // Every tool sits on the home screen, two rows of four, so none hides behind an extra tap.
-const HOME_TOOLS = ['media', 'sun', 'shutter', 'fov', 'hours', 'offload', 'downloads', 'units'];
+const HOME_TOOLS = ['fov', 'slate', 'sun', 'media', 'shutter', 'hours', 'offload', 'downloads', 'units'];
 
 export function render(ctx, _params, root) {
   const { store, t } = ctx;

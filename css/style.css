@@ -1450,3 +1450,7 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 .fov-cal.warn .btn { background: var(--accent); color: #16171A; border-color: var(--accent); }
 .vfx-calchip { display: block; margin-top: 6px; border: 1px solid #F2A33A; background: rgba(0,0,0,.55); color: #F2A33A; border-radius: 999px; padding: 5px 10px; font: inherit; font-size: 12px; font-weight: 800; cursor: pointer; }
 .vfx-calchip[hidden], .vfx-cal[hidden] { display: none; }
+/* home: nine tools, three rows of three — a little more room for each name */
+.toolrow { grid-template-columns: repeat(3, 1fr); }
+.tr-t { padding: 12px 4px 10px; }
+.tr-n { font-size: 12px; }
