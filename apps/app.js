@@ -5,7 +5,8 @@ import * as Tools from '../js/ui/tools.js';
 import { createCatalog, loadCatalog } from '../js/catalog.js';
 import { createCompat, loadCompat } from '../js/compat.js';
 import { t, getLang, setLang } from '../js/i18n.js';
-import { icons, esc } from '../js/ui/dom.js';
+import { icons, esc, openSheet } from '../js/ui/dom.js';
+import { canInstall, install } from '../js/install.js';
 
 const TOOL = document.documentElement.dataset.tool;
 const KEY = `camlist.app.${TOOL}`;
@@ -38,12 +39,14 @@ const ctx = {
   render: () => render(),
   setTopbar({ title = '' }) {
     const bar = document.getElementById('topbar');
-    bar.innerHTML = `<div class="title" dir="auto">${title}<small>CamList</small></div><button class="iconbtn" data-theme-btn aria-label="${esc(t('theme'))}">${prefs.theme === 'dark' ? icons.moon : icons.sun}</button><button class="langpill" data-lang aria-label="${esc(t('language'))}">${t('lang_switch')}</button>`;
+    bar.innerHTML = `<div class="title" dir="auto">${title}<small>CamList</small></div>${canInstall() ? `<button class="langpill install-btn" data-install aria-label="${esc(getLang() === 'he' ? 'התקן במסך הבית' : 'Install on the home screen')}">${getLang() === 'he' ? 'התקן' : 'Install'}</button>` : ''}<button class="iconbtn" data-theme-btn aria-label="${esc(t('theme'))}">${prefs.theme === 'dark' ? icons.moon : icons.sun}</button><button class="langpill" data-lang aria-label="${esc(t('language'))}">${t('lang_switch')}</button>`;
     bar.querySelector('[data-lang]').onclick = () => { prefs.lang = getLang() === 'he' ? 'en' : 'he'; setLang(prefs.lang); keep(); applyLook(); render(); };
+    bar.querySelector('[data-install]')?.addEventListener('click', () => install(getLang(), (title, text) => openSheet({ title, bodyHTML: `<p style="font-size:16px;line-height:1.6">${esc(text)}</p>`, actions: [{ label: getLang() === 'he' ? 'הבנתי' : 'Got it', kind: 'primary' }] })));
     bar.querySelector('[data-theme-btn]').onclick = () => { prefs.theme = prefs.theme === 'dark' ? 'light' : 'dark'; keep(); applyLook(); render(); };
   },
 };
 
+addEventListener('camlist-installable', () => render());
 function render() { Tools.render(ctx, { tool: TOOL }, root); }
 
 // What each tool reads besides its own form. The camera data (catalog + compat) is the heaviest, so
