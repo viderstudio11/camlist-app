@@ -1,5 +1,10 @@
 [
  {
+  "version": "v2.10.0",
+  "date": "2026-10-07",
+  "label": "Lens ring and live frame card (monitor looks), each tool as its own app with install, tools split into files, camera picker by maker"
+ },
+ {
   "version": "v2.9.1",
   "date": "2026-10-06",
   "label": "Camera picker by maker tabs, distance tape, short camera names, hide distance data, keep your place on redraw, save vs send"
