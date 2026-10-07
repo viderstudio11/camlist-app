@@ -35,7 +35,9 @@ export async function openViewfinder(o) {
   if (stops[idx]?.mm !== o.focal && idx > 0 && Math.abs(stops[idx - 1].mm - o.focal) < Math.abs(stops[idx].mm - o.focal)) idx -= 1;
 
   const el = document.createElement('div');
-  el.className = 'vfx';
+  // dressed like the chosen camera world's monitor (ARRI bars, Sony corners, RED boxes, Canon band)
+  const LOOK = ['arri', 'sony', 'red', 'canon'].includes(o.look) ? o.look : 'arri';
+  el.className = `vfx vfx-look-${LOOK}`;
   el.setAttribute('role', 'dialog');
   el.setAttribute('aria-modal', 'true');
   el.setAttribute('aria-label', T('viewfinder'));
@@ -322,9 +324,12 @@ export async function openViewfinder(o) {
     });
     // the monitor's data bars, top and bottom
     const bh = Math.round(u * 6);
-    g.fillStyle = 'rgba(24,24,24,.86)'; g.fillRect(0, 0, OW, bh); g.fillRect(0, OH - bh, OW, bh);
+    const BAR = { arri: 'rgba(24,24,24,.86)', red: 'rgba(0,0,0,.92)', canon: 'rgba(11,30,51,.75)', sony: '' }[LOOK];
+    if (BAR) { g.fillStyle = BAR; g.fillRect(0, 0, OW, bh); g.fillRect(0, OH - bh, OW, bh); }
     g.font = mono(bh * 0.5); g.textBaseline = 'middle'; g.textAlign = 'left';
-    const row = (y, parts) => { let x = bh * 0.45; for (const [t, c] of parts) { if (!t) continue; g.fillStyle = c || '#f2f2f2'; g.fillText(t, x, y); x += g.measureText(t).width + bh * 0.8; } };
+    // Sony's text sits on the picture: an outline keeps it readable
+    g.lineWidth = Math.max(2, bh * 0.08); g.strokeStyle = 'rgba(0,0,0,.75)';
+    const row = (y, parts) => { let x = bh * 0.45; for (const [t, c] of parts) { if (!t) continue; if (!BAR) g.strokeText(t, x, y); g.fillStyle = c || '#f2f2f2'; g.fillText(t, x, y); x += g.measureText(t).width + bh * 0.8; } };
     const recTxt = live && rec ? `● REC ${recClock()}` : '';
     row(bh / 2, [[recTxt, '#ff4d4d'], [fps.toFixed(2)], [fmtLabel()], [`TC ${tcNow()}`]]);
     row(OH - bh / 2, [[cam.name], [`${mm}mm`], [`${degOf(mm)}°`], [o.distance && o.frameSize ? `@${o.distance} ${o.frameSize(mm, area)}` : '']]);

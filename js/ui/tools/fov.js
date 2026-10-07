@@ -265,7 +265,8 @@ function fovTool(T, lang, ctx) {
     // the same, short and in Latin units: for the frame labels and the data burned into a grab
     frameSize: (mm, area = sn) => { const z = frameAt(area, mm, s.distance); return `${num(toUnit(z.widthM, unit), 2)}×${num(toUnit(z.heightM, unit), 2)}${unit}`; },
     get distance() { return `${dist(s.distance)}${unit}`; },
-    fps: s.fps || 25, onFps: (f) => { S.fov.fps = f; keepFov(); } };
+    fps: s.fps || 25, onFps: (f) => { S.fov.fps = f; keepFov(); },
+    get look() { return LOOKS[s.look] ? s.look : 'arri'; } };
   keepFov();
 
   // The page: the camera, the lens ring, and the frame from where you stand.

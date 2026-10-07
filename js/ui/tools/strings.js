@@ -182,7 +182,7 @@ export const L = {
   lenses_for: { he: 'עדשות מהמאגר שמתאימות ל־{cam}', en: 'Lenses in the catalog that fit {cam}' },
   standard_primes: { he: 'פריימים סטנדרטיים', en: 'Standard primes' },
   tap_lens_hint: { he: 'לחיצה על עדשה מראה בציור מה היא נותנת', en: 'Tap a lens to see what it gives in the drawing' },
-  prime_lbl: { he: 'פריים', en: 'Prime' },
+  prime_lbl: { he: 'עדשה קבועה', en: 'Prime' },
   zoom_lbl: { he: 'זום', en: 'Zoom' },
   back_to_rec: { he: 'חזרה להמלצה ({mm} מ״מ)', en: 'Back to the pick ({mm} mm)' },
 
