@@ -1,5 +1,10 @@
 [
  {
+  "version": "v2.11.0",
+  "date": "2026-10-07",
+  "label": "Slate & timecode tool and app, phone calibration with a clear accuracy note, monitor looks on the live viewfinder"
+ },
+ {
   "version": "v2.10.0",
   "date": "2026-10-07",
   "label": "Lens ring and live frame card (monitor looks), each tool as its own app with install, tools split into files, camera picker by maker"

@@ -1,0 +1,392 @@
+/* ============================================================
+   SKINS
+   A skin is a whole language: typeface, density, how a selected row is marked, how a
+   department heading is drawn, what a button looks like, whether numerals are monospaced.
+   Loaded after style.css so these win on equal specificity.
+   Typefaces are fetched per skin by js/skins.js, so fifteen families never load at once.
+   ============================================================ */
+
+/* ---------- The calibration chart behind everything ----------
+   Plates from a real lens test. Each skin lights a different set. */
+.chartbg { background-image: none; }
+.chartbg span { position: absolute; display: none; pointer-events: none; }
+
+.chartbg .siemens { inset-block-start: -18vmin; inset-inline-end: -14vmin; width: 58vmin; height: 58vmin;
+  border-radius: 50%; background: repeating-conic-gradient(var(--chart) 0 3deg, transparent 3deg 6deg); }
+.chartbg .siemens2 { inset-block-end: 22vmin; inset-inline-start: -20vmin; width: 38vmin; height: 38vmin;
+  border-radius: 50%; background: repeating-conic-gradient(var(--chart) 0 4.5deg, transparent 4.5deg 9deg); }
+.chartbg .grid { inset: 0;
+  background-image: linear-gradient(transparent calc(100% - 1px), var(--chart) 0),
+    linear-gradient(90deg, transparent calc(100% - 1px), var(--chart) 0);
+  background-size: 34px 34px; }
+.chartbg .wedge { inset-block-end: 6vmin; inset-inline-start: 4vmin; width: 34vmin; height: 13vmin;
+  background: repeating-linear-gradient(90deg, var(--chart) 0 2px, transparent 2px 6px);
+  -webkit-mask-image: linear-gradient(72deg, #000 10%, transparent 85%);
+  mask-image: linear-gradient(72deg, #000 10%, transparent 85%); }
+.chartbg .wedgev { inset-block-start: 28vmin; inset-inline-end: 5vmin; width: 17vmin; height: 21vmin;
+  background: repeating-linear-gradient(0deg, var(--chart) 0 2px, transparent 2px 6px);
+  -webkit-mask-image: linear-gradient(200deg, #000, transparent 80%);
+  mask-image: linear-gradient(200deg, #000, transparent 80%); }
+.chartbg .steps { inset-block-end: 0; inset-inline: 0; height: 5vmin;
+  background: repeating-linear-gradient(90deg, var(--chart) 0 9%, transparent 9% 18%);
+  -webkit-mask-image: linear-gradient(0deg, #000, transparent);
+  mask-image: linear-gradient(0deg, #000, transparent); }
+.chartbg .zone { inset-block-start: 10vmin; inset-inline-start: -10vmin; width: 46vmin; height: 46vmin;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle, var(--chart) 0 2px, transparent 2px 9px);
+  -webkit-mask-image: radial-gradient(circle, #000 35%, transparent 72%);
+  mask-image: radial-gradient(circle, #000 35%, transparent 72%); }
+.chartbg .marks { inset: 3vmin; border: 1px solid var(--chart);
+  -webkit-mask-image: linear-gradient(90deg, #000 0 12%, transparent 12% 88%, #000 88%),
+    linear-gradient(0deg, #000 0 14%, transparent 14% 86%, #000 86%);
+  mask-image: linear-gradient(90deg, #000 0 12%, transparent 12% 88%, #000 88%),
+    linear-gradient(0deg, #000 0 14%, transparent 14% 86%, #000 86%);
+  -webkit-mask-composite: source-in; mask-composite: intersect; }
+
+.chartbg .iris { inset-block-start: -22vmin; inset-inline-start: -26vmin; width: 78vmin; height: 78vmin; color: var(--text); opacity: .07; }
+.chartbg .iris svg { width: 100%; height: 100%; display: block; }
+[data-skin="clean"] .chartbg .iris, [data-skin="clean"] .chartbg .siemens2 { display: block; }
+[data-skin="arri"] .chartbg .siemens, [data-skin="arri"] .chartbg .grid,
+[data-skin="arri"] .chartbg .steps, [data-skin="arri"] .chartbg .wedgev { display: block; }
+[data-skin="sony"] .chartbg .zone, [data-skin="sony"] .chartbg .grid,
+[data-skin="sony"] .chartbg .wedge { display: block; }
+[data-skin="blackmagic"] .chartbg .siemens2, [data-skin="blackmagic"] .chartbg .grid,
+[data-skin="blackmagic"] .chartbg .zone { display: block; }
+[data-skin="red"] .chartbg .marks, [data-skin="red"] .chartbg .grid,
+[data-skin="red"] .chartbg .wedgev { display: block; }
+[data-skin="panasonic"] .chartbg .grid, [data-skin="panasonic"] .chartbg .wedgev,
+[data-skin="panasonic"] .chartbg .steps { display: block; }
+[data-skin="canon"] .chartbg .siemens2, [data-skin="canon"] .chartbg .grid,
+[data-skin="canon"] .chartbg .wedge { display: block; }
+[data-skin="broadcast"] .chartbg .steps, [data-skin="broadcast"] .chartbg .grid,
+[data-skin="broadcast"] .chartbg .marks { display: block; }
+
+/* ============================================================ DEFAULT ============
+   The default look lives in style.css (its tokens are the :root blocks). Nothing to override.
+   The camera skins below still speak the v1 token names; this maps the new names onto them.
+   Every camera skin sets all six source names in both its light and dark block. */
+:root:not([data-skin="clean"]) {
+  --text-2: var(--muted); --text-3: var(--dim); --line: var(--border); --line-2: var(--border-2);
+  --accent-ink: var(--accent-2); --on-accent: var(--amber-ink);
+}
+/* Sun mode on a camera skin: the skin keeps its light palette, but lines get heavier,
+   nothing is translucent and the background plates go away. */
+:root[data-theme="sun"]:not([data-skin="clean"]) { --glass: var(--surface); --chart: transparent; --shadow: none; --shadow-s: none; }
+
+/* ============================================================ ARRI ==============
+   An ALEXA labels everything in small caps and keeps its values in a monospaced column. */
+[data-skin="arri"] {
+  --font: "Heebo", -apple-system, "Segoe UI", Roboto, "Noto Sans Hebrew", sans-serif;
+  --radius: 0px; --radius-s: 0px; --shadow: none; --shadow-s: none;
+}
+[data-skin="arri"]:not([data-theme="dark"]) {
+  --bg: #E7E7E5; --bg-2: #F2F2F0; --surface: #F4F4F2; --surface-2: #E2E2DF; --surface-3: #D3D3CF;
+  --border: rgba(0,0,0,.16); --border-2: rgba(0,0,0,.26); --hair: rgba(0,0,0,.11);
+  --text: #16181A; --muted: #4E5257; --dim: #7C8186;
+  --accent: #8A5200; --accent-2: #6E4100; --accent-soft: rgba(138,82,0,.13);
+  --amber: #8A5200; --amber-soft: rgba(138,82,0,.14); --amber-ink: #FFFFFF;
+  --tint: rgba(0,0,0,.05); --tint-2: rgba(0,0,0,.09); --glass: rgba(244,244,242,.92);
+  --chart: rgba(0,0,0,.14);
+}
+[data-skin="arri"][data-theme="dark"] {
+  --bg: #262626; --bg-2: #1E1E1E; --surface: #303030; --surface-2: #3A3A3A; --surface-3: #474747;
+  --border: rgba(255,255,255,.13); --border-2: rgba(255,255,255,.22); --hair: rgba(255,255,255,.09);
+  --text: #EFEFEF; --muted: #AFAFAF; --dim: #808080;
+  --accent: #FFB020; --accent-2: #FFC85C; --accent-soft: rgba(255,176,32,.18);
+  --amber: #FFB020; --amber-soft: rgba(255,176,32,.18); --amber-ink: #1A1A1A;
+  --ok: #5FD39B; --ok-soft: rgba(95,211,155,.17);
+  --tint: rgba(255,255,255,.06); --tint-2: rgba(255,255,255,.11); --glass: rgba(38,38,38,.93);
+  --chart: rgba(255,255,255,.12);
+}
+[data-skin="arri"] .group-head { background: var(--surface-2); border-block-end: 1px solid var(--border); padding: 9px 12px; }
+[data-skin="arri"] .group-head h2, [data-skin="arri"] .section-title,
+[data-skin="arri"] .row .sub { text-transform: uppercase; letter-spacing: .13em; font-size: 11.5px; }
+[data-skin="arri"] .row .q, [data-skin="arri"] .stepper .q, [data-skin="arri"] .torow b,
+[data-skin="arri"] .group-head .count { font-family: "IBM Plex Mono", var(--mono); font-weight: 600; }
+[data-skin="arri"] .row.is-build { background: var(--amber); }
+[data-skin="arri"] .row.is-build .name, [data-skin="arri"] .row.is-build .sub,
+[data-skin="arri"] .row.is-build .q { color: var(--amber-ink); }
+[data-skin="arri"] .btn.primary { background: var(--amber); color: var(--amber-ink); }
+
+/* ============================================================ SONY ==============
+   A VENICE fits a great many parameters on one page: condensed type, tight rows,
+   and a solid blue bar on whatever is selected. */
+[data-skin="sony"] {
+  --font: "Barlow Condensed", "Noto Sans Hebrew", -apple-system, sans-serif;
+  --radius: 2px; --radius-s: 2px; --shadow: none; --shadow-s: none;
+}
+[data-skin="sony"]:not([data-theme="dark"]) {
+  --bg: #EDEEF0; --bg-2: #F7F8F9; --surface: #FFFFFF; --surface-2: #E6E8EB; --surface-3: #D5D8DD;
+  --border: rgba(0,0,0,.15); --border-2: rgba(0,0,0,.25); --hair: rgba(0,0,0,.1);
+  --text: #101214; --muted: #4A5057; --dim: #7A8189;
+  --accent: #0B57B5; --accent-2: #083F84; --accent-soft: rgba(11,87,181,.12);
+  --amber: #0B57B5; --amber-soft: rgba(11,87,181,.12); --amber-ink: #FFFFFF;
+  --chart: rgba(0,0,0,.14);
+}
+[data-skin="sony"][data-theme="dark"] {
+  --bg: #0B0B0B; --bg-2: #101010; --surface: #141414; --surface-2: #1C1C1C; --surface-3: #282828;
+  --border: rgba(255,255,255,.12); --border-2: rgba(255,255,255,.2); --hair: rgba(255,255,255,.08);
+  --text: #EDEDED; --muted: #9A9A9A; --dim: #6E6E6E;
+  --accent: #1273E6; --accent-2: #4A9BFF; --accent-soft: rgba(18,115,230,.2);
+  --amber: #1273E6; --amber-soft: rgba(18,115,230,.2); --amber-ink: #FFFFFF;
+  --tint: rgba(255,255,255,.05); --tint-2: rgba(255,255,255,.1); --glass: rgba(11,11,11,.93);
+  --chart: rgba(255,255,255,.12);
+}
+[data-skin="sony"] { font-size: 104%; }
+[data-skin="sony"] .row { padding: 5px 11px; gap: 9px; }
+[data-skin="sony"] .row .thumb { width: 32px; height: 32px; }
+[data-skin="sony"] .row .name { font-size: 16px; font-weight: 600; letter-spacing: .008em; }
+[data-skin="sony"] .row .sub { font-size: 13px; margin-top: 1px; }
+[data-skin="sony"] .group-head { padding: 5px 11px; background: var(--surface-2); }
+[data-skin="sony"] .group-head h2 { font-size: 14px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+[data-skin="sony"] .row.is-build { background: var(--accent); }
+[data-skin="sony"] .row.is-build .name, [data-skin="sony"] .row.is-build .sub,
+[data-skin="sony"] .row.is-build .q { color: #fff; }
+
+/* ============================================================ BLACKMAGIC ========
+   Roomy, rounded, generous touch targets — the friendliest of the camera skins. */
+[data-skin="blackmagic"] {
+  --font: "Assistant", -apple-system, "Segoe UI", Roboto, "Noto Sans Hebrew", sans-serif;
+  --radius: 14px; --radius-s: 10px;
+}
+[data-skin="blackmagic"]:not([data-theme="dark"]) {
+  --bg: #F2F2F5; --bg-2: #FFFFFF; --surface: #FFFFFF; --surface-2: #EAEAEF; --surface-3: #DCDCE3;
+  --border: rgba(0,0,0,.1); --border-2: rgba(0,0,0,.17); --hair: rgba(0,0,0,.07);
+  --text: #111114; --muted: #55555F; --dim: #8A8A93;
+  --accent: #0B62CC; --accent-2: #0850A8; --accent-soft: rgba(11,98,204,.12);
+  --amber: #0B62CC; --amber-soft: rgba(11,98,204,.12); --amber-ink: #FFFFFF;
+  --chart: rgba(0,0,0,.14);
+}
+[data-skin="blackmagic"][data-theme="dark"] {
+  --bg: #1B1B1D; --bg-2: #232326; --surface: #2C2C2E; --surface-2: #38383C; --surface-3: #46464B;
+  --border: rgba(255,255,255,.1); --border-2: rgba(255,255,255,.18); --hair: rgba(255,255,255,.07);
+  --text: #F5F5F7; --muted: #A5A5AE; --dim: #7B7B85;
+  --accent: #0A84FF; --accent-2: #4BA7FF; --accent-soft: rgba(10,132,255,.2);
+  --amber: #0A84FF; --amber-soft: rgba(10,132,255,.2); --amber-ink: #FFFFFF;
+  --tint: rgba(255,255,255,.06); --tint-2: rgba(255,255,255,.11); --glass: rgba(27,27,29,.9);
+  --chart: rgba(255,255,255,.12);
+}
+[data-skin="blackmagic"] .row { padding: 13px 14px; }
+[data-skin="blackmagic"] .row .thumb { border-radius: 9px; width: 46px; height: 46px; }
+[data-skin="blackmagic"] .group-head { padding: 14px 6px 9px; }
+[data-skin="blackmagic"] .group-head h2 { font-weight: 700; letter-spacing: -.01em; }
+[data-skin="blackmagic"] .btn { border-radius: 10px; }
+[data-skin="blackmagic"] .row.is-build { background: var(--accent-soft); border-color: var(--accent); }
+
+/* ============================================================ RED ===============
+   Narrow uppercase headings and numerals that read from across the truck. */
+[data-skin="red"] {
+  --font: "Oswald", "Noto Sans Hebrew", -apple-system, sans-serif;
+  --radius: 3px; --radius-s: 3px; --shadow: none; --shadow-s: none;
+}
+[data-skin="red"]:not([data-theme="dark"]) {
+  --bg: #EFEFEF; --bg-2: #FFFFFF; --surface: #FFFFFF; --surface-2: #E6E6E6; --surface-3: #D6D6D6;
+  --border: rgba(0,0,0,.14); --border-2: rgba(0,0,0,.24); --hair: rgba(0,0,0,.09);
+  --text: #0F0F0F; --muted: #4C4C4C; --dim: #7D7D7D;
+  --accent: #A50D25; --accent-2: #7E0A1C; --accent-soft: rgba(165,13,37,.11);
+  --amber: #A50D25; --amber-soft: rgba(165,13,37,.11); --amber-ink: #FFFFFF;
+  --chart: rgba(0,0,0,.14);
+}
+[data-skin="red"][data-theme="dark"] {
+  --bg: #0D0D0D; --bg-2: #131313; --surface: #171717; --surface-2: #202020; --surface-3: #2C2C2C;
+  --border: rgba(255,255,255,.12); --border-2: rgba(255,255,255,.2); --hair: rgba(255,255,255,.08);
+  --text: #F2F2F2; --muted: #9C9C9C; --dim: #6F6F6F;
+  --accent: #C8102E; --accent-2: #F2415C; --accent-soft: rgba(200,16,46,.2);
+  --amber: #C8102E; --amber-soft: rgba(200,16,46,.2); --amber-ink: #FFFFFF;
+  --tint: rgba(255,255,255,.05); --tint-2: rgba(255,255,255,.1); --glass: rgba(13,13,13,.92);
+  --chart: rgba(255,255,255,.12);
+}
+[data-skin="red"] .group-head h2, [data-skin="red"] .section-title {
+  text-transform: uppercase; letter-spacing: .14em; font-size: 13px; font-weight: 500; }
+[data-skin="red"] .row .name { font-weight: 500; letter-spacing: .01em; font-size: 15.5px; }
+[data-skin="red"] .row .q, [data-skin="red"] .stepper .q, [data-skin="red"] .torow b {
+  font-size: 19px; font-weight: 600; }
+[data-skin="red"] .torow.big b { font-size: 27px; }
+[data-skin="red"] .row { background: var(--tint); }
+[data-skin="red"] .row.is-build { border-color: var(--accent); background: var(--accent-soft); }
+[data-skin="red"] .group-head { border-block-end: 2px solid var(--accent); }
+
+/* ============================================================ PANASONIC =========
+   Technical and cool: squared rows, engineering type, values in a steady column. */
+[data-skin="panasonic"] {
+  --font: "IBM Plex Sans", "Noto Sans Hebrew", -apple-system, sans-serif;
+  --radius: 3px; --radius-s: 3px; --shadow: none; --shadow-s: none;
+}
+[data-skin="panasonic"]:not([data-theme="dark"]) {
+  --bg: #EEF1F4; --bg-2: #FFFFFF; --surface: #FFFFFF; --surface-2: #E4E8EE; --surface-3: #D2D8E1;
+  --border: rgba(16,24,36,.15); --border-2: rgba(16,24,36,.26); --hair: rgba(16,24,36,.1);
+  --text: #101822; --muted: #48535F; --dim: #78838F;
+  --accent: #0B57C7; --accent-2: #083F94; --accent-soft: rgba(11,87,199,.12);
+  --amber: #0B57C7; --amber-soft: rgba(11,87,199,.12); --amber-ink: #FFFFFF;
+  --chart: rgba(16,24,36,.14);
+}
+[data-skin="panasonic"][data-theme="dark"] {
+  --bg: #1E2126; --bg-2: #171A1E; --surface: #262A30; --surface-2: #30353C; --surface-3: #3D434B;
+  --border: rgba(255,255,255,.12); --border-2: rgba(255,255,255,.2); --hair: rgba(255,255,255,.08);
+  --text: #E9EDF2; --muted: #9DA6B1; --dim: #6F7883;
+  --accent: #3D8BFF; --accent-2: #6FA9FF; --accent-soft: rgba(61,139,255,.2);
+  --amber: #3D8BFF; --amber-soft: rgba(61,139,255,.2); --amber-ink: #0F1318;
+  --tint: rgba(255,255,255,.05); --tint-2: rgba(255,255,255,.1); --glass: rgba(30,33,38,.93);
+  --chart: rgba(255,255,255,.12);
+}
+[data-skin="panasonic"] .row { padding: 8px 12px; }
+[data-skin="panasonic"] .group-head { background: var(--surface-2); border-block-end: 1px solid var(--border); padding: 8px 12px; }
+[data-skin="panasonic"] .group-head h2 { font-size: 13px; font-weight: 600; letter-spacing: .05em; }
+[data-skin="panasonic"] .row .q, [data-skin="panasonic"] .torow b { font-family: "IBM Plex Mono", var(--mono); }
+[data-skin="panasonic"] .row.is-build { box-shadow: inset 3px 0 0 var(--accent); background: var(--accent-soft); }
+
+/* ============================================================ CANON =============
+   Cinema EOS: tiny uppercase labels over compact rows, a red rule under each heading. */
+[data-skin="canon"] {
+  --font: "Barlow", "Noto Sans Hebrew", -apple-system, sans-serif;
+  --radius: 5px; --radius-s: 5px; --shadow: none; --shadow-s: none;
+}
+[data-skin="canon"]:not([data-theme="dark"]) {
+  --bg: #F4F1ED; --bg-2: #FFFDFA; --surface: #FFFDFA; --surface-2: #EBE6DF; --surface-3: #DCD5CB;
+  --border: rgba(40,32,26,.16); --border-2: rgba(40,32,26,.28); --hair: rgba(40,32,26,.1);
+  --text: #221C17; --muted: #554C43; --dim: #877C70;
+  --accent: #B02019; --accent-2: #8A1710; --accent-soft: rgba(176,32,25,.11);
+  --amber: #B02019; --amber-soft: rgba(176,32,25,.11); --amber-ink: #FFFFFF;
+  --chart: rgba(40,32,26,.14);
+}
+[data-skin="canon"][data-theme="dark"] {
+  --bg: #2A2724; --bg-2: #221F1D; --surface: #332F2B; --surface-2: #3E3935; --surface-3: #4B4540;
+  --border: rgba(255,255,255,.12); --border-2: rgba(255,255,255,.21); --hair: rgba(255,255,255,.08);
+  --text: #F0EBE6; --muted: #AEA49B; --dim: #7E756D;
+  --accent: #E03A36; --accent-2: #FF6B63; --accent-soft: rgba(224,58,54,.2);
+  --amber: #E03A36; --amber-soft: rgba(224,58,54,.2); --amber-ink: #FFFFFF;
+  --tint: rgba(255,255,255,.05); --tint-2: rgba(255,255,255,.1); --glass: rgba(42,39,36,.93);
+  --chart: rgba(255,255,255,.12);
+}
+[data-skin="canon"] .row { padding: 7px 12px; }
+[data-skin="canon"] .row .sub { font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; }
+[data-skin="canon"] .group-head { border-block-end: 2px solid var(--accent); padding: 9px 12px; }
+[data-skin="canon"] .group-head h2 { font-size: 12.5px; text-transform: uppercase; letter-spacing: .11em; font-weight: 600; }
+[data-skin="canon"] .row.is-build { background: var(--accent-soft); }
+
+/* ============================================================ BROADCAST =========
+   Engineering gear: everything monospaced, headings in a solid yellow bar. */
+[data-skin="broadcast"] {
+  --font: "IBM Plex Mono", "Noto Sans Hebrew", ui-monospace, monospace;
+  --radius: 0px; --radius-s: 0px; --shadow: none; --shadow-s: none;
+}
+[data-skin="broadcast"]:not([data-theme="dark"]) {
+  --bg: #FFFFFF; --bg-2: #FFFFFF; --surface: #FFFFFF; --surface-2: #F4F1E2; --surface-3: #E7E1C4;
+  --border: rgba(0,0,0,.32); --border-2: rgba(0,0,0,.6); --hair: rgba(0,0,0,.2);
+  --text: #000000; --muted: #333333; --dim: #5E5E5E;
+  --accent: #7A5A00; --accent-2: #5C4400; --accent-soft: rgba(122,90,0,.14);
+  --amber: #7A5A00; --amber-soft: rgba(122,90,0,.14); --amber-ink: #FFFFFF;
+  --chart: rgba(0,0,0,.1);
+}
+[data-skin="broadcast"][data-theme="dark"] {
+  --bg: #000000; --bg-2: #050505; --surface: #0C0C0C; --surface-2: #161616; --surface-3: #242424;
+  --border: rgba(255,255,255,.22); --border-2: rgba(255,255,255,.42); --hair: rgba(255,255,255,.14);
+  --text: #FFFFFF; --muted: #CFCFCF; --dim: #8F8F8F;
+  --accent: #FFD400; --accent-2: #FFE566; --accent-soft: rgba(255,212,0,.2);
+  --amber: #FFD400; --amber-soft: rgba(255,212,0,.2); --amber-ink: #000000;
+  --tint: rgba(255,255,255,.05); --tint-2: rgba(255,255,255,.1); --glass: rgba(0,0,0,.94);
+  --chart: rgba(255,255,255,.14);
+}
+[data-skin="broadcast"] .group-head { background: var(--accent); padding: 6px 11px; }
+[data-skin="broadcast"] .group-head h2 { color: var(--amber-ink); text-transform: uppercase; letter-spacing: .14em; font-size: 12px; }
+[data-skin="broadcast"] .group-head .count, [data-skin="broadcast"] .group-head .chev { color: var(--amber-ink); }
+[data-skin="broadcast"] .row .name { font-size: 13px; letter-spacing: -.01em; }
+[data-skin="broadcast"] .btn.primary { background: var(--accent); color: var(--amber-ink); }
+[data-skin="broadcast"] .row.is-build { box-shadow: inset 0 0 0 2px var(--accent); }
+
+/* ---------- The skin bank in settings ---------- */
+.skin-group { font-size: 11px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase;
+  color: var(--dim); margin: 16px 0 8px; }
+.skin-list { display: grid; gap: 9px; }
+.skin-opt { display: flex; align-items: center; gap: 12px; padding: 11px 13px; width: 100%; text-align: start;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-s); color: var(--text);
+  transition: border-color .2s, background .2s; }
+.skin-opt:hover { border-color: var(--border-2); }
+.skin-opt.on { border-color: var(--accent); background: var(--accent-soft); }
+.skin-swatch { display: flex; flex: 0 0 auto; border: 1px solid var(--border-2); border-radius: 5px; overflow: hidden; }
+.skin-swatch i { width: 15px; height: 34px; display: block; }
+.skin-main { flex: 1; min-width: 0; }
+.skin-main b { display: block; font-size: 14.5px; font-weight: 800; }
+.skin-main small { color: var(--muted); font-size: 12px; line-height: 1.45; }
+.skin-check { flex: 0 0 auto; color: var(--accent); font-weight: 900; font-size: 17px; }
+
+/* ============================================================ CAMERA WORLD ======
+   Not a maker's menus but the things around a camera: the field monitor, the slate, the lens barrel. */
+
+/* ---------- FIELD MONITOR: dark glass, monitor green, frame-line corners, mono numerals ---------- */
+[data-skin="monitor"] { --mono: "IBM Plex Mono", "Heebo", ui-monospace, monospace; --radius: 6px; --radius-s: 4px; --shadow: none; --shadow-s: none; }
+[data-skin="monitor"]:not([data-theme="dark"]) {
+  --bg: #E9ECEF; --bg-2: #E2E6EA; --surface: #F8F9FA; --surface-2: #EEF1F4; --surface-3: #DDE2E7;
+  --border: rgba(0,0,0,.14); --border-2: rgba(0,0,0,.28); --hair: rgba(0,0,0,.1);
+  --text: #0D0F12; --muted: #3E444B; --dim: #5F666E;
+  --accent: #1E7D3A; --accent-2: #166030; --accent-soft: rgba(30,125,58,.14); --accent-ink: #1E7D3A;
+  --amber: #1E7D3A; --amber-soft: rgba(30,125,58,.14); --amber-ink: #FFFFFF; --chart: rgba(0,0,0,.08);
+}
+[data-skin="monitor"][data-theme="dark"] {
+  --bg: #0D0F12; --bg-2: #101317; --surface: #15181D; --surface-2: #1C2026; --surface-3: #2A2F36;
+  --border: rgba(255,255,255,.12); --border-2: rgba(255,255,255,.24); --hair: rgba(255,255,255,.08);
+  --text: #E8EAED; --muted: #B4BAC1; --dim: #8A9199;
+  --accent: #34C759; --accent-2: #5BD97A; --accent-soft: rgba(52,199,89,.18); --accent-ink: #34C759;
+  --amber: #34C759; --amber-soft: rgba(52,199,89,.18); --amber-ink: #06210F;
+  --tint: rgba(255,255,255,.04); --tint-2: rgba(255,255,255,.08); --glass: rgba(13,15,18,.94); --chart: rgba(255,255,255,.07);
+}
+/* frame-line corners on every card, like the guides on a monitor */
+[data-skin="monitor"] .card, [data-skin="monitor"] .phero {
+  background-image:
+    linear-gradient(var(--accent), var(--accent)), linear-gradient(var(--accent), var(--accent)),
+    linear-gradient(var(--accent), var(--accent)), linear-gradient(var(--accent), var(--accent));
+  background-size: 12px 2px, 2px 12px, 12px 2px, 2px 12px;
+  background-position: top left, top left, bottom right, bottom right;
+  background-repeat: no-repeat;
+}
+[data-skin="monitor"] .num, [data-skin="monitor"] .sh-big, [data-skin="monitor"] .tsub { font-family: var(--mono); }
+[data-skin="monitor"] .tsub { text-transform: uppercase; letter-spacing: .1em; }
+
+/* ---------- SLATE: clapper stripes, board-style serif headings, straight lines ---------- */
+[data-skin="slate"] { --font-head: "Frank Ruhl Libre", "Heebo", serif; --radius: 4px; --radius-s: 3px; --shadow: none; --shadow-s: none;
+  --stripes: repeating-linear-gradient(-45deg, var(--text) 0 12px, var(--surface) 12px 24px); }
+[data-skin="slate"]:not([data-theme="dark"]) {
+  --bg: #F2F1EC; --bg-2: #EAE8E1; --surface: #FFFFFF; --surface-2: #F4F3EE; --surface-3: #E4E2DA;
+  --border: rgba(0,0,0,.2); --border-2: rgba(0,0,0,.55); --hair: rgba(0,0,0,.14);
+  --text: #141414; --muted: #3F3F3C; --dim: #66655F;
+  --accent: #141414; --accent-2: #333333; --accent-soft: rgba(20,20,20,.08); --accent-ink: #141414;
+  --amber: #141414; --amber-soft: rgba(20,20,20,.08); --amber-ink: #FFFFFF; --chart: rgba(0,0,0,.07);
+}
+[data-skin="slate"][data-theme="dark"] {
+  --bg: #111111; --bg-2: #161616; --surface: #1C1C1C; --surface-2: #242424; --surface-3: #333333;
+  --border: rgba(255,255,255,.2); --border-2: rgba(255,255,255,.5); --hair: rgba(255,255,255,.12);
+  --text: #F2F1EC; --muted: #CFCDC6; --dim: #9C9A93;
+  --accent: #F2F1EC; --accent-2: #FFFFFF; --accent-soft: rgba(242,241,236,.12); --accent-ink: #F2F1EC;
+  --amber: #F2F1EC; --amber-soft: rgba(242,241,236,.12); --amber-ink: #111111;
+  --tint: rgba(255,255,255,.04); --tint-2: rgba(255,255,255,.08); --glass: rgba(17,17,17,.95); --chart: rgba(255,255,255,.07);
+}
+[data-skin="slate"] .topbar { padding-top: 15px; overflow: hidden; }
+[data-skin="slate"] .topbar::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 7px; background: var(--stripes); }
+[data-skin="slate"] .phero { border: 2px solid var(--text); }
+[data-skin="slate"] .phero::before { content: ""; display: block; height: 12px; background: var(--stripes); border-bottom: 2px solid var(--text); }
+[data-skin="slate"] .group-head { border-block-end: 2px solid var(--text); }
+[data-skin="slate"] .group-head h2, [data-skin="slate"] .phero h2, [data-skin="slate"] .sh-big { font-family: var(--font-head); }
+[data-skin="slate"] .tsub { text-transform: uppercase; letter-spacing: .14em; }
+
+/* ---------- LENS BARREL: anodised black, engraved yellow numerals, knurled grip, red mount dot ---------- */
+[data-skin="barrel"] { --mono: "Barlow Condensed", "Heebo", sans-serif; --radius: 12px; --radius-s: 8px;
+  --knurl: repeating-linear-gradient(90deg, rgba(255,255,255,.07) 0 2px, transparent 2px 5px); }
+[data-skin="barrel"]:not([data-theme="dark"]) {
+  --bg: #E6E6E3; --bg-2: #DCDCD8; --surface: #F5F5F3; --surface-2: #EBEBE8; --surface-3: #D6D6D2;
+  --border: rgba(0,0,0,.14); --border-2: rgba(0,0,0,.3); --hair: rgba(0,0,0,.1);
+  --text: #141414; --muted: #444444; --dim: #666666;
+  --accent: #8A6A00; --accent-2: #6E5400; --accent-soft: rgba(138,106,0,.14); --accent-ink: #8A6A00;
+  --amber: #8A6A00; --amber-soft: rgba(138,106,0,.14); --amber-ink: #FFFFFF; --chart: rgba(0,0,0,.07);
+  --knurl: repeating-linear-gradient(90deg, rgba(0,0,0,.08) 0 2px, transparent 2px 5px);
+}
+[data-skin="barrel"][data-theme="dark"] {
+  --bg: #0F0F0F; --bg-2: #141414; --surface: #1A1A1A; --surface-2: #222222; --surface-3: #2E2E2E;
+  --border: rgba(255,255,255,.1); --border-2: rgba(255,255,255,.22); --hair: rgba(255,255,255,.07);
+  --text: #F4F4F4; --muted: #BDBDBD; --dim: #8E8E8E;
+  --accent: #F2C230; --accent-2: #FFD65C; --accent-soft: rgba(242,194,48,.16); --accent-ink: #F2C230;
+  --amber: #F2C230; --amber-soft: rgba(242,194,48,.16); --amber-ink: #141414;
+  --tint: rgba(255,255,255,.04); --tint-2: rgba(255,255,255,.08); --glass: rgba(15,15,15,.94); --chart: rgba(255,255,255,.06);
+}
+[data-skin="barrel"] .topbar, [data-skin="barrel"] .bottombar:not(.fabbar) { background-image: var(--knurl); }
+[data-skin="barrel"] .num, [data-skin="barrel"] .sh-big, [data-skin="barrel"] .arc-mm { font-family: var(--mono); color: var(--accent); fill: var(--accent); }
+[data-skin="barrel"] .tag.rec .rec-dot { background: #E53935; }
