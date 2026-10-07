@@ -15,16 +15,17 @@ import * as luts from './tools/luts.js';
 import * as hours from './tools/hours.js';
 import * as units from './tools/units.js';
 import * as downloads from './tools/downloads.js';
+import * as slate from './tools/slate.js';
 
 export { setCodecs, setLuts, setDownloads, setWatch, setPlaces } from './tools/shared.js';
 export { camModel, camFull } from './tools/fov.js';
 
-const VIEWS = { media, fov, shutter, hours, offload, sun, luts, units, downloads };
+const VIEWS = { media, fov, shutter, hours, offload, sun, luts, units, downloads, slate };
 
 // Short labels for places outside the tools screen (the home screen's tool row).
 export const toolLabel = (k, lang) => L[k]?.[lang] ?? L[k]?.he ?? k;
 
-const TOOLS = ['media', 'fov', 'shutter', 'hours', 'offload', 'sun', 'downloads', 'units'];
+const TOOLS = ['media', 'fov', 'shutter', 'slate', 'hours', 'offload', 'sun', 'downloads', 'units'];
 
 
 export function render(ctx, { tool: id }, root) {

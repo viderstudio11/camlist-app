@@ -6,9 +6,9 @@ import { writeFileSync, mkdirSync } from 'node:fs';
 import { TOOL_ICON } from '../js/ui/icons.js';
 import { L } from '../js/ui/tools/strings.js';
 
-const APPS = ['sun', 'media', 'shutter', 'hours', 'offload', 'downloads', 'units'];
+const APPS = ['slate', 'sun', 'media', 'shutter', 'hours', 'offload', 'downloads', 'units'];
 // short names for the home screen (one word after CamList, so the icon label stays whole)
-const SHORT = { sun: 'Sun', media: 'Media', shutter: 'Shutter', hours: 'Hours', offload: 'Offload', downloads: 'Downloads', units: 'Units' };
+const SHORT = { slate: 'Slate', sun: 'Sun', media: 'Media', shutter: 'Shutter', hours: 'Hours', offload: 'Offload', downloads: 'Downloads', units: 'Units' };
 const BG = '#16171A', AMBER = '#F2A33A';
 
 let Resvg = null;

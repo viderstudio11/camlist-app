@@ -233,7 +233,7 @@ function fovTool(T, lang, ctx) {
     <div class="fov-ringwrap"><div class="fov-ring" dir="ltr" data-ring data-vals="${stops.map(x => x.mm).join(',')}" role="slider" aria-label="${esc(T('vf_ruler'))}" aria-valuetext="${shown} mm">${stops.map((x, i) => `<button class="fov-rmark" data-ri="${i}" tabindex="-1">${x.mm}</button>`).join('')}</div><i class="fov-witness" aria-hidden="true"></i></div>
     <button class="btn primary fov-open" data-vf-start>${toolIcon('fov')}${esc(T('vf_start'))}</button>
     <p class="tnote">${esc(Tp('vf_hint', { cam: camFull(cam.product) }))}</p>
-    <div class="fov-cal"><span>${esc(phoneCal() ? Tp('vf_cal_ok', { eq: phoneCal().eq }) : T('vf_cal_none'))}</span><button class="btn sm" data-vf-cal>${esc(T('vf_cal_btn'))}</button></div>
+    <div class="fov-cal ${phoneCal() ? 'ok' : 'warn'}"><span>${phoneCal() ? '✓ ' : '⚠ '}${esc(phoneCal() ? Tp('vf_cal_ok', { eq: phoneCal().eq }) : T('vf_cal_none'))}</span><button class="btn sm" data-vf-cal>${esc(T('vf_cal_btn'))}</button></div>
   </div>`;
 
   // 2. Distance and frame: drag the tape and the monitor, the shot and the frame size follow live.
