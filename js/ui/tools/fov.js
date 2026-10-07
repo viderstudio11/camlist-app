@@ -23,14 +23,6 @@ const FIG = [
   '<path d="M43.6 168 L48.4 172 L48.4 174.4 L33 174.4 L33 168"/>',
 ].join('');
 
-// Distance slider: logarithmic, 0.5 m to 30 m, so the short distances where a step matters get
-// most of the travel.
-const DIST_MIN = 0.5, DIST_MAX = 30;
-const distToSlider = (d) => Math.round((Math.log(d / DIST_MIN) / Math.log(DIST_MAX / DIST_MIN)) * 1000);
-const sliderToDist = (v) => {
-  const d = DIST_MIN * (DIST_MAX / DIST_MIN) ** (v / 1000);
-  return d < 3 ? Math.round(d * 10) / 10 : d < 10 ? Math.round(d * 4) / 4 : Math.round(d);
-};
 
 // Camera names as crews say them: "Sony FX6", not "PXW-FX6"; "Blackmagic Pocket 4K", not "Pocket Cinema Camera 4K".
 const MAKER_SHORT = { sony: 'Sony', arri: 'ARRI', canon: 'Canon', red: 'RED', 'blackmagic-design': 'Blackmagic', panasonic: 'Panasonic', dji: 'DJI', fujifilm: 'Fujifilm', nikon: 'Nikon' };
@@ -139,15 +131,6 @@ function fovTool(T, lang, ctx) {
         ${cam ? `<button class="btn sm fov-pick-cancel" data-cpick-cancel>${esc(T('cancel_pick'))}</button>` : ''}
       </div>`;
 
-  const distCard = `<div class="card sh-sec" data-part="dist">
-    <div class="sh-head"><div class="tsub">${esc(T('distance_step'))}</div>
-      <div class="seg sh-mode"><button class="${unit === 'm' ? 'active' : ''}" data-unit="m">${esc(T('meters'))}</button><button class="${unit === 'ft' ? 'active' : ''}" data-unit="ft">${esc(T('feet'))}</button></div></div>
-    <div class="fov-dist"><input type="range" min="0" max="1000" step="1" value="${distToSlider(s.distance)}" data-dist aria-label="${esc(T('distance_step'))}">
-      <label class="fov-dnum"><input type="number" data-fdist value="${esc(dist(s.distance))}" min="0.2" max="600" step="0.1" inputmode="decimal"><span>${esc(uLabel)}</span></label></div>
-    <div class="tsub" style="margin-top:12px">${esc(T('shot_step'))}</div>
-    <div class="chips">${SHOTS.map(x => chip('data-shot', x.id, esc(name(x)), x.id === shot.id)).join('')}</div>
-  </div>`;
-
   if (!cam) {
     return `<div class="card sh-answer warn" data-part="answer"><p class="sh-line">${esc(T('choose_camera_first'))}</p></div>${pickCard}`;
   }
@@ -176,109 +159,102 @@ function fovTool(T, lang, ctx) {
   const lenses = catalogLenses.length ? catalogLenses : PRIME_SET.map(x => ({ min: x, max: x, label: `${x}` }));
   const rec = pickLens(need, lenses);
   const focal = s.focal > 0 ? s.focal : rec.focal;
-  const fr = frameAt(sn, focal, s.distance);
-  const isRec = !(s.focal > 0) || s.focal === rec.focal;
-  // Which lens that focal length is on: a prime of exactly that length, else the narrowest zoom holding it.
-  const onLens = lenses.find(l => l.min === l.max && l.min === focal)
-    || lenses.filter(l => l.min <= focal && focal <= l.max).sort((x, y) => (x.max / x.min) - (y.max / y.min))[0];
-  const lensName = onLens ? (onLens.min === onLens.max ? T('prime_lbl') : `${T('zoom_lbl')} ${onLens.label}`) : '';
+
+  const stops = rulerStops([], PRIME_SET);
+  const nearestStop = (mm) => stops.reduce((b, x) => (Math.abs(x.mm - mm) < Math.abs(b.mm - mm) ? x : b), stops[0]).mm;
+  const shown = nearestStop(focal);
+  // the lens the ring is on now (moved by the ring itself, the shot chips, or a typed distance)
+  const liveMM = () => nearestStop(s.focal > 0 ? s.focal : shown);
 
   // Where the frame sits on a 1.75 m person, in metres above the ground: a frame taller than the
   // person stands on the ground; a tighter one sits on the upper body with a little headroom,
-  // where an operator would put it. Both drawings below use this, so they always agree.
+  // where an operator would put it.
   const PERSON_M = 1.75;
-  const bottomM = fr.heightM >= PERSON_M ? 0 : PERSON_M + fr.heightM * 0.12 - fr.heightM;
-  const two = fr.widthM >= PERSON_M * 2.4;
   const figureAt = (x, groundY, h) => {
     const k = h / FIG_H;
     return `<g class="fig" transform="translate(${(x - (FIG_W * k) / 2).toFixed(2)} ${(groundY - h).toFixed(2)}) scale(${k.toFixed(4)})">${FIG}</g>`;
   };
+  // The shot a frame height makes on a standing person, by the nearest of the named shot sizes.
+  const shotOf = (hM) => SHOTS.reduce((b, x) => (Math.abs(Math.log(x.height / hM)) < Math.abs(Math.log(b.height / hM)) ? x : b), SHOTS[0]);
+  const LOOKS = { arri: 'ARRI', sony: 'Sony', red: 'RED', canon: 'Canon' };
+  const fmtTxt = String(sn.mode || '').replace(/\s+/g, ' ').slice(0, 22);
+  const fpsTxt = (Number(s.fps) || 25).toFixed(2);
 
-  // 1. The monitor: exactly what the camera sees, in the sensor's own aspect ratio.
-  const MW = 320, MH = Math.round((MW * sn.h) / sn.w);
-  const mpx = MW / fr.widthM;
-  const mGround = MH + bottomM * mpx;
-  const people = two ? [MW / 2 - fr.widthM * 0.22 * mpx, MW / 2 + fr.widthM * 0.22 * mpx] : [MW / 2];
-  const monitor = `<svg viewBox="0 0 ${MW} ${MH}" class="fov-monitor" role="img" aria-label="${esc(T('framing'))}">
-    <defs><clipPath id="fov-clip"><rect width="${MW}" height="${MH}" rx="6"/></clipPath></defs>
-    <rect width="${MW}" height="${MH}" rx="6" class="mon-bg"/>
-    <g clip-path="url(#fov-clip)"><rect y="${mGround.toFixed(1)}" width="${MW}" height="${MH}" class="mon-floor"/>${people.map(x => figureAt(x, mGround, PERSON_M * mpx)).join('')}</g>
-    <rect x="${MW * 0.05}" y="${MH * 0.05}" width="${MW * 0.9}" height="${MH * 0.9}" class="mon-safe"/>
-    <path d="M${MW / 2 - 8} ${MH / 2}h16M${MW / 2} ${MH / 2 - 8}v16" class="mon-cross"/>
-    <text x="10" y="${MH - 10}" class="mon-mm">${focal}mm</text>
-    <rect width="${MW}" height="${MH}" rx="6" class="mon-edge"/>
-  </svg>`;
+  // The monitor: exactly what the camera sees from here, dressed the way the chosen camera world's monitor
+  // dresses a picture (inspired by each maker's field monitor, not a copy of it). Only facts the app knows.
+  const monitorHTML = (mm) => {
+    const look = LOOKS[s.look] ? s.look : 'arri';
+    const fr = frameAt(sn, mm, s.distance);
+    const bottomM = fr.heightM >= PERSON_M ? 0 : PERSON_M + fr.heightM * 0.12 - fr.heightM;
+    const two = fr.widthM >= PERSON_M * 2.4;
+    const MW = 320, MH = Math.round((MW * sn.h) / sn.w), mpx = MW / fr.widthM, mGround = MH + bottomM * mpx;
+    const people = two ? [MW / 2 - fr.widthM * 0.22 * mpx, MW / 2 + fr.widthM * 0.22 * mpx] : [MW / 2];
+    const size = `${num(toUnit(fr.widthM, unit), 2)}×${num(toUnit(fr.heightM, unit), 2)}${unit}`;
+    const tx = (x, y, str, o = {}) => `<text x="${x}" y="${y}" class="ml-t ${o.cls || ''}" text-anchor="${o.a || 'start'}">${esc(str)}</text>`;
+    const ov = {
+      arri: `<rect width="${MW}" height="17" class="ml-bar"/><rect y="${MH - 17}" width="${MW}" height="17" class="ml-bar"/>
+        ${tx(8, 12, 'STBY')}${tx(54, 12, fpsTxt)}${tx(104, 12, fmtTxt)}${tx(8, MH - 5, `${mm}mm`)}${tx(MW - 8, MH - 5, size, { a: 'end' })}
+        <rect x="18" y="26" width="${MW - 36}" height="${MH - 52}" class="ml-line"/>`,
+      sony: `${[[16, 16, 1, 1], [MW - 16, 16, -1, 1], [16, MH - 16, 1, -1], [MW - 16, MH - 16, -1, -1]].map(([x, y, dx, dy]) => `<path d="M${x} ${y + dy * 14} L${x} ${y} L${x + dx * 14} ${y}" class="ml-corner"/>`).join('')}
+        <rect x="22" y="6" width="34" height="13" rx="2" class="ml-stby"/>${tx(39, 16, 'STBY', { a: 'middle', cls: 'ml-b' })}
+        ${tx(64, 16, fmtTxt, { cls: 'ml-sh' })}${tx(MW - 22, 16, `${fpsTxt}p`, { a: 'end', cls: 'ml-sh' })}
+        ${tx(22, MH - 6, `${mm}mm`, { cls: 'ml-sh' })}${tx(MW - 22, MH - 6, size, { a: 'end', cls: 'ml-sh' })}`,
+      red: `<rect width="${MW}" height="18" class="ml-bar ml-black"/><rect y="${MH - 18}" width="${MW}" height="18" class="ml-bar ml-black"/>
+        ${[[`${fpsTxt} FPS`, 6], [fmtTxt, 84]].map(([t, x]) => `<rect x="${x}" y="3" width="${t.length * 6.2 + 8}" height="12" rx="1" class="ml-box"/>${tx(x + 4, 12.5, t)}`).join('')}
+        <circle cx="${MW - 14}" cy="9" r="4.5" class="ml-rec"/>${tx(8, MH - 5.5, `${mm}mm`)}${tx(MW - 8, MH - 5.5, size, { a: 'end' })}
+        <rect x="22" y="28" width="${MW - 44}" height="${MH - 56}" class="ml-line ml-dash"/>`,
+      canon: `<rect x="12" y="12" width="${MW - 24}" height="${MH - 24}" class="ml-line"/>
+        <path d="M${MW / 2 - 8} ${MH / 2} h16 M${MW / 2} ${MH / 2 - 8} v16" class="ml-cross"/>
+        <rect y="${MH - 20}" width="${MW}" height="20" class="ml-band"/>
+        ${tx(10, MH - 6.5, `STBY  ${mm}mm`, { cls: 'ml-sans' })}${tx(MW - 10, MH - 6.5, `${fpsTxt}P  ${size}`, { a: 'end', cls: 'ml-sans' })}`,
+    }[look];
+    return `<svg viewBox="0 0 ${MW} ${MH}" class="fov-monitor" role="img" aria-label="${esc(T('framing'))}" direction="ltr">
+      <defs><clipPath id="fov-clip"><rect width="${MW}" height="${MH}" rx="6"/></clipPath></defs>
+      <rect width="${MW}" height="${MH}" rx="6" class="mon-bg"/>
+      <g clip-path="url(#fov-clip)"><rect y="${mGround.toFixed(1)}" width="${MW}" height="${MH}" class="mon-floor"/>${people.map(x => figureAt(x, mGround, PERSON_M * mpx)).join('')}${ov}</g>
+    </svg>`;
+  };
+  const factsHTML = (mm) => {
+    const fr = frameAt(sn, mm, s.distance);
+    return `<span class="fov-shot">${esc(name(shotOf(fr.heightM)))}</span><span>${esc(Tp('frame_line', { w: num(toUnit(fr.widthM, unit), 2), h: num(toUnit(fr.heightM, unit), 2), u: uLabel, a: num(fr.hFov, 0) }))}</span>`;
+  };
+  const readHTML = (mm) => {
+    const lens = lenses.find(l => l.min === l.max && l.min === mm) || lenses.filter(l => l.min <= mm && mm <= l.max).sort((x, y) => (x.max / x.min) - (y.max / y.min))[0];
+    const lname = lens ? (lens.min === lens.max ? T('prime_lbl') : `${T('zoom_lbl')} ${lens.label}`) : '';
+    return `<b>${mm}</b><i>mm · ${num(frameAt(sn, mm, s.distance).hFov, 0)}°</i>${lname ? `<span class="sh-small">${esc(lname)}</span>` : ''}`;
+  };
+  // which lens frames a shot from here: the catalog's (or a standard prime), on the ring's nearest mark
+  const focalForShot = (id) => { const sh = SHOTS.find(x => x.id === id) || shot; const r = pickLens(lensFor(sn, s.distance, sh.height), lenses); return r ? nearestStop(r.focal) : shown; };
 
-  // 2. The measurement: the same frame on the person against a height scale, with its real size.
-  const box = 150, top = 18, L = 28;
-  const tallest = Math.max(fr.heightM + bottomM, PERSON_M) * 1.08;
-  const px = (box - top) / tallest;
-  const fw = fr.widthM * px, fh = fr.heightM * px, ph = PERSON_M * px;
-  const vw = Math.max(fw + 30, 200) + L + 40;
-  const cx = L + (vw - L - 40) / 2;
-  const gy = box - 2;
-  const fx0 = cx - fw / 2, fx1 = cx + fw / 2, fy = gy - (bottomM + fr.heightM) * px;
-  const step = unit === 'ft' ? 0.6096 : 0.5; // a tick every 2 ft or every half metre
-  const ticks = [];
-  for (let m = 0; m <= tallest + 1e-9; m += step) {
-    const y = gy - m * px;
-    ticks.push(`<line x1="${L - 6}" y1="${y.toFixed(1)}" x2="${L}" y2="${y.toFixed(1)}" class="ms-tick"/><text x="${L - 8}" y="${(y + 3.5).toFixed(1)}" class="ms-num" text-anchor="end">${num(toUnit(m, unit), unit === 'ft' ? 0 : 1)}</text>`);
-  }
-  const measured = `<svg viewBox="0 0 ${vw.toFixed(0)} ${box}" class="fov-measure" role="img">
-    <line x1="${L}" y1="${top - 6}" x2="${L}" y2="${gy}" class="ms-tick"/>${ticks.join('')}
-    <line x1="${L}" y1="${gy}" x2="${vw}" y2="${gy}" class="ms-ground"/>
-    ${(two ? [cx - fw * 0.22, cx + fw * 0.22] : [cx]).map(x => figureAt(x, gy, ph)).join('')}
-    <rect x="${fx0.toFixed(1)}" y="${fy.toFixed(1)}" width="${fw.toFixed(1)}" height="${fh.toFixed(1)}" class="ms-frame"/>
-    <path d="M${(fx1 + 8).toFixed(1)} ${fy.toFixed(1)}v${fh.toFixed(1)}M${(fx1 + 4).toFixed(1)} ${fy.toFixed(1)}h8M${(fx1 + 4).toFixed(1)} ${(fy + fh).toFixed(1)}h8" class="ms-dim"/>
-    <text x="${(fx1 + 13).toFixed(1)}" y="${(fy + fh / 2 + 4).toFixed(1)}" class="ms-lbl">${num(toUnit(fr.heightM, unit), 2)}</text>
-    <path d="M${fx0.toFixed(1)} ${(fy - 7).toFixed(1)}h${fw.toFixed(1)}M${fx0.toFixed(1)} ${(fy - 11).toFixed(1)}v8M${fx1.toFixed(1)} ${(fy - 11).toFixed(1)}v8" class="ms-dim"/>
-    <text x="${cx.toFixed(1)}" y="${(fy - 12).toFixed(1)}" class="ms-lbl" text-anchor="middle">${num(toUnit(fr.widthM, unit), 2)} ${esc(uLabel)}</text>
-  </svg>`;
-
-  const answer = `<div class="card sh-answer ok" data-part="answer">
-    <div class="fov-top"><b class="sh-big">${focal}<small>mm</small></b>${lensName ? `<span class="sh-small">${esc(lensName)}</span>` : ''}${isRec ? `<span class="sh-rec">${esc(T('recommended'))}</span>` : `<button class="linkbtn" data-lens-reset>${esc(Tp('back_to_rec', { mm: rec.focal }))}</button>`}</div>
-    <p class="sh-line">${esc(Tp('need_sentence', { d: dist(s.distance), u: uLabel, shot: name(shot), cam: cam.product.name, mm: num(need, 1) }))}</p>
-    ${monitor}
-    <details class="fov-more"><summary>${esc(Tp('frame_line', { w: num(toUnit(fr.widthM, unit), 2), h: num(toUnit(fr.heightM, unit), 2), u: uLabel, a: num(fr.hFov, 0) }))}</summary>${measured}</details>
-  </div>`;
-
-  const stops = rulerStops([], PRIME_SET);
-  const at = stops.reduce((b, x, i) => (Math.abs(x.mm - focal) < Math.abs(stops[b].mm - focal) ? i : b), 0);
-  const shown = stops[at].mm;
-  // An arc from 180° to 0°: the lit part runs up to this lens's place among the stops.
-  const R = 70, CX = 80, CY = 76;
-  const pt = (t) => [CX - R * Math.cos(Math.PI * t), CY - R * Math.sin(Math.PI * t)];
-  const tEnd = stops.length > 1 ? at / (stops.length - 1) : 0;
-  const [x0, y0] = pt(0), [x1, y1] = pt(Math.max(tEnd, 0.001));
-  const viewfinder = `<div class="card fov-dialcard" data-part="vf">
+  // 1. The lens ring: turned like the focal ring on the lens, under a fixed witness mark.
+  const ring = `<div class="card fov-ringcard" data-part="vf">
     <div class="tsub">${esc(T('lens_now'))}</div>
-    <div class="fov-dial">
-      <button class="fov-step" data-fstep="-1" aria-label="${esc(T('lens_wider'))}" ${at === 0 ? 'aria-disabled="true"' : ''}>‹</button>
-      <svg viewBox="0 0 160 84" class="fov-arc" role="img" aria-label="${shown} mm">
-        <path d="M${x0} ${y0} A${R} ${R} 0 0 1 ${CX + R} ${CY}" class="arc-bg"/>
-        <path d="M${x0} ${y0} A${R} ${R} 0 0 1 ${x1.toFixed(1)} ${y1.toFixed(1)}" class="arc-on"/>
-        <text x="80" y="70" text-anchor="middle" class="arc-mm">${shown}<tspan class="arc-u" dx="2">mm</tspan></text>
-      </svg>
-      <button class="fov-step" data-fstep="1" aria-label="${esc(T('lens_longer'))}" ${at === stops.length - 1 ? 'aria-disabled="true"' : ''}>›</button>
-    </div>
+    <div class="fov-read" data-part="read">${readHTML(shown)}</div>
+    <div class="fov-ringwrap"><div class="fov-ring" dir="ltr" data-ring data-vals="${stops.map(x => x.mm).join(',')}" role="slider" aria-label="${esc(T('vf_ruler'))}" aria-valuetext="${shown} mm">${stops.map((x, i) => `<button class="fov-rmark" data-ri="${i}" tabindex="-1">${x.mm}</button>`).join('')}</div><i class="fov-witness" aria-hidden="true"></i></div>
     <button class="btn primary fov-open" data-vf-start>${toolIcon('fov')}${esc(T('vf_start'))}</button>
     <p class="tnote">${esc(Tp('vf_hint', { cam: camFull(cam.product) }))}</p>
-  </div>
-`;
+  </div>`;
+
+  // 2. Distance and frame: drag the tape and the monitor, the shot and the frame size follow live.
   const frameAtLine = (mm) => { const z = frameAt(sn, mm, s.distance); return Tp('frame_at', { mm, d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); };
   const TAPE = unit === 'ft' ? DIST_FT : DIST_M;
   const tapeMajor = (v) => (unit === 'ft' ? [5, 10, 20, 50, 100, 200].includes(v) : [1, 2, 3, 5, 10, 20, 50, 100].includes(v));
   const tape = `<div class="fov-tapewrap"><div class="fov-tape" dir="ltr" data-tape data-vals="${TAPE.join(',')}" role="slider" aria-label="${esc(T('distance_step'))}" aria-valuetext="${esc(`${dist(s.distance)} ${uLabel}`)}">${TAPE.map((v, i) => `<button class="fov-tick ${tapeMajor(v) ? 'major' : ''}" data-ti="${i}" tabindex="-1"><b>${v}</b></button>`).join('')}</div><i class="fov-needle" aria-hidden="true"></i></div>`;
-  const distRow = `<div class="card fov-distrow" data-part="distrow">
-    <label class="fov-distin"><span class="tsub">${esc(T('distance_step'))}</span>
+  const look = LOOKS[s.look] ? s.look : 'arri';
+  const frameCard = `<div class="card fov-framecard" data-part="distrow">
+    <div class="fov-looks" role="group" aria-label="${esc(T('mon_look'))}"><span class="tsub">${esc(T('mon_look'))}</span>${Object.entries(LOOKS).map(([k, n]) => `<button class="fov-look ${k === look ? 'on' : ''}" data-mlook="${k}" aria-pressed="${k === look}">${n}</button>`).join('')}</div>
+    <div class="fov-mon" data-part="mon">${monitorHTML(shown)}</div>
+    <div class="fov-facts" data-part="facts">${factsHTML(shown)}</div>
+    <div class="fov-distin2"><label class="fov-distin"><span class="tsub">${esc(T('distance_step'))}</span>
       <input type="number" data-fdist2 value="${esc(dist(s.distance))}" min="0.2" max="600" step="0.1" inputmode="decimal" aria-label="${esc(T('distance_step'))}"></label>
-    <div class="seg sh-mode"><button class="${unit === 'm' ? 'active' : ''}" data-unit="m">${esc(T('meters'))}</button><button class="${unit === 'ft' ? 'active' : ''}" data-unit="ft">${esc(T('feet'))}</button></div>
+      <div class="seg sh-mode"><button class="${unit === 'm' ? 'active' : ''}" data-unit="m">${esc(T('meters'))}</button><button class="${unit === 'ft' ? 'active' : ''}" data-unit="ft">${esc(T('feet'))}</button></div></div>
     ${tape}
-    <p class="fov-frameline">${esc(frameAtLine(shown))}</p>
+    <div class="tsub" style="margin-top:12px">${esc(T('lens_for_shot'))}</div>
+    <div class="chips fov-shots">${SHOTS.map(x => `<button class="chip pick" data-shot="${x.id}">${esc(name(x))}</button>`).join('')}</div>
   </div>`;
 
   fovView = { cam: { id: cam.prof.id, name: camFull(cam.product), w: sn.w, h: sn.h, mode: sn.mode }, stops, focal: shown,
-    frameAtLine: () => frameAtLine(shown),
+    frameAtLine: () => frameAtLine(liveMM()), liveMM, monitorHTML, factsHTML, readHTML, focalForShot,
     modes: modesOf(cam), modeId: modeOf(cam)?.id,
     cameras: cams.map(c => ({ id: c.prof.id, name: camFull(c.product), modes: modesOf(c), w: c.prof.sensor.w, h: c.prof.sensor.h, mode: c.prof.sensor.mode })),
     projectId: projProf, recent: (s.recent || []).slice(),
@@ -288,19 +264,18 @@ function fovTool(T, lang, ctx) {
     frameLine: (mm, area = sn) => { const z = frameAt(area, mm, s.distance); return Tp('vf_at', { d: dist(s.distance), u: uLabel, w: num(toUnit(z.widthM, unit), 2), h: num(toUnit(z.heightM, unit), 2) }); },
     // the same, short and in Latin units: for the frame labels and the data burned into a grab
     frameSize: (mm, area = sn) => { const z = frameAt(area, mm, s.distance); return `${num(toUnit(z.widthM, unit), 2)}×${num(toUnit(z.heightM, unit), 2)}${unit}`; },
-    distance: `${dist(s.distance)}${unit}`,
+    get distance() { return `${dist(s.distance)}${unit}`; },
     fps: s.fps || 25, onFps: (f) => { S.fov.fps = f; keepFov(); } };
   keepFov();
 
-  // The page is the camera and the viewfinder; the calculation from a distance waits folded.
-  return `${pickCard}${viewfinder}${distRow}<details class="card fov-calc" ${s.calcOpen ? 'open' : ''} data-calc><summary>${esc(T('calc_by_distance'))}</summary>${distCard}${answer}</details>`;
+  // The page: the camera, the lens ring, and the frame from where you stand.
+  return `${pickCard}${ring}${frameCard}`;
 }
 
 export { fovTool as view };
 
+
 export function bind(root, ctx, { T, lang, rewire }) {
-  root.querySelectorAll('[data-lens]').forEach(b => { b.onclick = () => { S.fov.focal = Number(b.dataset.lens); ctx.render(); }; });
-  root.querySelector('[data-lens-reset]')?.addEventListener('click', () => { S.fov.focal = 0; ctx.render(); });
   root.querySelectorAll('[data-cbrand]').forEach(b => { b.onclick = () => { Object.assign(S.fov, { camBrand: b.dataset.cbrand, picking: true }); ctx.render(); }; });
   root.querySelectorAll('[data-cmodel]').forEach(b => { b.onclick = () => {
     // a row is a camera in a format: choosing it sets both
@@ -326,23 +301,6 @@ export function bind(root, ctx, { T, lang, rewire }) {
     fresh.querySelectorAll('[data-cbrand]').forEach(b => { b.onclick = () => { Object.assign(S.fov, { camBrand: b.dataset.cbrand, picking: true }); ctx.render(); }; });
   };
   root.querySelectorAll('[data-unit]').forEach(b => { b.onclick = () => { S.fov.unit = b.dataset.unit; ctx.render(); }; });
-  const fdist = root.querySelector('[data-fdist]');
-  if (fdist) fdist.onchange = () => { const v = Number(fdist.value); if (v > 0) { S.fov.distance = fromUnit(v, S.fov.unit); S.fov.focal = 0; } ctx.render(); };
-  root.querySelectorAll('[data-shot]').forEach(b => { b.onclick = () => { S.fov.shot = b.dataset.shot; S.fov.focal = 0; ctx.render(); }; });
-  // Dragging the distance redraws everything but the slider itself, so the drag is never interrupted.
-  const dist = root.querySelector('[data-dist]');
-  if (dist) dist.oninput = () => {
-    S.fov.distance = sliderToDist(Number(dist.value));
-    S.fov.focal = 0;
-    const tpl = document.createElement('template');
-    tpl.innerHTML = fovTool(T, lang, ctx);
-    tpl.content.querySelectorAll('[data-part]').forEach(fresh => {
-      const part = fresh.dataset.part;
-      if (part === 'dist') { const n = root.querySelector('[data-part="dist"] [data-fdist]'); const v = toUnit(S.fov.distance, S.fov.unit); if (n) n.value = num(v, v < 10 ? 1 : 0); return; }
-      root.querySelector(`[data-part="${part}"]`)?.replaceWith(fresh);
-    });
-    rewire();
-  };
   root.querySelector('[data-vf-start]')?.addEventListener('click', async () => {
     if (!fovView) return;
     const ok = await openViewfinder({ ...fovView, T, onClose: (mm) => { S.fov.focal = mm; ctx.render(); } });
@@ -353,55 +311,70 @@ export function bind(root, ctx, { T, lang, rewire }) {
       toast(T(key), { kind: 'err', ms: 9000 });
     }
   });
-  root.querySelector('[data-calc]')?.addEventListener('toggle', (e) => { S.fov.calcOpen = e.currentTarget.open; });
-  root.querySelectorAll('[data-fstep]').forEach(b => { b.onclick = () => {
-    const stops = fovView?.stops; if (!stops) return;
-    const i = stops.findIndex(x => x.mm === fovView.focal) + Number(b.dataset.fstep);
-    if (i < 0 || i >= stops.length) { feel.end(); return; }
-    S.fov.focal = stops[i].mm; feel.detent(); ctx.render();
-  }; });
-  // the page's distance changes the frame, not the lens
-  const fd2 = root.querySelector('[data-fdist2]');
-  if (fd2) fd2.onchange = () => { const v = Number(fd2.value); if (v > 0) S.fov.distance = fromUnit(v, S.fov.unit); ctx.render(); };
-  // Dragging the tape: the distance, the box and the frame line follow live, a detent on every mark.
-  const tapeEl = root.querySelector('[data-tape]');
-  if (tapeEl) {
-    const vals = tapeEl.dataset.vals.split(',').map(Number);
-    const here = toUnit(S.fov.distance, S.fov.unit);
-    let ti = vals.reduce((bi, v, i) => (Math.abs(v - here) < Math.abs(vals[bi] - here) ? i : bi), 0);
-    const centre = (i, smooth) => { const b = tapeEl.children[i]; tapeEl.scrollTo({ left: b.offsetLeft - (tapeEl.clientWidth - b.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' }); };
-    const mark = () => tapeEl.querySelectorAll('.fov-tick').forEach((b, i) => b.classList.toggle('on', i === ti));
-    const apply = () => {
-      S.fov.distance = fromUnit(vals[ti], S.fov.unit);
-      if (fd2) fd2.value = String(vals[ti]);
-      const fl = root.querySelector('.fov-frameline');
-      if (fl && fovView?.frameAtLine) fl.textContent = fovView.frameAtLine();
-      tapeEl.setAttribute('aria-valuetext', String(vals[ti]));
-    };
+  // Repaint what follows the lens and the distance, leaving the strips (and the finger on them) alone.
+  const paint = () => {
+    if (!fovView?.liveMM) return;
+    const mm = fovView.liveMM();
+    fovView.focal = mm;
+    const part = (p, html) => { const el = root.querySelector(`[data-part="${p}"]`); if (el) el.innerHTML = html; };
+    part('read', fovView.readHTML(mm)); part('mon', fovView.monitorHTML(mm)); part('facts', fovView.factsHTML(mm));
+    const fd = root.querySelector('[data-fdist2]'); if (fd && document.activeElement !== fd) { const v = toUnit(S.fov.distance, S.fov.unit); fd.value = num(v, v < 10 ? 1 : 0); }
+  };
+  // A strip of marks scrolled under a fixed mark: the one under it is picked, a detent on each.
+  const snapStrip = (el, vals, current, pick) => {
+    if (!el) return null;
+    let at = vals.reduce((bi, v, i) => (Math.abs(v - current) < Math.abs(vals[bi] - current) ? i : bi), 0);
+    const centre = (i, smooth) => { const b = el.children[i]; el.scrollTo({ left: b.offsetLeft - (el.clientWidth - b.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' }); };
+    const mark = () => [...el.children].forEach((b, i) => b.classList.toggle('on', i === at));
     mark();
-    requestAnimationFrame(() => centre(ti, false));
-    // only the user's own drag moves the distance — not the tape being centred on a typed value
+    requestAnimationFrame(() => centre(at, false));
+    // only the user's own drag moves it — not the strip being centred on a value set elsewhere
     let user = false, lastTick = 0, settleT = 0, raf = 0;
-    ['pointerdown', 'touchstart', 'wheel'].forEach(ev => tapeEl.addEventListener(ev, () => { user = true; }, { passive: true }));
-    tapeEl.addEventListener('scroll', () => {
+    ['pointerdown', 'touchstart', 'wheel'].forEach(ev => el.addEventListener(ev, () => { user = true; }, { passive: true }));
+    el.addEventListener('scroll', () => {
       if (!user) return;
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
-        const mid = tapeEl.scrollLeft + tapeEl.clientWidth / 2;
-        let best = ti, d = Infinity;
-        [...tapeEl.children].forEach((b, i) => { const c = Math.abs(b.offsetLeft + b.offsetWidth / 2 - mid); if (c < d) { d = c; best = i; } });
-        if (best === ti) return;
-        ti = best; mark(); apply();
+        const mid = el.scrollLeft + el.clientWidth / 2;
+        let best = at, d = Infinity;
+        [...el.children].forEach((b, i) => { const c = Math.abs(b.offsetLeft + b.offsetWidth / 2 - mid); if (c < d) { d = c; best = i; } });
+        if (best === at) return;
+        at = best; mark(); pick(vals[at]);
         const now = performance.now(); if (now - lastTick > 60) { lastTick = now; feel.detent(); }
       });
       clearTimeout(settleT);
-      settleT = setTimeout(() => { keepFov(); feel.settle(); if (S.fov.calcOpen) ctx.render(); }, 220);
+      settleT = setTimeout(() => { keepFov(); feel.settle(); }, 220);
     }, { passive: true });
-    tapeEl.addEventListener('click', (e) => {
-      const b = e.target.closest('[data-ti]'); if (!b) return;
-      user = true; ti = Number(b.dataset.ti); mark(); apply(); centre(ti, true); keepFov(); feel.detent();
+    el.addEventListener('click', (e) => {
+      const b = e.target.closest('button'); if (!b || b.parentElement !== el) return;
+      user = true; at = [...el.children].indexOf(b); mark(); pick(vals[at]); centre(at, true); keepFov(); feel.detent();
     });
-  }
+    return { set: (v) => { at = vals.indexOf(v); if (at < 0) return; mark(); centre(at, true); } };
+  };
+  const ringEl = root.querySelector('[data-ring]');
+  const ringVals = ringEl ? ringEl.dataset.vals.split(',').map(Number) : [];
+  const ring = snapStrip(ringEl, ringVals, fovView?.focal, (mm) => { S.fov.focal = mm; ringEl.setAttribute('aria-valuetext', `${mm} mm`); paint(); });
+  const tapeEl = root.querySelector('[data-tape]');
+  snapStrip(tapeEl, tapeEl ? tapeEl.dataset.vals.split(',').map(Number) : [], toUnit(S.fov.distance, S.fov.unit), (v) => {
+    // the lens stays where it is while the distance changes
+    if (!(S.fov.focal > 0) && fovView) S.fov.focal = fovView.focal;
+    S.fov.distance = fromUnit(v, S.fov.unit); tapeEl.setAttribute('aria-valuetext', String(v)); paint();
+  });
+  // a typed distance moves the tape too (a full redraw centres it)
+  const fd2 = root.querySelector('[data-fdist2]');
+  if (fd2) fd2.onchange = () => { const v = Number(fd2.value); if (v > 0) { if (!(S.fov.focal > 0) && fovView) S.fov.focal = fovView.focal; S.fov.distance = fromUnit(v, S.fov.unit); } ctx.render(); };
+  // a shot size turns the ring to the lens that frames it from here
+  root.querySelectorAll('[data-shot]').forEach(b => { b.onclick = () => {
+    if (!fovView) return;
+    const mm = fovView.focalForShot(b.dataset.shot);
+    Object.assign(S.fov, { shot: b.dataset.shot, focal: mm }); keepFov(); feel.detent();
+    ring?.set(mm); paint();
+    root.querySelectorAll('[data-shot]').forEach(x => x.classList.toggle('on', x === b));
+  }; });
+  root.querySelectorAll('[data-mlook]').forEach(b => { b.onclick = () => {
+    S.fov.look = b.dataset.mlook; keepFov(); feel.detent(); paint();
+    root.querySelectorAll('[data-mlook]').forEach(x => { x.classList.toggle('on', x === b); x.setAttribute('aria-pressed', x === b); });
+  }; });
   root.querySelectorAll('[data-cmode]').forEach(b => { b.onclick = () => { S.fov.modes = { ...(S.fov.modes || {}), [S.fov.cam]: b.dataset.cmode }; S.fov.modesOpen = false; feel.detent(); ctx.render(); }; });
   root.querySelector('[data-modes-toggle]')?.addEventListener('click', () => { S.fov.modesOpen = !S.fov.modesOpen; ctx.render(); });
   root.querySelector('[data-cchange]')?.addEventListener('click', () => { Object.assign(S.fov, { picking: true, camBrand: '' }); ctx.render(); });   // opens on the current camera's maker

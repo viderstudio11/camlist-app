@@ -23,7 +23,7 @@ export const isNew = (url) => { const d = D.watch.pages?.[url]?.changed; return 
 // Everything the user typed, kept while the app is open so switching tools does not reset the work.
 export const S = {
   media: { brand: 'Sony', cam: 'fx6', fmt: '', fps: 25, mtype: '', card: 0, cardPicked: false, customCard: false, backup: false, hours: 10, customHours: false },
-  fov: { distance: 4, unit: 'm', shot: 'waist', focal: 0, fps: 25, cam: '', camBrand: '', modes: {}, recent: [], q: '', picking: false, fromProject: false, calcOpen: false },
+  fov: { distance: 4, unit: 'm', shot: 'waist', focal: 0, fps: 25, look: 'arri', cam: '', camBrand: '', modes: {}, recent: [], q: '', picking: false, fromProject: false, calcOpen: false },
   shutter: { fps: 25, mode: 'speed', speed: 50, angle: 180, mains: 50, projectFps: 25, customFps: false },
   offload: { gb: 1000, reader: 'CFexpress A', drive: 'ssd10', copies: 2, verify: true, customGb: false, fromMedia: false, readOther: false, readMBs: 800, writeOther: false, writeMBs: 1000, readers: 1, port: 'tb', cardGb: 0 },
   sun: { country: 'IL', city: 0, date: new Date().toISOString().slice(0, 10), dateMode: 'today', lat: null, lon: null },
@@ -42,7 +42,7 @@ export const keepHours = () => { try { localStorage.setItem(HOURS_KEY, JSON.stri
 // The lens tool remembers its camera and last lens on this phone, so opening it again picks up where
 // the user left off. Kept in this browser only; losing it just means starting from the project's camera.
 const FOV_KEY = 'camlist.fov';
-const FOV_KEEP = ['cam', 'camBrand', 'res', 'sens', 'modes', 'recent', 'focal', 'distance', 'unit', 'shot', 'fps'];
+const FOV_KEEP = ['cam', 'camBrand', 'res', 'sens', 'modes', 'recent', 'focal', 'distance', 'unit', 'shot', 'fps', 'look'];
 // The cameras used last, newest first — the picker and the viewfinder offer them before anything else.
 export const pushRecent = (id) => { S.fov.recent = [String(id), ...(S.fov.recent || []).map(String).filter(x => x !== String(id))].slice(0, 5); };
 try {

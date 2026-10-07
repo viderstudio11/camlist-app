@@ -1344,3 +1344,40 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 .vfx-at .vfx-attxt { unicode-bidi: plaintext; }
 /* the shells' install button: amber, so it is found */
 .langpill.install-btn { background: var(--accent); color: #16171A; border-color: var(--accent); padding: 0 12px; width: auto; }
+/* lens tool, style A: the lens ring, and the frame card where the tape drives the monitor */
+.card.fov-ringcard { margin-top: 12px; padding: 14px 16px 12px; border-radius: 22px; }
+.fov-read { display: flex; align-items: baseline; justify-content: center; gap: 8px; margin: 2px 0 10px; flex-wrap: wrap; }
+.fov-read b { font-size: 44px; font-weight: 800; line-height: 1; font-variant-numeric: tabular-nums; }
+.fov-read i { font-style: normal; color: var(--muted); font-size: 15px; }
+.fov-ringwrap { position: relative; margin: 0 -16px 12px; }
+.fov-ring { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 16px 50% 10px; scrollbar-width: none; touch-action: pan-x; background: linear-gradient(#26282D, #1C1E22 45%, #26282D); border-block: 1px solid #34363C; -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent); }
+.fov-ring::-webkit-scrollbar { display: none; }
+.fov-rmark { position: relative; flex: 0 0 64px; scroll-snap-align: center; padding: 12px 0 0; border: 0; background: none; color: #8E9097; font: 700 20px/1 var(--mono, ui-monospace, monospace); cursor: pointer; -webkit-user-select: none; user-select: none; }
+.fov-rmark::before { content: ""; position: absolute; top: 0; left: 50%; width: 2px; height: 8px; transform: translateX(-50%); background: #6B6E75; }
+.fov-rmark.on { color: var(--accent); }
+.fov-witness { position: absolute; left: 50%; top: 0; width: 0; height: 0; transform: translateX(-50%); border-left: 8px solid transparent; border-right: 8px solid transparent; border-top: 10px solid var(--accent); pointer-events: none; }
+.card.fov-framecard { margin-top: 12px; padding: 14px 16px; }
+.fov-looks { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.fov-looks .tsub { margin: 0 0 0 4px; margin-inline-end: 4px; }
+.fov-look { min-height: 34px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--border-2); background: transparent; color: var(--text); font: inherit; font-size: 13px; font-weight: 800; cursor: pointer; }
+.fov-look.on { border-color: var(--accent); color: var(--accent); }
+.fov-mon svg { display: block; width: 100%; height: auto; border-radius: 6px; }
+.fov-facts { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; font-size: 13px; color: var(--muted); flex-wrap: wrap; }
+.fov-shot { background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); border-radius: 999px; padding: 3px 10px; font-weight: 800; font-size: 12px; }
+.fov-distin2 { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; }
+.fov-framecard .fov-tapewrap { margin-top: 4px; }
+/* the monitor's dress */
+.fov-monitor .ml-t { fill: #F2F2F2; font: 600 10px var(--mono, ui-monospace, monospace); }
+.fov-monitor .ml-sans { font-family: inherit; font-size: 11px; }
+.fov-monitor .ml-b { font-weight: 800; font-size: 9px; }
+.fov-monitor .ml-sh { paint-order: stroke; stroke: #000; stroke-width: 2.5px; stroke-opacity: .7; }
+.fov-monitor .ml-bar { fill: #181818; fill-opacity: .88; }
+.fov-monitor .ml-black { fill: #000; fill-opacity: .9; }
+.fov-monitor .ml-box { fill: #2A2A2A; }
+.fov-monitor .ml-line { fill: none; stroke: #fff; stroke-opacity: .85; stroke-width: 1; }
+.fov-monitor .ml-dash { stroke-dasharray: 6 4; stroke-opacity: .75; }
+.fov-monitor .ml-corner { fill: none; stroke: #fff; stroke-width: 2; }
+.fov-monitor .ml-stby { fill: #D93025; }
+.fov-monitor .ml-rec { fill: none; stroke: #E0262B; stroke-width: 1.5; }
+.fov-monitor .ml-cross { stroke: #fff; stroke-width: 1.5; }
+.fov-monitor .ml-band { fill: #0B1E33; fill-opacity: .72; }

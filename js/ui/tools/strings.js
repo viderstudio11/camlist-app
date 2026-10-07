@@ -131,6 +131,8 @@ export const L = {
   frame_at: { he: '{mm} מ״מ מ־{d} {u}: פריים {w} × {h} {u}', en: '{mm} mm from {d} {u}: frame {w} × {h} {u}' },
   vf_at: { he: 'מ־{d} {u}: {w} × {h} {u}', en: 'At {d} {u}: {w} × {h} {u}' },
   lens_now: { he: 'עדשה', en: 'Lens' },
+  mon_look: { he: 'מראה מוניטור', en: 'Monitor look' },
+  lens_for_shot: { he: 'איזו עדשה לשוט? לחיצה מסובבת את הטבעת', en: 'Which lens for a shot? Tap to turn the ring' },
   lens_wider: { he: 'עדשה רחבה יותר', en: 'Wider lens' },
   lens_longer: { he: 'עדשה ארוכה יותר', en: 'Longer lens' },
   vf_hold: { he: 'גוללים את החוגה או מחליקים על התמונה. החזקה ארוכה על עדשה מוסיפה אותה להשוואה — עד שלוש, כל אחת בצבע משלה.', en: 'Turn the dial or swipe the picture. Hold a lens to add it to the comparison — up to three, each in its own colour.' },
