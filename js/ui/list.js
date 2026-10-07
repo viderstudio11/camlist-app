@@ -113,7 +113,7 @@ export function render(ctx, { id }, root) {
     kitHTML = `<section class="kit">
       <div class="kit-head">
         ${thumbHTML(active, 'cameras')}
-        <div class="kit-title"><small>${t('base_kit')} · ${t('building_around')}</small><b dir="auto">${esc(displayName(active))}</b><div class="pchips">${profileChips(activeProf, t)}</div><a class="fw-link" href="#/tools/downloads?q=${encodeURIComponent(String(displayName(active)).replace(/\s+(\d+K\s+)?(Digital Motion Picture|Digital Cinema|Mirrorless|Cinema|Full[- ]Frame)?\s*Camera\b.*$/i, '').trim())}">${t('downloads_for_cam')} ›</a></div>
+        <div class="kit-title"><small>${t('base_kit')} · ${t('building_around')}</small><b dir="auto">${esc(displayName(active))}</b><div class="pchips">${profileChips(activeProf, t)}</div></div>
         <button class="iconbtn" data-clear-build aria-label="${t('clear_build')}" title="${t('clear_build')}">×</button>
       </div>
       <div class="slots">${slots.map(s => `

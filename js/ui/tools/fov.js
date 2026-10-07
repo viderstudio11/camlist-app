@@ -7,7 +7,6 @@ import { activeProject } from '../../home.js';
 import { feel } from '../../feel.js';
 import { openViewfinder, rulerStops, phoneCal } from '../viewfinder.js';
 import { S, keepFov, pushRecent, DIST_M, DIST_FT } from './shared.js';
-import { isoLine } from './iso.js';
 
 // A 1.75 m figure drawn once in a 60 × 175 box — one unit to the centimetre — then placed with a
 // transform, so the proportions hold at any size. Seven and a half heads tall.
@@ -64,8 +63,6 @@ function fovTool(T, lang, ctx) {
     .map(p => { const product = ctx.catalog.byId(p.id); return { prof: product ? ctx.compat.profileFor(product) : null, product }; })
     .filter(x => x.product && x.prof)
     .sort((a, b) => (b.prof.year || 0) - (a.prof.year || 0) || a.product.name.localeCompare(b.product.name));
-  // Catalog names carry the maker's marketing tail ('8K Digital Motion Picture Camera'); the model is enough here.
-  const short = (c) => c.product.name.replace(/\s+(\d+K\s+)?(Digital Motion Picture|Digital Cinema|Mirrorless|Cinema|Full[- ]Frame)?\s*Camera\b.*$/i, '').trim() || c.product.name;
   const sensOf = (label, fmt) => {
     const L = String(label || '');
     if (/open gate|\b(3:2|4:3|6:5|1:1|8:9)\b/i.test(L)) return 'OG';
@@ -120,7 +117,7 @@ function fovTool(T, lang, ctx) {
         <div class="model-list fov-modellist">${models.map(rowHTML).join('')}</div>`;
   const pickCard = cam && !s.picking
     ? `<div class="card sh-sec fov-cam" data-part="cam">
-        <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(camFull(cam.product))}</b><p class="tnote">${esc(sensorNote)}</p>${isoLine(cam.prof.id) ? `<p class="tnote fov-iso">${esc(T('iso_base_lbl'))} <b dir="ltr">${esc(isoLine(cam.prof.id))}</b></p>` : ''}<a class="fw-link" href="#/tools/downloads?q=${encodeURIComponent(short(cam))}">${esc(T('dl_for_cam'))} ›</a></div>
+        <div class="fov-cam-row"><span class="fov-cam-ico" aria-hidden="true">${deptIcon('cameras')}</span><div class="fov-cam-txt"><div class="tsub">${esc(T('camera_step'))}${s.fromProject ? ` · ${esc(T('from_project'))}` : ''}</div><b>${esc(camFull(cam.product))}</b><p class="tnote">${esc(sensorNote)}</p></div>
         <button class="btn sm" data-cchange>${esc(T('change'))}</button></div>
         ${modeRow}
       </div>`
