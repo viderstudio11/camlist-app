@@ -9,5 +9,8 @@
     "fetch-logos": "node scripts/fetch-logos.js",
     "logos-index": "node scripts/fetch-logos.js --index-only",
     "serve": "npx --yes serve -l 5173 ."
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2"
   }
 }

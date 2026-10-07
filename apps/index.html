@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16171A">
+<title>CamList — tools as apps</title>
+<link rel="icon" href="../icons/icon-192.png" type="image/png">
+<link rel="stylesheet" href="../css/style.css">
+<style>
+  .apps { display: grid; gap: 10px; margin-top: 14px; }
+  .app { display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border-2); color: var(--text); text-decoration: none; }
+  .app img { width: 52px; height: 52px; border-radius: 12px; flex: 0 0 auto; }
+  .app b { display: block; font-size: 16px; }
+  .app small { color: var(--muted); font-size: 13px; }
+  .how { margin-top: 16px; font-size: 14px; color: var(--muted); line-height: 1.5; }
+</style>
+</head>
+<body>
+<main class="view" style="padding-top: 20px">
+  <h1 data-he="כל כלי כאפליקציה" data-en="Each tool as an app">כל כלי כאפליקציה</h1>
+  <p class="how" data-he="פותחים כלי, ומוסיפים למסך הבית: באייפון שיתוף ← הוסף למסך הבית, באנדרואיד ⋮ ← הוסף למסך הבית / התקן." data-en="Open a tool, then add it to the home screen: iPhone Share → Add to Home Screen; Android ⋮ → Add to Home screen / Install.">פותחים כלי, ומוסיפים למסך הבית: באייפון שיתוף ← הוסף למסך הבית, באנדרואיד ⋮ ← הוסף למסך הבית / התקן.</p>
+  <button class="btn sm" id="lang" style="margin-top:8px">English</button>
+  <div class="apps">
+    <a class="app" href="../lens/"><img src="../lens/icon-192.png" alt=""><span><b>CamList Lens</b><small data-he="בחירת עדשה ועינית חיה" data-en="Lens choice and live viewfinder">בחירת עדשה ועינית חיה</small></span></a>
+    <a class="app" href="sun/"><img src="sun/icon-192.png" alt=""><span><b>CamList Sun</b><small data-he="שקיעה, זריחה ושעת זהב" data-en="Sunset, sunrise and golden hour">שקיעה, זריחה ושעת זהב</small></span></a>
+    <a class="app" href="media/"><img src="media/icon-192.png" alt=""><span><b>CamList Media</b><small data-he="כמה מדיה ליום צילום" data-en="How much media a shoot day needs">כמה מדיה ליום צילום</small></span></a>
+    <a class="app" href="shutter/"><img src="shutter/icon-192.png" alt=""><span><b>CamList Shutter</b><small data-he="פריים רייט ושאטר" data-en="Frame rate and shutter">פריים רייט ושאטר</small></span></a>
+    <a class="app" href="hours/"><img src="hours/icon-192.png" alt=""><span><b>CamList Hours</b><small data-he="דוח שעות ושעות נוספות" data-en="Timesheet and overtime">דוח שעות ושעות נוספות</small></span></a>
+    <a class="app" href="offload/"><img src="offload/icon-192.png" alt=""><span><b>CamList Offload</b><small data-he="כמה זמן לוקחת העתקה" data-en="How long the offload takes">כמה זמן לוקחת העתקה</small></span></a>
+    <a class="app" href="downloads/"><img src="downloads/icon-192.png" alt=""><span><b>CamList Downloads</b><small data-he="עדכוני תוכנה, תוכנות ו־LUT" data-en="Firmware, software and LUTs">עדכוני תוכנה, תוכנות ו־LUT</small></span></a>
+    <a class="app" href="units/"><img src="units/icon-192.png" alt=""><span><b>CamList Units</b><small data-he="המרת מידות" data-en="Unit conversion">המרת מידות</small></span></a>
+  </div>
+</main>
+<script>
+  // light/dark follows the phone; the language button switches the texts
+  document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+  let he = true;
+  document.getElementById('lang').onclick = (e) => {
+    he = !he;
+    document.documentElement.lang = he ? 'he' : 'en'; document.documentElement.dir = he ? 'rtl' : 'ltr';
+    document.querySelectorAll('[data-he]').forEach(x => { x.textContent = he ? x.dataset.he : x.dataset.en; });
+    e.target.textContent = he ? 'English' : 'עברית';
+  };
+</script>
+</body>
+</html>
