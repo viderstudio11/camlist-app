@@ -11,6 +11,11 @@ const PHONE_EQ = 26;
 // Half the angle across the long side of a 4:3 phone sensor: the long side is 4/5 of the diagonal,
 // and a 16:9 video stream crops the short side only, so the long side holds for video too.
 const TAN_HALF_LONG = (43.27 / 2) * 0.8 / PHONE_EQ;
+// Phones differ (about 23–28 mm), so the estimate can be off by ~10%. A calibration against an object of
+// known width at a known distance measures this phone's own angle; it is kept on the phone.
+const CAL_KEY = 'camlist.vfcal';
+export const phoneCal = () => { try { const c = JSON.parse(localStorage.getItem(CAL_KEY) || 'null'); return c && c.tan > 0.2 && c.tan < 1.5 ? c : null; } catch { return null; } };
+const eqOf = (tan) => Math.round(((43.27 / 2) * 0.8 / tan) * 10) / 10;
 
 let open = null;
 
@@ -34,6 +39,8 @@ export async function openViewfinder(o) {
   let idx = Math.max(0, stops.findIndex(s => s.mm >= o.focal));
   if (stops[idx]?.mm !== o.focal && idx > 0 && Math.abs(stops[idx - 1].mm - o.focal) < Math.abs(stops[idx].mm - o.focal)) idx -= 1;
 
+  // this phone's angle: its calibration when there is one, else the 26 mm estimate
+  let TANH = phoneCal()?.tan || TAN_HALF_LONG;
   const el = document.createElement('div');
   // dressed like the chosen camera world's monitor (ARRI bars, Sony corners, RED boxes, Canon band)
   const LOOK = ['arri', 'sony', 'red', 'canon'].includes(o.look) ? o.look : 'arri';
@@ -46,6 +53,7 @@ export async function openViewfinder(o) {
     <div class="vfx-cmp c0" hidden><span></span></div><div class="vfx-cmp c1" hidden><span></span></div><div class="vfx-cmp c2" hidden><span></span></div>
     <div class="vfx-frame"><span class="vfx-mm"></span></div>
     <div class="vfx-centre" aria-hidden="true"></div>
+    <div class="vfx-calbox" aria-hidden="true"></div>
     <div class="vfx-ui">
     <div class="vfx-data" dir="ltr"><span class="vfx-rec">STBY</span><button class="vfx-fps" aria-label="${esc(T('vf_fps'))}"></button><span class="vfx-dfmt"></span><span class="vfx-tc"></span></div>
     <div class="vfx-wide" hidden></div>
@@ -55,6 +63,13 @@ export async function openViewfinder(o) {
       <button class="vfx-thumb" aria-label="${esc(T('vf_share'))}" hidden><img alt=""><i aria-hidden="true" hidden>▶</i></button>
     </div>
     <div class="vfx-msg" role="status" hidden></div>
+    ${o.calibrate ? `<div class="vfx-cal">
+      <p class="vfx-cal-how">${esc(T('vf_cal_how'))}</p>
+      <div class="vfx-cal-row"><label>${esc(T('vf_cal_dist'))}<input type="number" class="vfx-cal-d" value="1" min="0.3" max="20" step="0.01" inputmode="decimal"></label><label>${esc(T('vf_cal_width'))}<input type="number" class="vfx-cal-w" value="29.7" min="5" max="500" step="0.1" inputmode="decimal"></label></div>
+      <div class="vfx-cal-row" dir="ltr"><button class="vfx-cal-step" data-cstep="-1" aria-label="−">−</button><input type="range" class="vfx-cal-s" min="20" max="1000" step="1" value="160" aria-label="${esc(T('vf_cal_width'))}"><button class="vfx-cal-step" data-cstep="1" aria-label="+">+</button></div>
+      <p class="vfx-cal-out"></p>
+      <div class="vfx-cal-row"><button class="vfx-cal-reset">${esc(T('vf_cal_reset'))}</button><button class="vfx-cal-save">${esc(T('vf_cal_save'))}</button></div>
+    </div>` : ''}
     <div class="vfx-keep" role="dialog" aria-label="${esc(T('vf_share'))}" hidden>
       <div class="vfx-keep-media"></div>
       <div class="vfx-keep-acts"><button class="vfx-save">${esc(T('vf_save'))}</button><button class="vfx-send">${esc(T('vf_send'))}</button></div>
@@ -147,7 +162,7 @@ export async function openViewfinder(o) {
   const sizeOf = (mm) => {
     const vw = video.videoWidth, vh = video.videoHeight;
     if (!vw || !vh) return null;
-    const tanPerVideoPx = TAN_HALF_LONG / (Math.max(vw, vh) / 2);
+    const tanPerVideoPx = TANH / (Math.max(vw, vh) / 2);
     const scale = Math.max(el.clientWidth / vw, el.clientHeight / vh);
     return { w: ((area.w / (2 * mm)) / tanPerVideoPx) * 2 * scale, h: ((area.h / (2 * mm)) / tanPerVideoPx) * 2 * scale };
   };
@@ -192,7 +207,7 @@ export async function openViewfinder(o) {
     const tooWide = rot ? (fw > SH * 1.02 || fh > SW * 1.02) : (fw > SW * 1.02 || fh > SH * 1.02);
     // Upright, a phone sees far less across than along; sideways it may well hold this lens.
     const short = Math.min(vw, vh) / Math.max(vw, vh);
-    const fitsSideways = !rot && SH > SW && area.w / (2 * mm) <= TAN_HALF_LONG && area.h / (2 * mm) <= TAN_HALF_LONG * short;
+    const fitsSideways = !rot && SH > SW && area.w / (2 * mm) <= TANH && area.h / (2 * mm) <= TANH * short;
     wide.textContent = T(fitsSideways ? 'vf_rotate' : 'vf_wider');
     wide.hidden = !tooWide;
     frame.classList.toggle('over', tooWide);
@@ -288,7 +303,7 @@ export async function openViewfinder(o) {
     if (!vw || !vh) return false;
     const mm = stops[idx].mm;
     const rot = el.classList.contains('vfx-rot');
-    const per = TAN_HALF_LONG / (Math.max(vw, vh) / 2);
+    const per = TANH / (Math.max(vw, vh) / 2);
     const fw = ((area.w / (2 * mm)) / per) * 2, fh = ((area.h / (2 * mm)) / per) * 2;
     const ar = area.w / area.h;
     const OW = ar >= 1 ? long : Math.round(long * ar), OH = ar >= 1 ? Math.round(long / ar) : long;
@@ -439,6 +454,42 @@ export async function openViewfinder(o) {
     loopId = requestAnimationFrame(loop);
   };
   loopId = requestAnimationFrame(loop);
+
+  // ---- Calibration: match a box to an object of known width at a known distance ----
+  if (o.calibrate) {
+    el.classList.add('vfx-calmode');
+    const box = el.querySelector('.vfx-calbox'), slider = el.querySelector('.vfx-cal-s');
+    const dIn = el.querySelector('.vfx-cal-d'), wIn = el.querySelector('.vfx-cal-w'), out = el.querySelector('.vfx-cal-out');
+    slider.max = String(Math.round(Math.max(el.clientWidth, el.clientHeight)));
+    let measured = null, started = false;
+    const calc = () => {
+      const px = Number(slider.value), D = Number(dIn.value), Wcm = Number(wIn.value);
+      box.style.width = `${px}px`; box.style.height = `${Math.round(px * 0.707)}px`;   // an A4 sheet's shape
+      const vw = video.videoWidth, vh = video.videoHeight;
+      if (!vw || !vh || !(D > 0) || !(Wcm > 0)) { out.textContent = ''; measured = null; return; }
+      const scale = Math.max(el.clientWidth / vw, el.clientHeight / vh);
+      // the box starts where the current angle says the object should be; the user fine-tunes from there
+      if (!started) { started = true; slider.value = String(Math.round(((Wcm / 100 / D) / (TANH / (Math.max(vw, vh) / 2))) * scale)); return calc(); }
+      // the object's angle over the box's width in video pixels gives the angle per pixel, hence the long side's
+      const tanPerVideoPx = (Wcm / 100 / D) / (px / scale);
+      measured = tanPerVideoPx * (Math.max(vw, vh) / 2);
+      const diff = Math.round((TAN_HALF_LONG / measured - 1) * 100);
+      out.textContent = T('vf_cal_result').replace('{eq}', eqOf(measured)).replace('{diff}', `${diff > 0 ? '+' : ''}${diff}%`);
+    };
+    [slider, dIn, wIn].forEach(x => x.addEventListener('input', calc));
+    el.querySelectorAll('[data-cstep]').forEach(b => b.addEventListener('click', () => { slider.value = String(Number(slider.value) + Number(b.dataset.cstep)); calc(); feel.detent(); }));
+    video.addEventListener('loadedmetadata', calc);
+    el.querySelector('.vfx-cal-save').addEventListener('click', () => {
+      if (!measured) return;
+      try { localStorage.setItem(CAL_KEY, JSON.stringify({ tan: measured, eq: eqOf(measured), at: new Date().toISOString().slice(0, 10) })); } catch { /* private window */ }
+      TANH = measured; el.classList.remove('vfx-calmode'); el.querySelector('.vfx-cal')?.remove(); feel.settle(); draw(); say('vf_cal_saved');
+    });
+    el.querySelector('.vfx-cal-reset').addEventListener('click', () => {
+      try { localStorage.removeItem(CAL_KEY); } catch { /* ignore */ }
+      TANH = TAN_HALF_LONG; el.classList.remove('vfx-calmode'); el.querySelector('.vfx-cal')?.remove(); draw();
+    });
+    calc();
+  }
 
   const onResize = () => { draw(); centreOn(idx, false); curve(); };
   video.addEventListener('loadedmetadata', onResize);

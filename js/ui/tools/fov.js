@@ -5,7 +5,7 @@ import { PRIME_SET, SHOTS, lensFor, frameAt, pickLens, toUnit, fromUnit } from '
 import { num } from '../../format.js';
 import { activeProject } from '../../home.js';
 import { feel } from '../../feel.js';
-import { openViewfinder, rulerStops } from '../viewfinder.js';
+import { openViewfinder, rulerStops, phoneCal } from '../viewfinder.js';
 import { S, keepFov, pushRecent, DIST_M, DIST_FT } from './shared.js';
 
 // A 1.75 m figure drawn once in a 60 × 175 box — one unit to the centimetre — then placed with a
@@ -233,6 +233,7 @@ function fovTool(T, lang, ctx) {
     <div class="fov-ringwrap"><div class="fov-ring" dir="ltr" data-ring data-vals="${stops.map(x => x.mm).join(',')}" role="slider" aria-label="${esc(T('vf_ruler'))}" aria-valuetext="${shown} mm">${stops.map((x, i) => `<button class="fov-rmark" data-ri="${i}" tabindex="-1">${x.mm}</button>`).join('')}</div><i class="fov-witness" aria-hidden="true"></i></div>
     <button class="btn primary fov-open" data-vf-start>${toolIcon('fov')}${esc(T('vf_start'))}</button>
     <p class="tnote">${esc(Tp('vf_hint', { cam: camFull(cam.product) }))}</p>
+    <div class="fov-cal"><span>${esc(phoneCal() ? Tp('vf_cal_ok', { eq: phoneCal().eq }) : T('vf_cal_none'))}</span><button class="btn sm" data-vf-cal>${esc(T('vf_cal_btn'))}</button></div>
   </div>`;
 
   // 2. Distance and frame: drag the tape and the monitor, the shot and the frame size follow live.
@@ -302,6 +303,11 @@ export function bind(root, ctx, { T, lang, rewire }) {
     fresh.querySelectorAll('[data-cbrand]').forEach(b => { b.onclick = () => { Object.assign(S.fov, { camBrand: b.dataset.cbrand, picking: true }); ctx.render(); }; });
   };
   root.querySelectorAll('[data-unit]').forEach(b => { b.onclick = () => { S.fov.unit = b.dataset.unit; ctx.render(); }; });
+  root.querySelector('[data-vf-cal]')?.addEventListener('click', async () => {
+    if (!fovView) return;
+    const ok = await openViewfinder({ ...fovView, T, calibrate: true, onClose: () => ctx.render() });
+    if (ok && ok !== true) toast(T(ok === 'unsupported' ? 'vf_err_inapp' : ok === 'nocamera' ? 'vf_err_nocam' : 'vf_denied'), { kind: 'err', ms: 9000 });
+  });
   root.querySelector('[data-vf-start]')?.addEventListener('click', async () => {
     if (!fovView) return;
     const ok = await openViewfinder({ ...fovView, T, onClose: (mm) => { S.fov.focal = mm; ctx.render(); } });
