@@ -1454,3 +1454,32 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 .toolrow { grid-template-columns: repeat(3, 1fr); }
 .tr-t { padding: 12px 4px 10px; }
 .tr-n { font-size: 12px; }
+/* ---------- base ISO ---------- */
+.card.iso-card { text-align: center; display: grid; gap: 6px; }
+.iso-name { font-weight: 800; font-size: 16px; }
+.iso-big { display: flex; justify-content: center; align-items: baseline; gap: 14px; }
+.iso-big b { font-size: 46px; font-weight: 800; font-variant-numeric: tabular-nums; line-height: 1.05; }
+.iso-big i { font-style: normal; color: var(--muted); font-size: 22px; }
+.iso-lbls { display: flex; justify-content: center; gap: 24px; font-size: 12px; color: var(--muted); }
+.iso-meta { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-top: 4px; }
+.iso-meta span { background: var(--surface-2); border-radius: 999px; padding: 3px 10px; font-size: 12px; font-weight: 700; }
+.iso-pend { color: var(--muted); margin: 10px 0; }
+.iso-scale { display: block; width: 100%; height: auto; }
+.iso-axis { stroke: var(--border-2); stroke-width: 2; }
+.iso-tick { stroke: var(--muted); }
+.iso-num { fill: var(--muted); font-size: 10px; }
+.iso-base { fill: var(--accent); }
+.iso-basetxt { fill: var(--accent); font-size: 12px; font-weight: 800; }
+.iso-you { fill: var(--text); }
+.iso-range { width: 100%; accent-color: var(--accent); }
+.iso-verdict { padding: 10px 12px; border-radius: 12px; border: 1px solid color-mix(in srgb, var(--accent) 50%, transparent); background: color-mix(in srgb, var(--accent) 9%, transparent); font-size: 14px; }
+.iso-src a { color: var(--accent); }
+.iso-cmpbtn { justify-self: center; margin-top: 6px; }
+.iso-cmprow { display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--hair, rgba(0,0,0,.08)); text-align: start; }
+.iso-chips { display: flex; gap: 4px; }
+.iso-chips i { font-style: normal; background: color-mix(in srgb, var(--accent) 18%, transparent); color: var(--accent); border-radius: 8px; padding: 3px 8px; font-weight: 800; font-variant-numeric: tabular-nums; font-size: 13px; }
+.iso-chips i.pend { background: var(--surface-2); color: var(--muted); }
+.iso-x { border: 0; background: none; color: var(--muted); font-size: 15px; cursor: pointer; }
+.iso-meet { margin: 10px 0; font-weight: 800; color: var(--accent); }
+.iso-add { width: 100%; min-height: 44px; border-radius: 12px; border: 1px solid var(--border-2); background: var(--surface-2); color: var(--text); font: inherit; padding: 0 10px; }
+.fov-iso b { color: var(--text); }

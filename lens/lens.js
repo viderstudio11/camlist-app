@@ -50,7 +50,9 @@ Promise.all([
   loadCatalog('../data/catalog.json'),
   loadCompat('../data/compat.json'),
   fetch('../data/extra.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).catch(() => null),
-]).then(([data, compatData, extra]) => {
+  fetch('../data/iso.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).catch(() => null),
+]).then(([data, compatData, extra, isoData]) => {
+  if (isoData) Tools.setIso(isoData);
   catalog = createCatalog(data, [], extra);
   compat = createCompat(compatData, catalog);
   render();

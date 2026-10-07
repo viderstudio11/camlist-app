@@ -55,6 +55,7 @@ const json = (file) => fetch(new URL(`../data/${file}`, import.meta.url), { cach
 const NEEDS = {
   media: () => json('codecs.json').then(d => { if (d) Tools.setCodecs(d); }),
   sun: () => json('places.json').then(d => { if (d) Tools.setPlaces(d); }),
+  iso: () => Promise.all([json('iso.json'), cameras()]).then(([d]) => { if (d) Tools.setIso(d); }),
   downloads: () => Promise.all([json('downloads.json'), json('downloads-watch.json'), json('luts.json'), cameras()])
     .then(([d, w, l]) => { if (d) Tools.setDownloads(d); if (w) Tools.setWatch(w); if (l) Tools.setLuts(l); }),
 };

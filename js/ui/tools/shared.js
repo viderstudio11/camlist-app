@@ -13,12 +13,15 @@ export const D = {
   places: { countries: [], defaultCountry: 'IL' },
   // a query carried by the route (#/tools/downloads?q=…), read once by the tool it opens
   route: new URLSearchParams(''),
+  // base ISO per camera (data/iso.json)
+  iso: { cameras: {} },
 };
 export const setCodecs = (data) => { D.media = createMedia(data); };
 export const setLuts = (data) => { D.lut = data || D.lut; };
 export const setDownloads = (data) => { D.dl = data || D.dl; };
 export const setWatch = (data) => { D.watch = data || D.watch; };
 export const setPlaces = (data) => { D.places = data || D.places; };
+export const setIso = (data) => { D.iso = data || D.iso; };
 export const isNew = (url) => { const d = D.watch.pages?.[url]?.changed; return !!d && (Date.now() - new Date(d).getTime()) < 21 * 864e5; };
 // Everything the user typed, kept while the app is open so switching tools does not reset the work.
 export const S = {

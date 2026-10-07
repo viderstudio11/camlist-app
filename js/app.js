@@ -216,7 +216,7 @@ function renderSettings(ctx, _p, root) {
 async function boot() {
   fetch('logos/index.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).then(idx => { if (idx) { setLogoIndex(idx); render(); } }).catch(() => {});
   try {
-    const [data, cdata, xdata, rdata, pdata, kdata, ldata, ddata, wdata, gdata] = await Promise.all([
+    const [data, cdata, xdata, rdata, pdata, kdata, ldata, ddata, wdata, gdata, idata] = await Promise.all([
       loadCatalog(),
       loadCompat().catch(() => compatData),
       fetch('data/extra.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).catch(() => null),
@@ -227,6 +227,7 @@ async function boot() {
       fetch('data/downloads.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).catch(() => null),
       fetch('data/downloads-watch.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).catch(() => null),
       fetch('data/places.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).catch(() => null),
+      fetch('data/iso.json', { cache: 'no-cache' }).then(r => (r.ok ? r.json() : null)).catch(() => null),
     ]);
     recency = createRecency(rdata || {});
     extraData = xdata;
@@ -240,6 +241,7 @@ async function boot() {
     if (ddata) Tools.setDownloads(ddata);
     if (wdata) Tools.setWatch(wdata);
     if (gdata) Tools.setPlaces(gdata);
+    if (idata) Tools.setIso(idata);
     catalogError = null;
   } catch (e) { catalogError = e; }
   render();
