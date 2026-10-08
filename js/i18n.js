@@ -3,7 +3,7 @@ export const DEPT_EMOJI = { cameras: '📷', lenses: '🔭', video: '📺', moni
 
 export const dict = {
   he: {
-    app_name: 'Cam2List', projects: 'פרויקטים', new_project: 'פרויקט חדש', no_projects: 'אין עדיין פרויקטים',
+    app_name: 'Vid2List', projects: 'פרויקטים', new_project: 'פרויקט חדש', no_projects: 'אין עדיין פרויקטים',
     no_projects_hint: 'צור פרויקט ראשון והתחל לבנות רשימת ציוד', project_name: 'שם ההפקה', tech_manager: 'עוזר צלם',
     date_from: 'מתאריך', date_to: 'עד תאריך', notes: 'הערות', save: 'שמור', cancel: 'ביטול', delete: 'מחק', duplicate: 'שכפל',
     rename: 'ערוך פרטים', confirm_delete_project: 'למחוק את הפרויקט "{name}"? הפעולה אינה הפיכה.',
@@ -40,7 +40,7 @@ export const dict = {
     clear_filters: 'נקה סינון', results_count: '{n} תוצאות', no_reader_at_utopia: 'אין בקטלוג קורא כרטיסים ל-{fam}', no_reader_hint: 'הוסף אותו כפריט ידני (מספק אחר / ציוד משלך):', no_reader_short: 'אין קורא ל-{fam} בקטלוג', brand_at_utopia: 'יצרן קיים באוטופיה', not_at_utopia: 'יצרן לא באוטופיה', mount: 'מאונט', sensor: 'חיישן', media: 'מדיה', battery: 'סוללה', fmt_FF: 'Full Frame', fmt_S35: 'Super 35', fmt_MFT: 'MFT', fmt_MF: 'מדיום פורמט', 'fmt_2/3': '2/3"', fmt_1in: '1"', fmt_16: '16mm', fmt_action: 'אקשן',
   },
   en: {
-    app_name: 'Cam2List', projects: 'Projects', new_project: 'New project', no_projects: 'No projects yet',
+    app_name: 'Vid2List', projects: 'Projects', new_project: 'New project', no_projects: 'No projects yet',
     no_projects_hint: 'Create your first project and start building a gear list', project_name: 'Production name', tech_manager: '1st AC',
     date_from: 'From', date_to: 'To', notes: 'Notes', save: 'Save', cancel: 'Cancel', delete: 'Delete', duplicate: 'Duplicate',
     rename: 'Edit details', confirm_delete_project: 'Delete project "{name}"? This cannot be undone.',

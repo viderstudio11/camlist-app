@@ -97,7 +97,7 @@ export function render(ctx, _params, root) {
   const projects = store.state.projects;
   const lang = ctx.lang();
   const locale = lang === 'he' ? 'he-IL' : 'en-GB';
-  ctx.setTopbar({ title: `<span class="brandmark">CAM<b>2</b>LIST</span>`, right: [{ icon: icons.gear, onClick: () => ctx.navigate('#/settings'), label: t('settings') }] });
+  ctx.setTopbar({ title: `<span class="brandmark">VID<b>2</b>LIST</span>`, right: [{ icon: icons.gear, onClick: () => ctx.navigate('#/settings'), label: t('settings') }] });
 
   const active = activeProject(projects);
   let hero = '';

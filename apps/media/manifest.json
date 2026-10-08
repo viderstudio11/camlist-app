@@ -1,6 +1,6 @@
 {
-  "name": "Cam2List Media — Media",
-  "short_name": "Cam2List Media",
+  "name": "Vid2List Media — Media",
+  "short_name": "Vid2List Media",
   "description": "How many cards a shoot day needs",
   "start_url": "./index.html",
   "scope": "./",

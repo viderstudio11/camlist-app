@@ -1,6 +1,6 @@
 {
-  "name": "Cam2List ISO — Base ISO",
-  "short_name": "Cam2List ISO",
+  "name": "Vid2List ISO — Base ISO",
+  "short_name": "Vid2List ISO",
   "description": "Each camera's base ISO, from the maker",
   "start_url": "./index.html",
   "scope": "./",

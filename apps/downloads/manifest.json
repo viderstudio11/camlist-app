@@ -1,6 +1,6 @@
 {
-  "name": "Cam2List Downloads — Downloads",
-  "short_name": "Cam2List Downloads",
+  "name": "Vid2List Downloads — Downloads",
+  "short_name": "Vid2List Downloads",
   "description": "Firmware, LUTs and software — from the makers",
   "start_url": "./index.html",
   "scope": "./",

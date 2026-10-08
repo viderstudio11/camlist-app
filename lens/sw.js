@@ -1,4 +1,4 @@
-// Cam2List Lens works offline after the first visit: every same-origin file is fetched fresh when the
+// Vid2List Lens works offline after the first visit: every same-origin file is fetched fresh when the
 // network is there and kept, and served from the cache when it is not (on set, signal comes and goes).
 const VERSION = 'lens-v1';
 self.addEventListener('install', () => self.skipWaiting());

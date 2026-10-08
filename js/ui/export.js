@@ -34,7 +34,7 @@ function docPreview(p, groups, t, sheet) {
     <div class="dp-title"><bdi>${esc(p.name || t('untitled'))}</bdi></div>
     ${meta.length ? `<div class="dp-meta">${meta.join('  ·  ')}</div>` : ''}
     ${rows}
-    <div class="dp-foot">Cam2List</div>
+    <div class="dp-foot">Vid2List</div>
   </div>`;
 }
 

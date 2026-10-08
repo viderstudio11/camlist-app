@@ -1,6 +1,6 @@
 {
-  "name": "Cam2List Units — Unit conversion",
-  "short_name": "Cam2List Units",
+  "name": "Vid2List Units — Unit conversion",
+  "short_name": "Vid2List Units",
   "description": "Metric and imperial, data, batteries",
   "start_url": "./index.html",
   "scope": "./",

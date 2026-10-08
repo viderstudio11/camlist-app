@@ -1,6 +1,6 @@
 {
-  "name": "Cam2List Shutter — Frame rate & shutter",
-  "short_name": "Cam2List Shutter",
+  "name": "Vid2List Shutter — Frame rate & shutter",
+  "short_name": "Vid2List Shutter",
   "description": "Shutter angle, speed and flicker",
   "start_url": "./index.html",
   "scope": "./",

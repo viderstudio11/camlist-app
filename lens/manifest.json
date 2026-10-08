@@ -1,6 +1,6 @@
 {
-  "name": "Cam2List Lens — lens choice and live viewfinder",
-  "short_name": "Cam2List Lens",
+  "name": "Vid2List Lens — lens choice and live viewfinder",
+  "short_name": "Vid2List Lens",
   "description": "Which lens frames the shot: a live viewfinder on your phone for any cine camera and recording format",
   "start_url": "./index.html",
   "scope": "./",

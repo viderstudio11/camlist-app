@@ -348,12 +348,12 @@ export async function openViewfinder(o) {
     const recTxt = live && rec ? `● REC ${recClock()}` : '';
     row(bh / 2, [[recTxt, '#ff4d4d'], [fps.toFixed(2)], [fmtLabel()], [`TC ${tcNow()}`]]);
     row(OH - bh / 2, [[cam.name], [`${mm}mm`], [`${degOf(mm)}°`], [o.distance && o.frameSize ? `@${o.distance} ${o.frameSize(mm, area)}` : '']]);
-    g.textAlign = 'right'; g.fillStyle = '#F2A33A'; g.fillText('Cam2List', OW - bh * 0.45, OH - bh / 2); g.textAlign = 'left';
+    g.textAlign = 'right'; g.fillStyle = '#F2A33A'; g.fillText('Vid2List', OW - bh * 0.45, OH - bh / 2); g.textAlign = 'left';
     return true;
   };
   const posterOf = (cv) => { const p = document.createElement('canvas'); const k = 160 / Math.max(cv.width, cv.height); p.width = Math.round(cv.width * k); p.height = Math.round(cv.height * k); p.getContext('2d').drawImage(cv, 0, 0, p.width, p.height); return p.toDataURL('image/jpeg', 0.7); };
   const stamp = () => { const d = new Date(); return `${d.getFullYear()}${pad(d.getMonth() + 1)}${pad(d.getDate())}-${pad(d.getHours())}${pad(d.getMinutes())}${pad(d.getSeconds())}`; };
-  const fileBase = () => `Cam2List_${cam.name.replace(/[^A-Za-z0-9.-]+/g, '-')}_${stops[idx].mm}mm_${stamp()}`;
+  const fileBase = () => `Vid2List_${cam.name.replace(/[^A-Za-z0-9.-]+/g, '-')}_${stops[idx].mm}mm_${stamp()}`;
   const thumb = el.querySelector('.vfx-thumb');
   const msg = el.querySelector('.vfx-msg');
   let msgT = 0;

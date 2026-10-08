@@ -1,6 +1,6 @@
 {
-  "name": "Cam2List Offload — Offload time",
-  "short_name": "Cam2List Offload",
+  "name": "Vid2List Offload — Offload time",
+  "short_name": "Vid2List Offload",
   "description": "How long the dump takes at wrap",
   "start_url": "./index.html",
   "scope": "./",

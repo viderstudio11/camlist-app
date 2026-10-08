@@ -43,7 +43,7 @@ test('hebrew share text snapshot', () => {
     '*אחר*',
     '• 1 × Shogun 7',
     '',
-    'Cam2List · 17.09.2026',
+    'Vid2List · 17.09.2026',
   ].join('\n'));
 });
 
@@ -53,7 +53,7 @@ test('english, no notes, with links', () => {
   assert.ok(txt.includes('• 2 × Sony FX6\n   https://u/fx6'));
   assert.ok(!txt.includes('Cam A+B'));
   assert.ok(!txt.includes('יחידה 2'));
-  assert.ok(txt.endsWith('Cam2List · 17.09.2026'));
+  assert.ok(txt.endsWith('Vid2List · 17.09.2026'));
   assert.ok(!/items|Total/.test(txt), 'no counts beyond each item’s quantity');
 });
 
