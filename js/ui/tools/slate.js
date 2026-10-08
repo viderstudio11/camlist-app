@@ -4,12 +4,13 @@
 import { esc } from '../dom.js';
 import { feel } from '../../feel.js';
 import { more } from './shared.js';
+import { parseTc, formatTc, runFrom } from '../../tools/timecode.js';
 
 const FPS = [23.976, 24, 25, 29.97, 30, 48, 50, 60];
 const ZONES = ['local', 'UTC', 'Europe/London', 'Europe/Paris', 'Asia/Jerusalem', 'America/New_York', 'America/Los_Angeles', 'Asia/Tokyo', 'Australia/Sydney'];
 const KEY = 'camlist.slate';
 const S = (() => {
-  const base = { fps: 25, scene: 1, take: 1, roll: 'A001', off: 0, zone: 'local', sound: 'clap', corr: 0 };
+  const base = { fps: 25, scene: 1, take: 1, roll: 'A001', off: 0, zone: 'local', sound: 'clap', corr: 0, src: 'tod', jam: null };
   try { return { ...base, ...JSON.parse(localStorage.getItem(KEY) || '{}') }; } catch { return base; }
 })();
 const keep = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch { /* private window */ } };
@@ -33,6 +34,8 @@ const shiftFor = (now) => {
 // Time-of-day timecode: the phone's clock (corrected by the clock check), moved to the chosen zone and
 // nudged by whole frames. 29.97 is shown with the drop-frame mark, as time-of-day timecode is.
 export const timecode = (now = Date.now()) => {
+  // Jammed by hand: runs on from the typed value at the moment it was set, at the chosen frame rate.
+  if (S.src === 'jam' && S.jam && S.jam.fps === S.fps) return formatTc(runFrom(S.jam.start, S.jam.at, now, S.fps) + S.off, S.fps);
   const base = Math.round(S.fps);
   const ms = now + S.corr + (S.off * 1000) / S.fps - new Date(now).getTimezoneOffset() * 60000 + shiftFor(now);
   const day = ((ms % 86400000) + 86400000) % 86400000;
@@ -99,7 +102,10 @@ function slateTool(T, lang) {
        ${Math.abs(check.offsetMs) > check.plusMinusMs ? `<button class="btn sm" data-sl-apply>${esc(T('sl_apply'))}</button>` : ''}`;
   return `<div class="card sl-card">
       <div class="sl-tc" data-sl-tc dir="ltr">${timecode()}</div>
-      <div class="sl-meta"><span>${esc(zoneName(S.zone))}</span><span>${S.fps} fps</span>${S.corr ? `<span>${esc(T('sl_corrected'))}</span>` : ''}</div>
+      <div class="chips sl-src"><button class="chip pick ${S.src !== 'jam' ? 'on' : ''}" data-sl-src="tod">${esc(T('sl_src_tod'))}</button><button class="chip pick ${S.src === 'jam' ? 'on' : ''}" data-sl-src="jam">${esc(T('sl_src_jam'))}</button></div>
+      ${S.src === 'jam' ? `<div class="sl-jam"><input class="sl-jam-in" data-sl-jam-in dir="ltr" inputmode="numeric" autocomplete="off" value="${esc(timecode())}" aria-label="${esc(T('sl_src_jam'))}"><button class="btn sm primary" data-sl-jam>${esc(T('sl_jam_btn'))}</button></div>
+      <p class="tnote" data-sl-jam-note>${esc(T(S.jam ? 'sl_jam_running' : 'sl_jam_hint'))}</p>` : ''}
+      <div class="sl-meta"><span>${esc(S.src === 'jam' ? T('sl_src_jam') : zoneName(S.zone))}</span><span>${S.fps} fps</span>${S.corr && S.src !== 'jam' ? `<span>${esc(T('sl_corrected'))}</span>` : ''}</div>
       <div class="chips sl-fps">${FPS.map(f => `<button class="chip pick ${f === S.fps ? 'on' : ''}" data-sl-fps="${f}">${f}</button>`).join('')}</div>
       <div class="sl-board">${field('scene', S.scene, true)}${field('take', S.take, true)}${field('roll', S.roll, false)}</div>
       <button class="btn primary sl-clap" data-sl-clap>${esc(T('sl_clap'))}</button>
@@ -182,7 +188,7 @@ export function bind(root, ctx, { T }) {
   const loop = () => { if (!tcEl.isConnected) return; tcEl.textContent = timecode(); raf = requestAnimationFrame(loop); };
   if (tcEl) { cancelAnimationFrame(raf); loop(); }
   const redraw = () => { keep(); ctx.render(); };
-  root.querySelectorAll('[data-sl-fps]').forEach(b => { b.onclick = () => { S.fps = Number(b.dataset.slFps); feel.detent(); redraw(); }; });
+  root.querySelectorAll('[data-sl-fps]').forEach(b => { b.onclick = () => { S.fps = Number(b.dataset.slFps); S.jam = null; feel.detent(); redraw(); }; });   // a jam belongs to its frame rate
   root.querySelectorAll('[data-sl]').forEach(b => { b.onclick = () => {
     const k = b.dataset.sl, d = Number(b.dataset.d);
     if (k === 'off') S.off += d; else S[k] = Math.max(1, S[k] + d);
@@ -196,6 +202,20 @@ export function bind(root, ctx, { T }) {
     setTimeout(() => { S.take += 1; redraw(); }, 450);
   });
   root.querySelector('[data-sl-full]')?.addEventListener('click', () => openFull(T, () => ctx.render()));
+  root.querySelectorAll('[data-sl-src]').forEach(b => { b.onclick = () => { S.src = b.dataset.slSrc; feel.detent(); redraw(); }; });
+  // Jam: the typed value starts running the moment the button is pressed — press it as the source ticks over.
+  const jamIn = root.querySelector('[data-sl-jam-in]');
+  if (jamIn) {
+    jamIn.onfocus = () => jamIn.select();
+    const jam = () => {
+      const start = parseTc(jamIn.value, S.fps);
+      if (start == null) { jamIn.classList.add('bad'); root.querySelector('[data-sl-jam-note]').textContent = T('sl_jam_bad'); return; }
+      S.jam = { start, at: Date.now(), fps: S.fps }; S.off = 0; feel.clap(); redraw();
+    };
+    root.querySelector('[data-sl-jam]').onclick = jam;
+    jamIn.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); jam(); } };
+    jamIn.oninput = () => jamIn.classList.remove('bad');
+  }
   root.querySelectorAll('[data-sl-sound]').forEach(b => { b.onclick = () => { S.sound = b.dataset.slSound; clapSound(); redraw(); }; });
   root.querySelector('[data-sl-zone]')?.addEventListener('change', (e) => { S.zone = e.target.value; zoneAt = 0; redraw(); });
   root.querySelector('[data-sl-check]')?.addEventListener('click', async (e) => {

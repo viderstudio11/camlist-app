@@ -1553,3 +1553,10 @@ button.pst:active { transform: scale(.97); }
 :root[data-skin="clean"] .buildbtn.active { background: var(--accent); color: var(--on-accent); }
 :root[data-skin="clean"] .kit { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }
 :root[data-skin="clean"] .slot-check { border-radius: 50%; }
+
+/* Slate: time of day or a hand jam */
+.sl-src { justify-content: center; margin: 10px 0 4px; }
+.sl-jam { display: flex; gap: 8px; margin: 6px 0 2px; }
+.sl-jam-in { flex: 1; min-width: 0; font-family: var(--mono); font-weight: 600; font-size: 20px; letter-spacing: .04em; text-align: center;
+  padding: 8px 10px; border-radius: 11px; border: var(--stroke) solid var(--line-2); background: var(--surface-2); }
+.sl-jam-in.bad { border-color: var(--no); }
