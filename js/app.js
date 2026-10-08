@@ -67,9 +67,9 @@ function renderSkins(ctx, _p, root) {
   root.innerHTML = GROUPS.map(g => {
     const list = SKINS.filter(s => s.group === g.id);
     if (!list.length) return '';
-    return `<div class="skin-group">${esc(getLang() === 'he' ? g.he : g.en)}</div><div class="skin-list">${list.map(s => `<button class="skin-opt ${ctx.skin() === s.id ? 'on' : ''}" data-skin="${esc(s.id)}"><span class="skin-swatch">${s.swatch.map(c => `<i style="background:${esc(c)}"></i>`).join('')}</span><span class="skin-main"><b>${esc(getLang() === 'he' ? s.he : s.en)}</b><small>${esc(getLang() === 'he' ? s.descHe : s.descEn)}</small></span><span class="skin-check">${ctx.skin() === s.id ? '\u2713' : ''}</span></button>`).join('')}</div>`;
+    return `<div class="skin-group">${esc(getLang() === 'he' ? g.he : g.en)}</div><div class="skin-list">${list.map(s => `<button class="skin-opt ${ctx.skin() === s.id ? 'on' : ''}" data-skin-id="${esc(s.id)}"><span class="skin-swatch">${s.swatch.map(c => `<i style="background:${esc(c)}"></i>`).join('')}</span><span class="skin-main"><b>${esc(getLang() === 'he' ? s.he : s.en)}</b><small>${esc(getLang() === 'he' ? s.descHe : s.descEn)}</small></span><span class="skin-check">${ctx.skin() === s.id ? '\u2713' : ''}</span></button>`).join('')}</div>`;
   }).join('');
-  root.querySelectorAll('[data-skin]').forEach(b => { b.onclick = () => ctx.setSkin(b.dataset.skin); });
+  root.querySelectorAll('[data-skin-id]').forEach(b => { b.onclick = () => ctx.setSkin(b.dataset.skinId); });
 }
 
 function applySkin() {
@@ -160,8 +160,6 @@ window.addEventListener('resize', () => {
   resizeTimer = setTimeout(() => { if (isSplitRoute(location.hash || '#/', window.innerWidth) !== !!ctx.split) render(); }, 150);
 });
 
-const BUILD_DATE = '28.09.2026';
-
 function renderSettings(ctx, _p, root) {
   ctx.setTopbar({ title: t('settings'), back: '#/' });
   const s = store.state.settings;
@@ -172,7 +170,7 @@ function renderSettings(ctx, _p, root) {
       <label>${t('default_tech_manager')}<input name="techManager" value="${esc(s.techManager)}" autocomplete="off"></label>
     </div>
     <div class="section-title">${t('appearance')}</div>
-    <div class="card"><button class="kv linkrow" data-open-skins><span>${t('design')}</span><b>${esc(getLang() === 'he' ? skin(ctx.skin()).he : skin(ctx.skin()).en)} \u203A</b></button>
+    <div class="card"><button class="kv linkrow" data-open-skins><span>${t('design')}</span><b>${esc(getLang() === 'he' ? skin(ctx.skin()).he : skin(ctx.skin()).en)} <span class="arr">\u203A</span></b></button>
       <label class="kv cbar-toggle set-toggle"><span>${t('sounds')}<small>${t('sounds_hint')}</small></span><input type="checkbox" data-sounds ${s.sounds ? 'checked' : ''}></label>
       <div class="kv set-toggle"><span>${t('vib_test')}<small>${t('vib_test_hint')}</small></span><button class="btn sm" data-vibtest>${t('vib_test_btn')}</button></div></div>
     <div class="section-title">${t('backup')}</div>
@@ -182,14 +180,13 @@ function renderSettings(ctx, _p, root) {
       <input type="file" accept="application/json,.json" hidden data-file>
     </div>
     <div class="section-title">${t('versions_past')}</div>
-    <div class="card"><a class="kv linkrow" href="v/" target="_blank" rel="noopener"><span>${t('versions_past_hint')}</span><b>›</b></a></div>
+    <div class="card"><a class="kv linkrow" href="v/" target="_blank" rel="noopener"><span>${t('versions_past_hint')}</span><b><span class="arr">›</span></b></a></div>
     <div class="section-title">${t('about')}</div>
     <div class="card">
       <div class="kv"><span>${t('catalog_date')}</span><b>${catalog.generatedAt ? new Date(catalog.generatedAt).toLocaleDateString(locale) : '—'}</b></div>
       <div class="kv"><span>${t('products')}</span><b>${catalog.products.length}</b></div>
       <div class="kv"><span>${t('brands')}</span><b>${catalog.brands.length}</b></div>
       <div class="kv"><span>${t('logos_hint')}</span></div>
-      <div class="kv"><span>utopiacam.com</span><b>${esc(BUILD_DATE)}</b></div>
     </div>`;
   root.querySelector('[name=techManager]').onchange = (e) => store.setSettings({ techManager: e.target.value.trim() });
   root.querySelector('[name=defaultRole]').addEventListener('change', (e) => store.setSettings({ role: e.target.value }));

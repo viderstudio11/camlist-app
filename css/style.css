@@ -552,7 +552,9 @@ img { -webkit-user-drag: none; user-drag: none; -webkit-touch-callout: none; }
 .thumb img, .brand-hero img, .logo img, .cbar .thumb img { pointer-events: none; }
 .kv.linkrow { display: flex; align-items: center; justify-content: space-between; gap: 10px; text-decoration: none; }
 .kv.linkrow b { color: var(--muted); font-size: 18px; }
-[dir="rtl"] .kv.linkrow b { display: inline-block; transform: scaleX(-1); }
+/* only the arrow turns round in Hebrew — never the words beside it */
+.kv.linkrow b .arr { display: inline-block; }
+[dir="rtl"] .kv.linkrow b .arr { transform: scaleX(-1); }
 
 /* ---------- Framing diagram ---------- */
 .card.framing { margin-top: 14px; padding: 12px 14px 10px; }
