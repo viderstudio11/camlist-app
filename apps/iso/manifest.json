@@ -1,6 +1,6 @@
 {
-  "name": "Vid2List ISO — Base ISO",
-  "short_name": "Vid2List ISO",
+  "name": "VidTooList ISO — Base ISO",
+  "short_name": "VidTooList ISO",
   "description": "Each camera's base ISO, from the maker",
   "start_url": "./index.html",
   "scope": "./",

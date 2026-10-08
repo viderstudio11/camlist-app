@@ -1,4 +1,4 @@
-// Vid2List Hours works offline after the first visit: every same-origin file is fetched fresh when
+// VidTooList Hours works offline after the first visit: every same-origin file is fetched fresh when
 // the network is there and kept, and served from the cache when it is not (on set, signal comes and goes).
 const VERSION = 'hours-v1';
 self.addEventListener('install', () => self.skipWaiting());

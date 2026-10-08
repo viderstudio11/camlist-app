@@ -1,6 +1,6 @@
 {
-  "name": "Vid2List Hours — Hours report",
-  "short_name": "Vid2List Hours",
+  "name": "VidTooList Hours — Hours report",
+  "short_name": "VidTooList Hours",
   "description": "Call, wrap, overtime and turnaround",
   "start_url": "./index.html",
   "scope": "./",

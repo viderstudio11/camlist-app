@@ -97,7 +97,7 @@ export function render(ctx, _params, root) {
   const projects = store.state.projects;
   const lang = ctx.lang();
   const locale = lang === 'he' ? 'he-IL' : 'en-GB';
-  ctx.setTopbar({ title: `<span class="brandmark">VID<b>2</b>LIST</span>`, right: [{ icon: icons.gear, onClick: () => ctx.navigate('#/settings'), label: t('settings') }] });
+  ctx.setTopbar({ title: `<span class="brandmark" role="img" aria-label="VidTooList">VIDT<b><svg class="inf" viewBox="7.5 3.5 25 13" aria-hidden="true"><path d="M20 10C17 4 9 4 9 10s8 6 11 0 11-6 11 0-8 6-11 0"/></svg></b>LIST</span>`, right: [{ icon: icons.gear, onClick: () => ctx.navigate('#/settings'), label: t('settings') }] });
 
   const active = activeProject(projects);
   let hero = '';

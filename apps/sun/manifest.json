@@ -1,6 +1,6 @@
 {
-  "name": "Vid2List Sun — Sun times",
-  "short_name": "Vid2List Sun",
+  "name": "VidTooList Sun — Sun times",
+  "short_name": "VidTooList Sun",
   "description": "Golden hour, blue hour, day length",
   "start_url": "./index.html",
   "scope": "./",

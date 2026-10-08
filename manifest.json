@@ -1,6 +1,6 @@
 {
-  "name": "Vid2List — Production Gear Lists",
-  "short_name": "Vid2List",
+  "name": "VidTooList — Production Gear Lists",
+  "short_name": "VidTooList",
   "description": "Build production gear lists from a rental catalog",
   "start_url": "./index.html",
   "scope": "./",

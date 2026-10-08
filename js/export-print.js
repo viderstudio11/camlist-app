@@ -38,7 +38,7 @@ export function renderPrint(ctx, project, groups, root, { includeNotes = true, i
   root.innerHTML = `<div class="print" dir="${dir}" lang="${lang}">
     <div class="screen-only card"><b>${ctx.t('pdf_hint')}</b><button class="btn sm primary" data-print>${ctx.t('pdf')}</button></div>
     <header class="pslate">
-      <div class="pslate-sticks"><span class="mark">VID<b>2</b>LIST</span></div>
+      <div class="pslate-sticks"><span class="mark" role="img" aria-label="VidTooList">VIDT<b><svg class="inf" viewBox="7.5 3.5 25 13" aria-hidden="true"><path d="M20 10C17 4 9 4 9 10s8 6 11 0 11-6 11 0-8 6-11 0"/></svg></b>LIST</span></div>
       <div class="pslate-board">
         <div class="pslate-cell wide"><small>${esc(t('project_name'))}</small><h1><bdi>${esc(project.name || t('untitled'))}</bdi></h1></div>
         ${slateCells.map(([k, v]) => `<div class="pslate-cell"><small>${esc(k)}</small><b>${v}</b></div>`).join('')}
@@ -46,7 +46,7 @@ export function renderPrint(ctx, project, groups, root, { includeNotes = true, i
       ${project.notes ? `<p class="pslate-notes"><bdi>${esc(project.notes)}</bdi></p>` : ''}
     </header>
     ${sections}
-    <footer class="pfoot">Vid2List · <bdi dir="ltr">${esc(fmtDate(todayStr()))}</bdi></footer>
+    <footer class="pfoot">VidTooList · <bdi dir="ltr">${esc(fmtDate(todayStr()))}</bdi></footer>
   </div>`;
 
   const go = () => window.print();

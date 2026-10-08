@@ -1,6 +1,6 @@
 {
-  "name": "Vid2List Downloads — Downloads",
-  "short_name": "Vid2List Downloads",
+  "name": "VidTooList Downloads — Downloads",
+  "short_name": "VidTooList Downloads",
   "description": "Firmware, LUTs and software — from the makers",
   "start_url": "./index.html",
   "scope": "./",

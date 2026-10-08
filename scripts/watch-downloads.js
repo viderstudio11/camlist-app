@@ -30,7 +30,7 @@ const versions = (html) => {
 
 async function check(url) {
   try {
-    const res = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (Vid2List download watch; +https://viderstudio11.github.io/camlist-app/)' }, redirect: 'follow', signal: AbortSignal.timeout(20000) });
+    const res = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (VidTooList download watch; +https://viderstudio11.github.io/camlist-app/)' }, redirect: 'follow', signal: AbortSignal.timeout(20000) });
     if (!res.ok) return { status: res.status };
     const v = versions(await res.text());
     return { status: 200, versions: v, sig: createHash('sha1').update(v.join('|')).digest('hex').slice(0, 16) };

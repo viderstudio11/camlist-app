@@ -125,7 +125,7 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
   }
   children.push(new D.Table({ width: { size: USABLE, type: D.WidthType.DXA }, columnWidths: cols.map(k => W[k]), layout: D.TableLayoutType.FIXED, visuallyRightToLeft: rtl, rows }));
 
-  const doc = new D.Document({ creator: 'Vid2List', title: project.name || 'Gear list',
+  const doc = new D.Document({ creator: 'VidTooList', title: project.name || 'Gear list',
     styles: { default: { document: { run: { ...(font ? { font } : {}), language, size: 22 } } } },
     sections: [{ properties: { page: { size: { width: PAGE.width, height: 16838 }, margin: { top: 900, bottom: 900, left: PAGE.margin, right: PAGE.margin } } }, children }] });
   sortRunProperties(doc);

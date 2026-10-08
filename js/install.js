@@ -1,4 +1,4 @@
-// Installing a Vid2List app on the phone's home screen. Android (Chrome) offers its own prompt, which is
+// Installing a VidTooList app on the phone's home screen. Android (Chrome) offers its own prompt, which is
 // held until the user taps Install; iPhone has no prompt, so the two steps are shown instead. Opened inside
 // WhatsApp / Instagram / Facebook, nothing can be installed — the user is told to open the link in the browser.
 let deferred = null;
