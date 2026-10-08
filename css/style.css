@@ -1562,5 +1562,5 @@ button.pst:active { transform: scale(.97); }
 .sl-jam-in.bad { border-color: var(--no); }
 
 /* VidTooList: the double O is the focus ring's infinity mark */
-.inf { display: inline-block; width: 1.2em; height: .62em; fill: none; stroke: currentColor; stroke-width: 3.6; stroke-linecap: round; vertical-align: .02em; margin: 0 .03em; }
-.print .inf { stroke-width: 3; }
+.inf { display: inline-block; width: 1.25em; height: .6em; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linejoin: round; stroke-linecap: round; vertical-align: .02em; margin: 0 .03em; }
+.print .inf { stroke-width: 2; }
