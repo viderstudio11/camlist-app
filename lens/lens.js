@@ -1,4 +1,4 @@
-// CamList Lens: the lens-choice tool on its own. It runs the very same tool as the full app
+// Cam2List Lens: the lens-choice tool on its own. It runs the very same tool as the full app
 // (js/ui/tools.js → the lens tool), with a small shell around it: the catalog and camera data, the
 // language and the light/dark switch — no projects, lists or other tools.
 import * as Tools from '../js/ui/tools.js';
@@ -34,7 +34,7 @@ const ctx = {
   // The shell's bar: the name, light/dark and the language — there is nowhere to go back to.
   setTopbar({ title = '' }) {
     const bar = document.getElementById('topbar');
-    bar.innerHTML = `<div class="title" dir="auto">${title}<small>CamList Lens</small></div>${canInstall() ? `<button class="langpill install-btn" data-install aria-label="${esc(getLang() === 'he' ? 'התקן במסך הבית' : 'Install on the home screen')}">${getLang() === 'he' ? 'התקן' : 'Install'}</button>` : ''}<button class="iconbtn" data-theme-btn aria-label="${esc(t('theme'))}">${prefs.theme === 'dark' ? icons.moon : icons.sun}</button><button class="langpill" data-lang aria-label="${esc(t('language'))}">${t('lang_switch')}</button>`;
+    bar.innerHTML = `<div class="title" dir="auto">${title}<small>Cam2List Lens</small></div>${canInstall() ? `<button class="langpill install-btn" data-install aria-label="${esc(getLang() === 'he' ? 'התקן במסך הבית' : 'Install on the home screen')}">${getLang() === 'he' ? 'התקן' : 'Install'}</button>` : ''}<button class="iconbtn" data-theme-btn aria-label="${esc(t('theme'))}">${prefs.theme === 'dark' ? icons.moon : icons.sun}</button><button class="langpill" data-lang aria-label="${esc(t('language'))}">${t('lang_switch')}</button>`;
     bar.querySelector('[data-lang]').onclick = () => { prefs.lang = getLang() === 'he' ? 'en' : 'he'; setLang(prefs.lang); keep(); applyLook(); render(); };
     bar.querySelector('[data-install]')?.addEventListener('click', () => install(getLang(), (title, text) => openSheet({ title, bodyHTML: `<p style="font-size:16px;line-height:1.6">${esc(text)}</p>`, actions: [{ label: getLang() === 'he' ? 'הבנתי' : 'Got it', kind: 'primary' }] })));
     bar.querySelector('[data-theme-btn]').onclick = () => { prefs.theme = prefs.theme === 'dark' ? 'light' : 'dark'; keep(); applyLook(); render(); };

@@ -1513,9 +1513,9 @@ button.pst:active { transform: scale(.97); }
 [dir="rtl"] .phero .ticks::after, [dir="rtl"] .phead .ticks::after { transform: translateX(50%); }
 
 /* The wordmark gets the barrel's front ring */
-:root[data-skin="clean"] .brandmark { display: inline-flex; align-items: center; gap: 8px; }
+:root[data-skin="clean"] .brandmark { display: inline-flex; align-items: center; }
 :root[data-skin="clean"] .brandmark::before { content: ""; width: 20px; height: 20px; flex: 0 0 auto; border-radius: 50%;
-  border: 2px solid var(--accent); background: linear-gradient(var(--accent), var(--accent)) 50% 0 / 2px 7px no-repeat; }
+  margin-inline-end: 8px; border: 2px solid var(--accent); background: linear-gradient(var(--accent), var(--accent)) 50% 0 / 2px 7px no-repeat; }
 
 :root[data-skin="clean"]:not([data-theme="sun"]) body {
   background: radial-gradient(130% 55% at 50% 0%, var(--surface-3), var(--bg) 62%) fixed var(--bg); }

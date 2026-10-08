@@ -92,7 +92,7 @@ function writeIndex(list) {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CamList · גרסאות</title>
+<title>Cam2List · גרסאות</title>
 <style>
   :root { color-scheme: light dark; --bg:#F5F4F1; --fg:#14171A; --mid:#545A63; --line:rgba(0,0,0,.12); --card:#fff; }
   @media (prefers-color-scheme: dark){ :root{ --bg:#14161A; --fg:#F2F4F7; --mid:#9BA3B0; --line:rgba(255,255,255,.14); --card:#1A1D23; } }
@@ -114,7 +114,7 @@ function writeIndex(list) {
 </head>
 <body>
 <div class="wrap">
-  <h1>גרסאות CamList</h1>
+  <h1>גרסאות Cam2List</h1>
   <p class="sub">כל גרסה שהועלתה, שמורה וניתנת לפתיחה. הן חולקות את המאגר והלוגואים עם הגרסה החיה, כך שההבדל ביניהן הוא העיצוב וההתנהגות.</p>
   <ul>${rows}</ul>
   <a class="back" href="${SITE}/">← לגרסה הנוכחית</a>

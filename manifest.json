@@ -1,6 +1,6 @@
 {
-  "name": "CamList — Production Gear Lists",
-  "short_name": "CamList",
+  "name": "Cam2List — Production Gear Lists",
+  "short_name": "Cam2List",
   "description": "Build production gear lists from a rental catalog",
   "start_url": "./index.html",
   "scope": "./",

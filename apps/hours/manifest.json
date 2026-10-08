@@ -1,6 +1,6 @@
 {
-  "name": "CamList Hours — Hours report",
-  "short_name": "CamList Hours",
+  "name": "Cam2List Hours — Hours report",
+  "short_name": "Cam2List Hours",
   "description": "Call, wrap, overtime and turnaround",
   "start_url": "./index.html",
   "scope": "./",

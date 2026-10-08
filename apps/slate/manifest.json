@@ -1,6 +1,6 @@
 {
-  "name": "CamList Slate — Slate & timecode",
-  "short_name": "CamList Slate",
+  "name": "Cam2List Slate — Slate & timecode",
+  "short_name": "Cam2List Slate",
   "description": "Timecode clock, scene and take, a clap to sync",
   "start_url": "./index.html",
   "scope": "./",

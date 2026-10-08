@@ -49,7 +49,7 @@ export function buildShareText(project, groups, { lang = 'he', includeNotes = tr
     }
   }
   // Only each item's quantity is a number on the page — no department counts and no total, which read as more quantities.
-  lines.push('', `CamList · ${fmtDate(todayStr(now))}`);
+  lines.push('', `Cam2List · ${fmtDate(todayStr(now))}`);
   // Each line takes its direction from its first letter — "• 1 × Sony FX6" would run left-to-right inside
   // a Hebrew list. An invisible mark (RLM / LRM) at the start keeps every line in the document's direction.
   // *Headings* stay bare: a mark before the asterisk would stop WhatsApp making them bold.

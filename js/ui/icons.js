@@ -3,7 +3,7 @@
 //
 // Sources (paths copied in by scripts/build-icons.js, so nothing loads from a CDN at runtime):
 //   Bootstrap Icons (MIT) · Font Awesome Free 6 solid (CC BY 4.0) · Material Symbols Sharp (Apache 2.0)
-//   · Phosphor (MIT). The lens, tripod and dolly are drawn for CamList — no set has them.
+//   · Phosphor (MIT). The lens, tripod and dolly are drawn for Cam2List — no set has them.
 // Each glyph keeps its source viewBox, so nothing is rescaled by hand.
 
 const wrap = ([viewBox, body]) => `<svg viewBox="${viewBox}" class="ico" fill="currentColor" aria-hidden="true">${body}</svg>`;

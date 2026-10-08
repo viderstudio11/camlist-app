@@ -1,6 +1,6 @@
 {
-  "name": "CamList Sun — Sun times",
-  "short_name": "CamList Sun",
+  "name": "Cam2List Sun — Sun times",
+  "short_name": "Cam2List Sun",
   "description": "Golden hour, blue hour, day length",
   "start_url": "./index.html",
   "scope": "./",

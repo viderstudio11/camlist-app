@@ -7,7 +7,7 @@ import { TOOL_ICON } from '../js/ui/icons.js';
 import { L } from '../js/ui/tools/strings.js';
 
 const APPS = ['slate', 'iso', 'sun', 'media', 'shutter', 'hours', 'offload', 'downloads', 'units'];
-// short names for the home screen (one word after CamList, so the icon label stays whole)
+// short names for the home screen (one word after Cam2List, so the icon label stays whole)
 const SHORT = { slate: 'Slate', iso: 'ISO', sun: 'Sun', media: 'Media', shutter: 'Shutter', hours: 'Hours', offload: 'Offload', downloads: 'Downloads', units: 'Units' };
 const BG = '#16171A', AMBER = '#F2A33A';
 
@@ -35,9 +35,9 @@ for (const id of APPS) {
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="CamList ${SHORT[id]}">
+<meta name="apple-mobile-web-app-title" content="Cam2List ${SHORT[id]}">
 <meta name="description" content="${desc}">
-<title>CamList ${SHORT[id]} — ${he}</title>
+<title>Cam2List ${SHORT[id]} — ${he}</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -54,8 +54,8 @@ for (const id of APPS) {
 </html>
 `);
   writeFileSync(`${dir}/manifest.json`, `${JSON.stringify({
-    name: `CamList ${SHORT[id]} — ${en}`,
-    short_name: `CamList ${SHORT[id]}`,
+    name: `Cam2List ${SHORT[id]} — ${en}`,
+    short_name: `Cam2List ${SHORT[id]}`,
     description: desc,
     start_url: './index.html',
     scope: './',
@@ -71,7 +71,7 @@ for (const id of APPS) {
       { src: 'icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
     ],
   }, null, 2)}\n`);
-  writeFileSync(`${dir}/sw.js`, `// CamList ${SHORT[id]} works offline after the first visit: every same-origin file is fetched fresh when
+  writeFileSync(`${dir}/sw.js`, `// Cam2List ${SHORT[id]} works offline after the first visit: every same-origin file is fetched fresh when
 // the network is there and kept, and served from the cache when it is not (on set, signal comes and goes).
 const VERSION = '${id}-v1';
 self.addEventListener('install', () => self.skipWaiting());
@@ -88,5 +88,5 @@ self.addEventListener('fetch', (e) => {
 });
 `);
   if (Resvg) for (const s of [180, 192, 512]) writeFileSync(`${dir}/icon-${s}.png`, new Resvg(iconSvg(id, s)).render().asPng());
-  console.log(`apps/${id}/  CamList ${SHORT[id]}`);
+  console.log(`apps/${id}/  Cam2List ${SHORT[id]}`);
 }

@@ -104,7 +104,7 @@ function route() {
 
 function render() {
   const root = document.getElementById('view');
-  document.title = 'CamList';
+  document.title = 'Cam2List';
   root.classList.remove('has-rail');
   document.body.classList.remove('print-mode');
   const sheet = document.getElementById('sheet');
