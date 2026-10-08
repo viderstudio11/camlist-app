@@ -7,7 +7,7 @@ const mem = () => { let s = null; return { get: () => s, set: (v) => { s = v; } 
 test('starts empty with default settings and persists on change', () => {
   const st = mem();
   const store = createStore(st);
-  assert.deepEqual(store.state.settings, { lang: 'he', techManager: '', theme: 'light', skin: 'clean' });
+  assert.deepEqual(store.state.settings, { lang: 'he', techManager: '', theme: 'dark', skin: 'clean' });
   store.setSettings({ lang: 'en' });
   assert.equal(JSON.parse(st.get()).settings.lang, 'en');
   assert.equal(createStore(st).state.settings.lang, 'en');

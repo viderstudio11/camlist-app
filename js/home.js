@@ -28,3 +28,13 @@ export function cameraChips(items, resolve, order) {
     .sort((a, b) => b.qty - a.qty)
     .slice(0, 3);
 }
+
+// The sun line on the hero card: today's sunset where the sun tool points, and how far the evening
+// golden hour is from now. After sunset it looks ahead to tomorrow's sunrise instead.
+export function sunNext(now, day, tomorrow) {
+  if (!day || day.polar || !day.sunset) return null;
+  const g = day.goldenEvening;
+  if (now < (g ? g.from : day.sunset)) return { kind: 'before', at: day.sunset, inMin: g ? Math.round((g.from - now) / 60000) : null };
+  if (now < day.sunset) return { kind: 'golden', at: day.sunset };
+  return tomorrow?.sunrise ? { kind: 'after', at: tomorrow.sunrise } : null;
+}

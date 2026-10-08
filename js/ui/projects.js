@@ -1,6 +1,10 @@
 import { esc, openSheet, confirmDialog, icons } from './dom.js';
 import { formatDateRange, ROLES, roleKey } from '../export-text.js';
-import { activeProject, deptStrip, cameraChips } from '../home.js';
+import { activeProject, deptStrip, cameraChips, sunNext } from '../home.js';
+import { sunDay, zoneOf, localTime, todayIn } from '../tools/solar.js';
+import { allocFor } from '../kitalloc.js';
+import { hm } from '../format.js';
+import { S, D } from './tools/shared.js';
 import { deptIcon, toolIcon } from './icons.js';
 import { toolLabel } from './tools.js';
 
@@ -57,6 +61,37 @@ export function editProjectSheet(ctx, id) {
 // Every tool sits on the home screen, two rows of four, so none hides behind an extra tap.
 const HOME_TOOLS = ['fov', 'slate', 'sun', 'media', 'shutter', 'hours', 'offload', 'downloads', 'units'];
 
+// Three live readings under the active project, the way a camera's home screen shows its settings:
+// how far the kit is, when the light goes, and what is on the list. Each fills itself.
+function heroStats(ctx, p, strip, cams) {
+  const { t } = ctx;
+  const cell = (attr, k, v, sub, ltr) => `<${attr ? 'button' : 'div'} class="pst" ${attr}><span class="lbl">${esc(k)}</span><b class="num" dir="ltr">${esc(v)}</b><small ${ltr ? 'dir="ltr"' : 'dir="auto"'}>${esc(sub || '')}</small></${attr ? 'button' : 'div'}>`;
+  const camId = p.buildCameraId, cam = camId != null ? ctx.resolve(camId) : null;
+  const base = cam ? ctx.compat.profileFor(cam) : null;
+  const slots = base ? ctx.compat.kitStatus(ctx.compat.powered(base, (p.powerRoute || {})[camId]), p.items, ctx.resolve, allocFor(p, camId)) : null;
+  const kit = slots ? cell('data-hs-kit', t('hs_kit'), `${slots.filter(s => s.done).length}/${slots.length}`, cam.name, true)
+    : cell('data-hs-kit', t('hs_kit'), '—', t('hs_pick_cam'));
+  const sun = sunCell(ctx, cell);
+  const qty = (k) => strip.find(d => d.key === k)?.qty || 0;
+  const gear = cell('', t('dept_cameras'), String(qty('cameras')), t('hs_lenses_n', { n: qty('lenses') }));
+  return `<div class="pstats">${kit}${sun}${gear}</div>`;
+}
+function sunCell(ctx, cell) {
+  const { t } = ctx, s = S.sun;
+  const countries = D.places?.countries || [];
+  const country = countries.find(c => c.code === s.country) || countries[0];
+  const city = country?.cities?.[s.city] || null;
+  const here = s.lat != null && s.lon != null;
+  const lat = here ? s.lat : city?.lat ?? 32.0853, lon = here ? s.lon : city?.lon ?? 34.7818;
+  const tz = here ? null : zoneOf(country, city);
+  const [y, m, d] = todayIn(tz).split('-').map(Number);
+  const n = sunNext(new Date(), sunDay(new Date(Date.UTC(y, m - 1, d)), lat, lon), sunDay(new Date(Date.UTC(y, m - 1, d + 1)), lat, lon));
+  if (!n) return cell('data-hs-sun', t('hs_sunset'), '—', '');
+  const place = city ? (ctx.lang() === 'he' ? city.he : city.en) : '';
+  const sub = n.kind === 'golden' ? t('hs_golden_now') : n.kind === 'before' && n.inMin != null ? t('hs_golden_in', { t: hm(n.inMin / 60) }) : place;
+  return cell('data-hs-sun', t(n.kind === 'after' ? 'hs_sunrise' : 'hs_sunset'), localTime(n.at, tz), sub);
+}
+
 export function render(ctx, _params, root) {
   const { store, t } = ctx;
   const projects = store.state.projects;
@@ -78,7 +113,7 @@ export function render(ctx, _params, root) {
         <div class="phero-top"><span class="tag rec" aria-label="${esc(t('rec_active'))}"><i class="rec-dot" aria-hidden="true"></i>${esc(t('active_tag'))}</span>${range ? `<span class="num phero-dates" dir="ltr">${range}</span>` : ''}</div>
         <h2 class="h-display phero-name" dir="auto">${esc(active.name || t('untitled'))}</h2>
         ${who ? `<p class="phero-sub" dir="auto">${who}</p>` : ''}
-        ${cams.length ? `<div class="camchips">${cams.map(c => `<span class="camchip" dir="ltr">${esc(c.name)} <b class="num">×${c.qty}</b></span>`).join('')}</div>` : ''}
+        ${heroStats(ctx, active, strip, cams)}
         ${strip.some(d => d.qty) ? `<div class="dstrip named">${strip.filter(d => d.qty).map(d => `<span class="ds"><span class="ds-ico">${deptIcon(d.key)}</span>${esc(t(`dept_${d.key}`))}</span>`).join('')}</div>` : ''}
         <div class="phero-acts"><button class="btn primary" data-open>${t('open_list')}<span class="fwd">${icons.back}</span></button><button class="btn sq" data-export aria-label="${esc(t('export'))}" ${active.items.length ? '' : 'disabled'}>${icons.share}</button></div>
         <div class="phero-meta"><span>${t('updated')} ${new Date(active.updatedAt).toLocaleDateString(locale)}</span></div>
@@ -112,6 +147,8 @@ export function render(ctx, _params, root) {
   root.querySelectorAll('[data-tool]').forEach(b => { b.onclick = () => ctx.navigate(`#/tools/${b.dataset.tool}`); });
   if (active) {
     root.querySelector('[data-open]').onclick = () => ctx.navigate(`#/p/${active.id}`);
+    root.querySelector('[data-hs-kit]').onclick = () => ctx.navigate(`#/p/${active.id}`);
+    root.querySelector('[data-hs-sun]').onclick = () => ctx.navigate('#/tools/sun');
     root.querySelector('.phero [data-export]').onclick = () => ctx.navigate(`#/p/${active.id}/export`);
   }
   root.querySelectorAll('.prow').forEach(row => {

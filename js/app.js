@@ -39,7 +39,7 @@ const ctx = {
   store, t, get catalog() { return catalog; }, get compat() { return compat; }, get recency() { return recency; }, get power() { return power; },
   lang: getLang,
   setLang(l) { setLang(l); store.setSettings({ lang: l }); applyDir(); render(); },
-  theme: () => store.state.settings.theme || 'light',
+  theme: () => store.state.settings.theme || 'dark',
   toggleTheme() { store.setSettings({ theme: nextTheme(ctx.theme()) }); applyTheme(); },
   skin: () => (isSkin(store.state.settings.skin) ? store.state.settings.skin : DEFAULT_SKIN),
   setSkin(id) { if (!isSkin(id)) return; store.setSettings({ skin: id }); applySkin(); },
@@ -79,7 +79,7 @@ function applySkin() {
   render();
 }
 
-const THEME_COLOR = { light: '#F4F3EF', sun: '#FFFFFF', dark: '#0F1012' };
+const THEME_COLOR = { light: '#E7E5E0', sun: '#FFFFFF', dark: '#121315' };
 function applyTheme() {
   const theme = ctx.theme();
   document.documentElement.dataset.theme = theme;
@@ -275,7 +275,7 @@ document.addEventListener('contextmenu', (e) => {
 applyDir();
 // tap a product's picture anywhere: the product card with the maker's site and stores
 installProductCard(ctx);
-document.documentElement.dataset.theme = store.state.settings.theme || 'light';
+document.documentElement.dataset.theme = store.state.settings.theme || 'dark';
 setSound(store.state.settings.sounds);
 document.documentElement.dataset.skin = isSkin(store.state.settings.skin) ? store.state.settings.skin : DEFAULT_SKIN;
 loadSkinFonts(document.documentElement.dataset.skin);

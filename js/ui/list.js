@@ -114,8 +114,10 @@ export function render(ctx, { id }, root) {
       <div class="kit-head">
         ${thumbHTML(active, 'cameras')}
         <div class="kit-title"><small>${t('base_kit')} · ${t('building_around')}</small><b dir="auto">${esc(displayName(active))}</b><div class="pchips">${profileChips(activeProf, t)}</div></div>
+        <span class="num kit-n">${slots.filter(s => s.done).length}/${slots.length}</span>
         <button class="iconbtn" data-clear-build aria-label="${t('clear_build')}" title="${t('clear_build')}">×</button>
       </div>
+      <div class="kbar" aria-hidden="true"><i style="width:${slots.length ? Math.round(100 * slots.filter(s => s.done).length / slots.length) : 0}%"></i></div>
       <div class="slots">${slots.map(s => `
         <div class="slot ${s.done ? 'done' : ''}" data-slot="${esc(s.slot)}">
           <span class="slot-check">${s.done ? '✓' : ''}</span>

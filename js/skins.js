@@ -122,7 +122,7 @@ export const nextTheme = (t) => THEMES[(Math.max(THEMES.indexOf(t), 0) + 1) % TH
 const SKIN_TO_THEME = { night: 'dark', contrast: 'sun' };
 export function migrateSettings(s = {}) {
   const known = SKINS.some(k => k.id === s.skin);
-  const theme = SKIN_TO_THEME[s.skin] || (THEMES.includes(s.theme) ? s.theme : 'light');
+  const theme = SKIN_TO_THEME[s.skin] || (THEMES.includes(s.theme) ? s.theme : 'dark');
   return { skin: known ? s.skin : 'clean', theme };
 }
 

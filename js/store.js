@@ -1,5 +1,5 @@
 const KEY = 'camlist.v1';
-const DEFAULT = () => ({ settings: { lang: 'he', techManager: '', theme: 'light', skin: 'clean' }, manualProducts: [], projects: [] });
+const DEFAULT = () => ({ settings: { lang: 'he', techManager: '', theme: 'dark', skin: 'clean' }, manualProducts: [], projects: [] });
 
 // The shape of a save. Raise it when the stored shape changes, and migrate older saves in parse().
 export const SCHEMA = 1;

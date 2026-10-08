@@ -15,8 +15,8 @@ test('saved v1 skins that were dropped land on a valid look', () => {
   assert.deepEqual(migrateSettings({ skin: 'night', theme: 'light' }), { skin: 'clean', theme: 'dark' });
   assert.deepEqual(migrateSettings({ skin: 'contrast' }), { skin: 'clean', theme: 'sun' });
   assert.deepEqual(migrateSettings({ skin: 'arri', theme: 'dark' }), { skin: 'arri', theme: 'dark' });
-  assert.deepEqual(migrateSettings({}), { skin: 'clean', theme: 'light' });
-  assert.deepEqual(migrateSettings({ skin: 'sony', theme: 'weird' }), { skin: 'sony', theme: 'light' });
+  assert.deepEqual(migrateSettings({}), { skin: 'clean', theme: 'dark' });
+  assert.deepEqual(migrateSettings({ skin: 'sony', theme: 'weird' }), { skin: 'sony', theme: 'dark' });
 });
 
 test('the bank is the default, the seven camera skins and the three camera-world themes', () => {
