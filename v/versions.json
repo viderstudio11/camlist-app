@@ -1,5 +1,10 @@
 [
  {
+  "version": "v2.12.0",
+  "date": "2026-10-09",
+  "label": "VidTooList: new name and look (engraved lens), live readings on the home card, Base ISO tool, manual timecode jam on the slate, new icons"
+ },
+ {
   "version": "v2.11.0",
   "date": "2026-10-07",
   "label": "Slate & timecode tool and app, phone calibration with a clear accuracy note, monitor looks on the live viewfinder"
