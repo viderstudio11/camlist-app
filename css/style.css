@@ -1564,3 +1564,13 @@ button.pst:active { transform: scale(.97); }
 /* VidTooList: the double O is the focus ring's infinity mark */
 .inf { display: inline-block; width: 1.25em; height: .6em; fill: none; stroke: currentColor; stroke-width: 2.3; stroke-linejoin: round; stroke-linecap: round; vertical-align: .02em; margin: 0 .03em; }
 .print .inf { stroke-width: 2; }
+
+/* The VidTooList wordmark (js/ui/brand.js): engraved letters between a focus scale and an iris ring */
+.brandmark:has(.wmk)::before { content: none !important; }
+.wmk { display: block; height: 40px; width: auto; overflow: visible; }
+.wmk .wm-ink { fill: var(--text); }
+.wmk .wm-tick line { stroke: var(--text-3); }
+.wmk .wm-inf { stroke: var(--accent); }
+.wmk .wm-acc { fill: var(--accent); }
+:root[data-theme="sun"] .wmk .wm-inf { stroke: var(--text); }
+:root[data-theme="sun"] .wmk .wm-acc { fill: var(--accent-ink); }
