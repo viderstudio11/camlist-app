@@ -5,6 +5,7 @@
 import { writeFileSync, mkdirSync } from 'node:fs';
 import { TOOL_ICON } from '../js/ui/icons.js';
 import { L } from '../js/ui/tools/strings.js';
+import { toolIconSVG } from '../js/ui/brand.js';
 
 const APPS = ['slate', 'iso', 'sun', 'media', 'shutter', 'hours', 'offload', 'downloads', 'units'];
 // short names for the home screen (one word after VidTooList, so the icon label stays whole)
@@ -14,13 +15,9 @@ const BG = '#16171A', AMBER = '#F2A33A';
 let Resvg = null;
 try { ({ Resvg } = await import('@resvg/resvg-js')); } catch { console.warn('no @resvg/resvg-js — icons skipped (npm i -D @resvg/resvg-js)'); }
 
-const iconSvg = (id, size) => {
-  const m = /viewBox="([^"]+)"[^>]*>([\s\S]*)<\/svg>/.exec(TOOL_ICON[id]);
-  const [x, y, w, h] = m[1].split(/\s+/).map(Number);
-  const box = size * 0.5, k = box / Math.max(w, h);
-  const tx = (size - w * k) / 2 - x * k, ty = (size - h * k) / 2 - y * k;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}"><rect width="${size}" height="${size}" fill="${BG}"/><g fill="${AMBER}" transform="translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${k.toFixed(5)})">${m[2]}</g></svg>`;
-};
+// the tool's glyph between the focus scale and the iris ring — the same family as the VTL app icon
+const glyphOf = (id) => { const m = /viewBox="([^"]+)"[^>]*>([\s\S]*)<\/svg>/.exec(TOOL_ICON[id]); return [m[1], m[2]]; };
+const iconSvg = (id, size) => toolIconSVG(glyphOf(id), size);
 
 for (const id of APPS) {
   const dir = `apps/${id}`;
@@ -90,3 +87,5 @@ self.addEventListener('fetch', (e) => {
   if (Resvg) for (const s of [180, 192, 512]) writeFileSync(`${dir}/icon-${s}.png`, new Resvg(iconSvg(id, s)).render().asPng());
   console.log(`apps/${id}/  VidTooList ${SHORT[id]}`);
 }
+// The lens app (lens/) is made by hand, but its icon joins the family too.
+if (Resvg) for (const s of [180, 192, 512]) writeFileSync(`lens/icon-${s}.png`, new Resvg(iconSvg('fov', s)).render().asPng());

@@ -1,6 +1,7 @@
 import { loadScript, download } from './ui/dom.js';
 import { displayName, formatDateRange, roleKey } from './export-text.js';
 import { safeName } from './export-xlsx.js';
+import { wordmarkPNG } from './ui/brand.js';
 
 // OOXML defines the children of <w:rPr> as a sequence, so their order is part of the format.
 // The bundled library appends them in the order it happens to check its options, which puts
@@ -105,7 +106,11 @@ export async function exportDocx(project, groups, { lang, includeNotes = true, i
     slateRows.push(new D.TableRow({ cantSplit: true, children: pair.map(([k, v], j) => cell([label(k), P(v, { size: 22, bold: true, spacing: { after: 20 } })],
       { w: pair.length === 1 ? stickW * STICKS : (j ? stickW * STICKS - half : half), span: pair.length === 1 ? STICKS : STICKS / 2, borders: box })) }));
   }
+  // The wordmark above the slate, drawn on a canvas so it keeps the brand's typeface.
+  let mark = null;
+  try { mark = await wordmarkPNG(); } catch { /* no canvas: the document goes without it */ }
   const children = [
+    ...(mark ? [new D.Paragraph({ alignment: D.AlignmentType.END, spacing: { after: 120 }, children: [new D.ImageRun({ data: mark, transformation: { width: 190, height: 48 } })] })] : []),
     new D.Table({ width: { size: stickW * STICKS, type: D.WidthType.DXA }, columnWidths: Array(STICKS).fill(stickW), layout: D.TableLayoutType.FIXED, visuallyRightToLeft: rtl, rows: slateRows }),
   ];
   if (project.notes) children.push(P(project.notes, { color: '555555', spacing: { before: 120 } }));

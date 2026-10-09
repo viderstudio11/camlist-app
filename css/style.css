@@ -1152,8 +1152,10 @@ html.vfx-on, html.vfx-on body { overflow: hidden; }
 
 /* ---------- the exported list opens with a slate (v2.8) ---------- */
 .print .pslate { margin: 4px 0 14px; border: 2px solid #000; }
-.print .pslate-sticks { height: 16px; position: relative; background: repeating-linear-gradient(-45deg, #000 0 12px, #fff 12px 24px); border-bottom: 2px solid #000; }
-.print .pslate-sticks .mark { position: absolute; inset-inline-end: 8px; top: 1px; background: #fff; border: 1px solid #000; padding: 0 5px; font-size: 9px; letter-spacing: .14em; line-height: 12px; font-weight: 600; }
+.print .pslate-sticks { height: 34px; position: relative; background: repeating-linear-gradient(-45deg, #000 0 12px, #fff 12px 24px); border-bottom: 2px solid #000; }
+.print .pslate-sticks .mark { position: absolute; inset-inline-end: 8px; top: 3px; background: #fff; border: 1px solid #000; padding: 1px 6px; }
+.print .pslate-sticks .mark .wmk { height: 24px; }
+.print .wmk .wm-ink { fill: #111; } .print .wmk .wm-tick line { stroke: #777; } .print .wmk .wm-inf { stroke: #E88A00; } .print .wmk .wm-acc { fill: #E88A00; }
 .print .pslate-sticks .mark b { font-weight: 600; }
 .print .pslate-board { display: grid; grid-template-columns: 1fr 1fr; }
 .print .pslate-cell { padding: 7px 10px 8px; border-bottom: 1px solid #000; border-inline-end: 1px solid #000; min-width: 0; }
@@ -1574,3 +1576,8 @@ button.pst:active { transform: scale(.97); }
 .wmk .wm-acc { fill: var(--accent); }
 :root[data-theme="sun"] .wmk .wm-inf { stroke: var(--text); }
 :root[data-theme="sun"] .wmk .wm-acc { fill: var(--accent-ink); }
+/* Ten tools in rows of three: the last one runs the full width as a wide key */
+.toolrow .tr-t:last-child:nth-child(3n+1) { grid-column: 1 / -1; aspect-ratio: auto; flex-direction: row; gap: 10px; padding: 12px; }
+.toolrow .tr-t:last-child:nth-child(3n+1) .tr-n { margin-top: 0; }
+/* The print preview is a sheet of paper whatever the app's lighting — black on white */
+@media screen { .print { background: #fff; border-radius: 14px; } .print .screen-only.card { color: var(--text); } }
